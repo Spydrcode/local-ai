@@ -1,0 +1,235 @@
+[
+  {
+    "id": "demo-joes-bbq",
+    "name": "Joe's BBQ",
+    "brandColor": "#B22222",
+    "siteUrl": "https://joesbbq.example.com",
+    "summary": "Award-winning smokehouse specializing in brisket, ribs, and catering for local events.",
+    "insights": {
+      "profitIq": "Average ticket rose 8% this month after adding family bundles. Recommend promoting Lunch Express combo on weekdays.",
+      "actions": [
+        "Feature online ordering prominently on hero section",
+        "Launch a Tuesday rib sampler promo for slow periods",
+        "Highlight catering testimonials on Facebook"
+      ]
+    },
+    "socialPosts": [
+      {
+        "platform": "Facebook",
+        "copy": "🔥 Joe's BBQ Rib Tuesday! Swing by for a sampler platter + sweet tea for $12. Tag your rib-loving crew! #BBQNight #LocalFlavor",
+        "cta": "Order Pickup"
+      },
+      {
+        "platform": "Instagram",
+        "copy": "Smoked low & slow 👉 brisket sandwiches ready in 10 minutes. Slide in for lunch! #SmokedBrisket #LunchGoals",
+        "cta": "Order Now"
+      },
+      {
+        "platform": "Twitter",
+        "copy": "Catering season is here! DM Joe's BBQ for graduation party trays. #SupportLocal #BBQCatering",
+        "cta": "Book Catering"
+      }
+    ],
+    "chatbotConfig": {
+      "persona": "Friendly pitmaster",
+      "faq": [
+        {
+          "question": "What are your hours?",
+          "answer": "We're open Sun-Thu 11am-9pm, Fri-Sat 11am-11pm."
+        },
+        {
+          "question": "Do you offer catering?",
+          "answer": "Yes! Full-service catering and delivery. Call 555-1212."
+        }
+      ]
+    },
+    "homepage": {
+      "hero": {
+        "headline": "Smoked-to-order goodness",
+        "subheadline": "Family recipes, modern ordering, and catering built for every celebration.",
+        "ctaLabel": "View the menu",
+        "backgroundIdea": "Showcase the smoker line-up with warm lighting"
+      },
+      "sections": [
+        {
+          "title": "Pitmaster favorites",
+          "body": "Highlight brisket, ribs, and seasonal sides with mouth-watering photography.",
+          "ctaLabel": "Order now"
+        },
+        {
+          "title": "Catering made easy",
+          "body": "Outline delivery zones, serving sizes, and onsite staffing options.",
+          "ctaLabel": "Plan your event"
+        }
+      ],
+      "style": {
+        "primaryColor": "#B22222",
+        "secondaryColor": "#3d0c02",
+        "accentColor": "#f97316",
+        "tone": "Bold, smoky, confident"
+      }
+    },
+    "blogPost": {
+      "title": "Celebrate rib season with Joe's BBQ",
+      "excerpt": "See how weekly specials and catering bundles can boost spring revenue.",
+      "outline": [
+        "Seasonal menu spotlight",
+        "Community events we cater",
+        "How to book Joe's for your next celebration"
+      ],
+      "body": "Our pitmasters fire up the smokers at sunrise to keep your plate full of hickory-kissed goodness. This spring, try the rib sampler Tuesdays or plan ahead with family bundles for graduations and reunions.",
+      "suggestedTags": ["bbq", "catering", "local-eats"]
+    }
+  },
+  {
+    "id": "demo-sunny-coffee",
+    "name": "Sunny Coffee",
+    "brandColor": "#FFB347",
+    "siteUrl": "https://sunnycoffee.example.com",
+    "summary": "Neighborhood coffee roastery focusing on seasonal beans and latte art.",
+    "insights": {
+      "profitIq": "Foot traffic spikes 9-11am; drive repeat visits through latte art workshops and coffee club memberships.",
+      "actions": [
+        "Bundle pastries with mobile orders",
+        "Upsell cold brew growlers on weekends",
+        "Launch loyalty QR cards"
+      ]
+    },
+    "socialPosts": [
+      {
+        "platform": "Instagram",
+        "copy": "Meet our new Sunrise Roast ☀️ honey + citrus vibes perfect for spring mornings. Grab a bag in-shop! #CoffeeFirst #RoasteryLove",
+        "cta": "Shop Beans"
+      },
+      {
+        "platform": "TikTok",
+        "copy": "Barista Ana showing latte art tips this Saturday! RSVP in bio ➡️ limited seats. #LatteArt #LocalEvents",
+        "cta": "RSVP"
+      },
+      {
+        "platform": "Facebook",
+        "copy": "Need caffeine on the go? Mobile order for pick-up in 10 minutes. ☕ #SunnyCoffeeClub",
+        "cta": "Order Ahead"
+      }
+    ],
+    "chatbotConfig": {
+      "persona": "Sunny barista",
+      "faq": [
+        {
+          "question": "Do you roast in-house?",
+          "answer": "Yes, we roast small batches every Monday and Thursday."
+        }
+      ]
+    },
+    "homepage": {
+      "hero": {
+        "headline": "Wake up with Sunny Coffee",
+        "subheadline": "Seasonal beans, latte art workshops, and a loyalty club built for morning regulars.",
+        "ctaLabel": "Order a latte",
+        "backgroundIdea": "Bright café interior with sunlight and latte pours"
+      },
+      "sections": [
+        {
+          "title": "Roastery schedule",
+          "body": "Share roast days, bean origins, and tasting notes.",
+          "ctaLabel": "Explore beans"
+        },
+        {
+          "title": "Events + workshops",
+          "body": "Promote latte art classes and cupping nights with RSVP links.",
+          "ctaLabel": "Reserve a spot"
+        }
+      ],
+      "style": {
+        "primaryColor": "#FFB347",
+        "secondaryColor": "#254e70",
+        "accentColor": "#fffbeb",
+        "tone": "Warm, bright, friendly"
+      }
+    },
+    "blogPost": {
+      "title": "Brewing brighter mornings at Sunny Coffee",
+      "excerpt": "Tips to make the most of spring flavors and loyalty perks.",
+      "outline": [
+        "Why seasonal beans matter",
+        "Latte art workshops for community",
+        "Perks of joining the Sunny Coffee Club"
+      ],
+      "body": "From honey-washed beans to citrus espresso blends, the baristas at Sunny Coffee curate the perfect spring menu. Join our next latte art workshop and load your loyalty card for surprise upgrades.",
+      "suggestedTags": ["coffee", "latte-art", "local-events"]
+    }
+  },
+  {
+    "id": "demo-propane-pro",
+    "name": "PropanePro",
+    "brandColor": "#0057B7",
+    "siteUrl": "https://propanepro.example.com",
+    "summary": "Commercial + residential propane delivery with 24/7 emergency support.",
+    "insights": {
+      "profitIq": "Service call response time improved to 42 minutes. Promote new smart tank monitors to lock in annual contracts.",
+      "actions": [
+        "Bundle maintenance checks in quarterly plans",
+        "Offer referral credit for restaurant clients",
+        "Highlight safety protocol certifications"
+      ]
+    },
+    "socialPosts": [
+      {
+        "platform": "LinkedIn",
+        "copy": "Restaurant owners: avoid mid-service propane shortages with our smart tank monitoring. Install schedule open now. #PropaneSafety",
+        "cta": "Book Install"
+      },
+      {
+        "platform": "Facebook",
+        "copy": "Propane emergencies don't wait. Our techs are on-call 24/7 across the metro. #PropanePro #SafetyFirst",
+        "cta": "Call Now"
+      }
+    ],
+    "chatbotConfig": {
+      "persona": "Reliable service rep",
+      "faq": [
+        {
+          "question": "How fast is delivery?",
+          "answer": "Residential refills within 48 hours, commercial same-day on request."
+        }
+      ]
+    },
+    "homepage": {
+      "hero": {
+        "headline": "Propane reliability on demand",
+        "subheadline": "24/7 emergency crews and smart monitors keep your business running.",
+        "ctaLabel": "Schedule delivery",
+        "backgroundIdea": "Fleet trucks at a commercial client site"
+      },
+      "sections": [
+        {
+          "title": "Commercial solutions",
+          "body": "Detail restaurant, manufacturing, and hospitality delivery plans.",
+          "ctaLabel": "Get a quote"
+        },
+        {
+          "title": "Safety + monitoring",
+          "body": "Highlight certifications, remote monitoring, and emergency response times.",
+          "ctaLabel": "Install monitors"
+        }
+      ],
+      "style": {
+        "primaryColor": "#0057B7",
+        "secondaryColor": "#0f172a",
+        "accentColor": "#38bdf8",
+        "tone": "Reliable, technical, reassuring"
+      }
+    },
+    "blogPost": {
+      "title": "Why smart propane monitors matter",
+      "excerpt": "Reduce downtime and keep fuel levels steady with connected sensors.",
+      "outline": [
+        "Downtime risk for restaurants",
+        "How smart monitors alert our team",
+        "Steps to schedule your install"
+      ],
+      "body": "PropanePro technicians are rolling out smart tank monitors that ping our dispatch team before levels drop. That means fewer emergency calls and more predictable deliveries for every account we service.",
+      "suggestedTags": ["propane", "safety", "smart-monitoring"]
+    }
+  }
+]
