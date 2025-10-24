@@ -161,11 +161,11 @@ export default function DemoBuilderPage() {
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-widest text-emerald-300">
-              Live personalized demo
+              We Build Apps
             </p>
-            <h1 className="text-3xl font-semibold text-white">Build a SmartLocal demo</h1>
+            <h1 className="text-3xl font-semibold text-white">Local AI</h1>
             <p className="text-sm text-slate-300">
-              Crawl a prospect site, generate Profit IQ insights, and preview the chatbot. For production loads, add your Supabase table + Pinecone keys.
+              Transform any business website into a comprehensive strategic analysis using AI-powered competitive intelligence, Michael Porter frameworks, and Fortune 500-level insights—delivered in minutes.
             </p>
           </div>
           <button
