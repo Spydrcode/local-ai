@@ -41,7 +41,6 @@ export default function DemoPreviewClient({ demo, presentMode = false }: DemoPre
   const persona = demo.chatbotConfig.persona ?? 'SmartLocal Assistant';
   const [brandColor, setBrandColor] = useState(demo.brandColor ?? '#34d399');
   const [chatbotName, setChatbotName] = useState(() => persona.split(' ')[0] || 'SmartLocal Bot');
-  const [subscribeState, setSubscribeState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000';
 
@@ -54,31 +53,22 @@ export default function DemoPreviewClient({ demo, presentMode = false }: DemoPre
     return `<iframe src="${vercelUrl}/demo/${demo.id}?${params.toString()}" style="width:100%;height:620px;border:0;border-radius:18px" allow="clipboard-write"></iframe>`;
   }, [demo.id, vercelUrl, brandColor, chatbotName]);
 
-  async function triggerCheckout() {
-    try {
-      setSubscribeState('loading');
-      const response = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ demoId: demo.id }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Checkout failed');
-      }
-
-      const payload = (await response.json()) as { url: string };
-      setSubscribeState('success');
-      window.location.href = payload.url;
-    } catch (err) {
-      console.error(err);
-      setSubscribeState('error');
-    }
-  }
-
   if (presentMode) {
     return (
       <div className="flex min-h-screen flex-col gap-4 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 p-3 md:gap-8 md:px-6 md:py-10">
+        {/* Back button for present mode */}
+        <div className="flex justify-end px-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/90 backdrop-blur-sm transition hover:border-white/40 hover:bg-white/20"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>New Demo</span>
+          </Link>
+        </div>
+        
         {/* Header */}
         <header
           className="rounded-2xl px-4 py-4 text-white shadow-2xl md:rounded-3xl md:px-8 md:py-6"
@@ -199,12 +189,23 @@ export default function DemoPreviewClient({ demo, presentMode = false }: DemoPre
   return (
     <div className="space-y-8">
       <header className="rounded-3xl border border-white/10 bg-white/5 p-8">
-        <div className="flex flex-wrap items-center gap-6">
+        <div className="mb-6 flex items-center justify-between">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Demo preview</p>
             <h1 className="text-3xl font-semibold text-white">{demo.name}</h1>
             <p className="text-sm text-slate-300">{demo.summary}</p>
           </div>
+          <Link
+            href="/"
+            className="flex shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm text-slate-300 transition hover:border-emerald-400/50 hover:bg-white/10 hover:text-white"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>New Demo</span>
+          </Link>
+        </div>
+        <div className="flex flex-wrap items-center gap-6">
           <div className="ml-auto flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-2 text-xs text-slate-200">
               <span>Switch brand:</span>
@@ -237,16 +238,6 @@ export default function DemoPreviewClient({ demo, presentMode = false }: DemoPre
                 className="rounded-full bg-white/10 px-3 py-1 text-xs text-white focus:outline-none"
               />
             </div>
-            <button
-              onClick={triggerCheckout}
-              className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 hover:bg-emerald-300"
-              type="button"
-            >
-              {subscribeState === 'loading' ? 'Loading…' : 'Save as client'}
-            </button>
-            {subscribeState === 'error' ? (
-              <span className="text-xs text-red-300">Unable to reach Stripe. Double-check API keys.</span>
-            ) : null}
           </div>
         </div>
       </header>

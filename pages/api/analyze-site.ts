@@ -102,11 +102,17 @@ async function maybeStoreChunks({
               : (embedding as number[])
             : [embedding as number];
 
+          const metadata: Record<string, string> = { source: sourceUrl };
+          const heading = headings[index];
+          if (heading) {
+            metadata.heading = heading;
+          }
+
           return {
             id: `${embeddingsId}-${index}`,
             demoId: embeddingsId,
             content,
-            metadata: { source: sourceUrl, heading: headings[index] ?? null },
+            metadata,
             embedding: vector,
           };
         })

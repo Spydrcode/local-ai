@@ -1,3 +1,4 @@
+import { Pinecone } from "@pinecone-database/pinecone";
 import { supabaseAdmin } from "../server/supabaseAdmin";
 import { hfEmbed } from "./hf";
 import { createEmbedding } from "./openai";
@@ -18,6 +19,52 @@ export interface SimilarityResult {
 }
 
 const useHFFallback = process.env.USE_HF === "true";
+
+// Initialize Pinecone client lazily
+let pineconeClient: Pinecone | null = null;
+
+function getPineconeClient() {
+  if (!pineconeClient && process.env.PINECONE_API_KEY) {
+    pineconeClient = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY,
+    });
+  }
+  return pineconeClient;
+}
+
+// Sanitize metadata for Pinecone - removes null/undefined values
+function sanitizeMetadata(
+  metadata: Record<string, unknown>
+): Record<string, string | number | boolean | string[]> {
+  const sanitized: Record<string, string | number | boolean | string[]> = {};
+
+  for (const [key, value] of Object.entries(metadata)) {
+    if (value === null || value === undefined) {
+      continue; // Skip null/undefined
+    }
+
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    ) {
+      sanitized[key] = value;
+    } else if (Array.isArray(value)) {
+      // Only include arrays of strings
+      const stringArray = value.filter(
+        (item): item is string => typeof item === "string"
+      );
+      if (stringArray.length > 0) {
+        sanitized[key] = stringArray;
+      }
+    } else if (typeof value === "object") {
+      // Convert objects to JSON strings
+      sanitized[key] = JSON.stringify(value);
+    }
+  }
+
+  return sanitized;
+}
 
 function cosineSimilarity(a: number[], b: number[]) {
   const dot = a.reduce((acc, value, index) => acc + value * b[index], 0);
@@ -48,17 +95,15 @@ export async function upsertChunks(chunks: VectorChunk[]) {
         throw new Error("Supabase admin client not configured.");
       }
 
-      const { error } = await supabaseAdmin
-        .from("site_chunks")
-        .upsert(
-          chunks.map((chunk) => ({
-            id: chunk.id,
-            demo_id: chunk.demoId,
-            content: chunk.content,
-            metadata: chunk.metadata ?? {},
-            embedding: chunk.embedding,
-          })),
-        );
+      const { error } = await supabaseAdmin.from("site_chunks").upsert(
+        chunks.map((chunk) => ({
+          id: chunk.id,
+          demo_id: chunk.demoId,
+          content: chunk.content,
+          metadata: chunk.metadata ?? {},
+          embedding: chunk.embedding,
+        }))
+      );
 
       if (error) {
         throw new Error(`Supabase upsert error: ${error.message}`);
@@ -66,8 +111,39 @@ export async function upsertChunks(chunks: VectorChunk[]) {
       return;
     }
     case "pinecone": {
-      // TODO: replace with Pinecone client upsert if VECTOR_PROVIDER=pinecone
-      console.warn("Pinecone provider not yet implemented. Implement pinecone upsert in lib/vector.ts");
+      const pinecone = getPineconeClient();
+      if (!pinecone) {
+        throw new Error(
+          "Pinecone client not configured. Set PINECONE_API_KEY in .env"
+        );
+      }
+
+      const indexName = process.env.PINECONE_INDEX_NAME ?? "local-ai-demos";
+      const index = pinecone.index(indexName);
+
+      // Convert chunks to Pinecone format with sanitized metadata
+      const records = chunks.map((chunk) => {
+        const baseMetadata = {
+          demoId: chunk.demoId,
+          content: chunk.content,
+        };
+
+        const combinedMetadata = {
+          ...baseMetadata,
+          ...(chunk.metadata ?? {}),
+        };
+
+        return {
+          id: chunk.id,
+          values: chunk.embedding,
+          metadata: sanitizeMetadata(combinedMetadata),
+        };
+      });
+
+      await index.upsert(records);
+      console.log(
+        `✓ Upserted ${records.length} vectors to Pinecone index: ${indexName}`
+      );
       return;
     }
     default:
@@ -123,8 +199,31 @@ export async function similaritySearch({
         .slice(0, topK);
     }
     case "pinecone": {
-      // TODO: wire up Pinecone query here using @pinecone-database/pinecone client.
-      throw new Error("Pinecone similarity search not implemented. Set VECTOR_PROVIDER=supabase for now.");
+      const pinecone = getPineconeClient();
+      if (!pinecone) {
+        throw new Error(
+          "Pinecone client not configured. Set PINECONE_API_KEY in .env"
+        );
+      }
+
+      const indexName = process.env.PINECONE_INDEX_NAME ?? "local-ai-demos";
+      const index = pinecone.index(indexName);
+
+      // Query Pinecone for similar vectors
+      const queryResponse = await index.query({
+        vector: queryEmbedding,
+        topK,
+        filter: { demoId: { $eq: demoId } },
+        includeMetadata: true,
+      });
+
+      // Transform Pinecone results to SimilarityResult format
+      return (queryResponse.matches ?? []).map((match) => ({
+        id: match.id,
+        score: match.score ?? 0,
+        content: (match.metadata?.content as string) ?? "",
+        metadata: match.metadata ?? {},
+      }));
     }
     default:
       throw new Error(`Unsupported vector provider: ${provider}`);

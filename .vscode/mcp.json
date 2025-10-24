@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "local-ai-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["c:\\Users\\dusti\\git\\local.ai\\mcp-server\\dist\\index.js"],
+      "cwd": "c:\\Users\\dusti\\git\\local.ai\\mcp-server",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}

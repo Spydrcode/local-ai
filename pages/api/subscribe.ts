@@ -1,4 +1,19 @@
+// STRIPE SUBSCRIPTION ENDPOINT - DISABLED
+// This endpoint has been disabled as Stripe functionality is not needed for the sales demo tool
+// Keeping the file for reference if subscription features are needed in the future
+
 import type { NextApiRequest, NextApiResponse } from "next";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<{ error: string }>
+) {
+  return res.status(503).json({
+    error: "Subscription endpoint is disabled. This is a sales demo tool.",
+  });
+}
+
+/* ORIGINAL STRIPE CODE - COMMENTED OUT FOR REFERENCE
 import { z } from "zod";
 import { throttle } from "../../server/rateLimiter";
 import { PRICE_IDS, stripe } from "../../server/stripe";
@@ -61,3 +76,4 @@ export default async function handler(
     return res.status(500).json({ error: "Failed to create checkout session" });
   }
 }
+*/

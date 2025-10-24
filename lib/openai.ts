@@ -4,7 +4,9 @@ const apiKey = process.env.OPENAI_API_KEY;
 
 if (!apiKey) {
   // Warn but do not throw, so the app can still boot in environments without keys.
-  console.warn("OPENAI_API_KEY is not set. OpenAI features will fail until configured.");
+  console.warn(
+    "OPENAI_API_KEY is not set. OpenAI features will fail until configured."
+  );
 }
 
 const client = new OpenAI({ apiKey });
@@ -19,9 +21,14 @@ export interface ChatMessage {
   content: string;
 }
 
-export async function createEmbedding(input: string, model = "text-embedding-3-small"): Promise<EmbeddingResult> {
+export async function createEmbedding(
+  input: string,
+  model = "text-embedding-3-small"
+): Promise<EmbeddingResult> {
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is missing. Set it in .env.local to enable embeddings.");
+    throw new Error(
+      "OPENAI_API_KEY is missing. Set it in .env.local to enable embeddings."
+    );
   }
 
   const response = await client.embeddings.create({
@@ -43,6 +50,7 @@ export interface ChatCompletionOptions {
   model?: string;
   temperature?: number;
   maxTokens?: number;
+  jsonMode?: boolean;
 }
 
 export async function createChatCompletion({
@@ -50,9 +58,12 @@ export async function createChatCompletion({
   model = "gpt-4.1-mini",
   temperature = 0.7,
   maxTokens = 800,
+  jsonMode = false,
 }: ChatCompletionOptions) {
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is missing. Set it in .env.local to enable chat.");
+    throw new Error(
+      "OPENAI_API_KEY is missing. Set it in .env.local to enable chat."
+    );
   }
 
   const response = await client.chat.completions.create({
@@ -60,6 +71,7 @@ export async function createChatCompletion({
     temperature,
     max_tokens: maxTokens,
     messages,
+    ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
   });
 
   const content = response.choices[0]?.message?.content;

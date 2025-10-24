@@ -42,6 +42,12 @@ export default function DemoBuilderPage() {
   const [step, setStep] = useState<'idle' | 'analyzing' | 'insights' | 'generating' | 'done'>('idle');
   const [error, setError] = useState<string | null>(null);
 
+  const resetAndGoHome = () => {
+    if (confirm('Are you sure? This will discard the current demo.')) {
+      window.location.href = '/';
+    }
+  };
+
   const progressText = useMemo(() => {
     switch (step) {
       case 'analyzing':
@@ -152,14 +158,26 @@ export default function DemoBuilderPage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-6 pb-24 pt-12 text-slate-100">
       <div className="flex flex-col gap-6 border border-white/10 bg-white/5 p-8 shadow-xl shadow-black/50">
-        <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-300">
-            Live personalized demo
-          </p>
-          <h1 className="text-3xl font-semibold text-white">Build a SmartLocal demo</h1>
-          <p className="text-sm text-slate-300">
-            Crawl a prospect site, generate Profit IQ insights, and preview the chatbot. For production loads, add your Supabase table + Pinecone keys.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-300">
+              Live personalized demo
+            </p>
+            <h1 className="text-3xl font-semibold text-white">Build a SmartLocal demo</h1>
+            <p className="text-sm text-slate-300">
+              Crawl a prospect site, generate Profit IQ insights, and preview the chatbot. For production loads, add your Supabase table + Pinecone keys.
+            </p>
+          </div>
+          <button
+            onClick={resetAndGoHome}
+            className="flex shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm text-slate-300 transition hover:border-emerald-400/50 hover:bg-white/10 hover:text-white"
+            type="button"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>New Demo</span>
+          </button>
         </div>
 
         <form

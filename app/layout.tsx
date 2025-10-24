@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Local AI | AI for your business",
-  description: "AI-powered marketing automation and insights for local businesses. Generate custom websites, social media content, and intelligent chatbots instantly.",
+  title: "Local AI | Sales Demo Builder",
+  description: "Create personalized AI-powered demos for your clients. Generate custom insights, websites, content, and chatbots in minutes.",
 };
 
 export default function RootLayout({

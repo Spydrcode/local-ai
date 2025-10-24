@@ -1,0 +1,332 @@
+'use client';
+
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface AnalysisData {
+  demoId: string;
+  businessName: string;
+  websiteUrl: string;
+  competitorAnalysis: {
+    competitors: Array<{
+      name: string;
+      url: string;
+      strengths: string[];
+      weaknesses: string[];
+    }>;
+    opportunities: string[];
+  };
+  brandAnalysis: {
+    tone: string;
+    voice: string;
+    messaging: string[];
+  };
+  conversionAnalysis: {
+    currentPath: string[];
+    recommendations: string[];
+    projectedImprovement: string;
+  };
+  contentCalendar: Array<{
+    day: string;
+    content: string;
+    platform: string;
+    hashtags: string[];
+  }>;
+  websiteGrade: {
+    score: number;
+    improvements: string[];
+    roiProjection: string;
+  };
+  socialPosts: Array<{
+    platform: string;
+    content: string;
+    emojis: string;
+  }>;
+  blogPosts: Array<{
+    title: string;
+    outline: string[];
+    keywords: string[];
+  }>;
+}
+
+export default function AnalysisPage() {
+  const params = useParams();
+  const demoId = (params?.demoId as string) || '';
+  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAnalysis = async () => {
+      try {
+        const response = await fetch(`/api/comprehensive-analysis/${demoId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setAnalysisData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch analysis:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (demoId) {
+      fetchAnalysis();
+    }
+  }, [demoId]);
+
+  const handleGenerateMockup = async () => {
+    setActionLoading('mockup');
+    try {
+      const response = await fetch('/api/generate-mockup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ demoId }),
+      });
+      const data = await response.json();
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      }
+    } catch (error) {
+      console.error('Failed to generate mockup:', error);
+      alert('Failed to generate mockup. Please try again.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleCreateSocialPosts = () => {
+    window.location.href = `/demo/${demoId}`;
+  };
+
+  const handleExportCalendar = async () => {
+    setActionLoading('calendar');
+    try {
+      const response = await fetch('/api/export-content-calendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          contentCalendar: analysisData?.contentCalendar || [],
+          businessName: analysisData?.businessName || 'Business'
+        }),
+      });
+      const data = await response.json();
+      if (data.csv) {
+        const blob = new Blob([data.csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = data.filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Failed to export calendar:', error);
+      alert('Failed to export calendar. Please try again.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleGeneratePresentation = async () => {
+    setActionLoading('presentation');
+    try {
+      const response = await fetch('/api/generate-presentation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ demoId }),
+      });
+      const data = await response.json();
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      }
+    } catch (error) {
+      console.error('Failed to generate presentation:', error);
+      alert('Failed to generate presentation. Please try again.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+          <p className="text-white">Generating comprehensive analysis...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!analysisData) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <p className="text-white">Analysis not found</p>
+      </div>
+    );
+  }
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'competitors', label: 'Competitors', icon: '🏢' },
+    { id: 'brand', label: 'Brand Voice', icon: '🎯' },
+    { id: 'conversion', label: 'Conversion', icon: '🔄' },
+    { id: 'content', label: 'Content', icon: '📝' },
+    { id: 'social', label: 'Social Media', icon: '📱' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-950">
+      {/* Header */}
+      <div className="bg-slate-900 border-b border-slate-800">
+        <div className="container mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">{analysisData.businessName}</h1>
+              <a 
+                href={analysisData.websiteUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-slate-400 hover:text-emerald-400 transition-colors"
+              >
+                {analysisData.websiteUrl}
+              </a>
+            </div>
+            <div className="flex gap-3">
+              <button 
+                onClick={handleGeneratePresentation}
+                disabled={actionLoading === 'presentation'}
+                className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                {actionLoading === 'presentation' ? 'Loading...' : 'Generate Presentation'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="bg-slate-900/50 border-b border-slate-800">
+        <div className="container mx-auto px-6">
+          <nav className="flex space-x-8">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-4 px-2 border-b-2 font-medium text-sm ${
+                  activeTab === tab.id
+                    ? 'border-emerald-500 text-emerald-400'
+                    : 'border-transparent text-slate-400 hover:text-white'
+                }`}
+              >
+                {tab.icon} {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="container mx-auto px-6 py-8">
+        {activeTab === 'overview' && (
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-slate-900 rounded-xl p-6">
+                <h2 className="text-xl font-semibold text-white mb-4">Website Grade & ROI</h2>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="text-4xl font-bold text-emerald-400">
+                    {analysisData.websiteGrade.score}/100
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">Current Performance</p>
+                    <p className="text-slate-400 text-sm">{analysisData.websiteGrade.roiProjection}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {analysisData.websiteGrade.improvements.map((improvement, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <span className="text-emerald-400">•</span>
+                      <span className="text-slate-300 text-sm">{improvement}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="bg-slate-900 rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+                <div className="space-y-3">
+                  <button 
+                    onClick={handleGenerateMockup}
+                    disabled={actionLoading === 'mockup'}
+                    className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 text-white py-2 px-4 rounded-lg text-sm transition-colors"
+                  >
+                    {actionLoading === 'mockup' ? 'Loading...' : 'Generate Website Mockup'}
+                  </button>
+                  <button 
+                    onClick={handleCreateSocialPosts}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm transition-colors"
+                  >
+                    Create Social Posts
+                  </button>
+                  <button 
+                    onClick={handleExportCalendar}
+                    disabled={actionLoading === 'calendar'}
+                    className="w-full bg-purple-500 hover:bg-purple-600 disabled:bg-purple-500/50 text-white py-2 px-4 rounded-lg text-sm transition-colors"
+                  >
+                    {actionLoading === 'calendar' ? 'Exporting...' : 'Export Content Calendar'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'social' && (
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-slate-900 rounded-xl p-6">
+                <h2 className="text-xl font-semibold text-white mb-4">Social Media Posts</h2>
+                <div className="space-y-4">
+                  {analysisData.socialPosts.map((post, index) => (
+                    <div key={index} className="bg-slate-800 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg">{post.emojis}</span>
+                        <span className="font-medium text-white">{post.platform}</span>
+                      </div>
+                      <p className="text-slate-300 text-sm">{post.content}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-slate-900 rounded-xl p-6">
+                <h2 className="text-xl font-semibold text-white mb-4">Content Calendar</h2>
+                <div className="space-y-3">
+                  {analysisData.contentCalendar.map((item, index) => (
+                    <div key={index} className="bg-slate-800 rounded-lg p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-medium text-white">{item.day}</span>
+                        <span className="text-xs text-slate-400">{item.platform}</span>
+                      </div>
+                      <p className="text-slate-300 text-sm mb-2">{item.content}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {item.hashtags.map((tag, i) => (
+                          <span key={i} className="text-xs text-emerald-400">#{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
