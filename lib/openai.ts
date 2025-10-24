@@ -55,7 +55,7 @@ export interface ChatCompletionOptions {
 
 export async function createChatCompletion({
   messages,
-  model = "gpt-4.1-mini",
+  model = "gpt-4o-mini",
   temperature = 0.7,
   maxTokens = 800,
   jsonMode = false,
@@ -86,7 +86,7 @@ export async function createChatCompletion({
 export async function summarizeText({
   text,
   prompt,
-  model = "gpt-4.1-mini",
+  model = "gpt-4o-mini",
 }: {
   text: string;
   prompt: string;

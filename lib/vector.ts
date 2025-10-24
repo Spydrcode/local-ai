@@ -121,11 +121,15 @@ export async function upsertChunks(chunks: VectorChunk[]) {
       const indexName = process.env.PINECONE_INDEX_NAME ?? "local-ai-demos";
       const index = pinecone.index(indexName);
 
-      // Convert chunks to Pinecone format with sanitized metadata
+      // Convert chunks to Pinecone format with enriched metadata
       const records = chunks.map((chunk) => {
         const baseMetadata = {
           demoId: chunk.demoId,
-          content: chunk.content,
+          content: chunk.content.substring(0, 40000), // Pinecone limit
+          contentLength: chunk.content.length,
+          wordCount: chunk.content.split(' ').length,
+          timestamp: new Date().toISOString(),
+          chunkType: chunk.metadata?.heading ? 'heading' : 'content',
         };
 
         const combinedMetadata = {
@@ -209,21 +213,38 @@ export async function similaritySearch({
       const indexName = process.env.PINECONE_INDEX_NAME ?? "local-ai-demos";
       const index = pinecone.index(indexName);
 
-      // Query Pinecone for similar vectors
+      // Enhanced query with better filtering and ranking
       const queryResponse = await index.query({
         vector: queryEmbedding,
-        topK,
+        topK: Math.min(topK * 3, 20), // Get more results for better filtering
         filter: { demoId: { $eq: demoId } },
         includeMetadata: true,
       });
 
-      // Transform Pinecone results to SimilarityResult format
-      return (queryResponse.matches ?? []).map((match) => ({
-        id: match.id,
-        score: match.score ?? 0,
-        content: (match.metadata?.content as string) ?? "",
-        metadata: match.metadata ?? {},
-      }));
+      // Transform and rank results with quality scoring
+      const results = (queryResponse.matches ?? [])
+        .filter(match => (match.score ?? 0) > 0.7) // Filter low-quality matches
+        .map((match) => {
+          const content = (match.metadata?.content as string) ?? "";
+          const wordCount = match.metadata?.wordCount as number ?? 0;
+          const isHeading = match.metadata?.chunkType === 'heading';
+          
+          // Boost score for headings and longer content
+          let adjustedScore = (match.score ?? 0);
+          if (isHeading) adjustedScore += 0.1;
+          if (wordCount > 50) adjustedScore += 0.05;
+          
+          return {
+            id: match.id,
+            score: adjustedScore,
+            content,
+            metadata: match.metadata ?? {},
+          };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, topK);
+
+      return results;
     }
     default:
       throw new Error(`Unsupported vector provider: ${provider}`);

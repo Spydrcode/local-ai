@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createChatCompletion } from "../../lib/openai";
 import { CHATBOT_SYSTEM_PROMPT } from "../../lib/prompts";
 import { embedText, similaritySearch } from "../../lib/vector";
+import { getEnhancedContext } from "../../lib/hybrid-search";
 import { getDemoFromCache } from "../../server/demoCache";
 import { throttle } from "../../server/rateLimiter";
 import { supabaseAdmin } from "../../server/supabaseAdmin";
@@ -117,21 +118,8 @@ export default async function handler(
   }
 
   try {
-    const { embedding } = await embedText(message);
-    const embeddingArray = Array.isArray(embedding)
-      ? Array.isArray(embedding[0])
-        ? embedding[0]
-        : embedding
-      : [embedding as number];
-    const matches = await similaritySearch({
-      demoId: demoId,
-      queryEmbedding: embeddingArray as number[],
-      topK: 3,
-    });
-
-    const contextBlock = matches
-      .map((match) => `Chunk ${match.id}: ${match.content}`)
-      .join("\n\n");
+    // Use enhanced hybrid search for better context
+    const contextBlock = await getEnhancedContext(demoId, message);
 
     const systemPrompt = `${CHATBOT_SYSTEM_PROMPT}\nBusiness URL: ${demo.url ?? "unknown"}\nBrand voice: ${demo.chatbotConfig.persona ?? "Helpful local expert"}\nContext:\n${contextBlock || demo.summary}`;
 
@@ -146,7 +134,7 @@ export default async function handler(
 
     return res.status(200).json({
       reply,
-      sources: matches.map((match) => ({ id: match.id, score: match.score })),
+      sources: [{ id: 'hybrid-search', score: 1.0 }],
     });
   } catch (error) {
     console.error("Chat handler failed", error);

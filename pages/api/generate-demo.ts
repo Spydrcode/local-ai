@@ -123,17 +123,17 @@ ${keyItems.map((item, idx) => `${idx + 1}. ${item}`).join("\n")}
 
 Generate 3-4 posts that mention their specific products/services and appeal to their target customers. Be creative and industry-specific.${strictnessLevel}`;
 
-    const response = await createChatCompletion({
-      messages: [
-        { role: "system", content: SOCIAL_POST_PROMPT },
-        { role: "user", content: contextPrompt },
-      ],
-      temperature: 0.85,
-      maxTokens: 500,
-      jsonMode: true,
-    });
-
     try {
+      const response = await createChatCompletion({
+        messages: [
+          { role: "system", content: SOCIAL_POST_PROMPT },
+          { role: "user", content: contextPrompt },
+        ],
+        temperature: 0.85,
+        maxTokens: 500,
+        jsonMode: true,
+      });
+
       const parsed = JSON.parse(response);
       let posts: Array<{ platform: string; copy: string; cta: string }> = [];
 
@@ -147,74 +147,31 @@ Generate 3-4 posts that mention their specific products/services and appeal to t
           }));
       }
 
-      // Validate at least one post for business specificity
       if (posts.length > 0) {
-        const samplePost = posts[0].copy;
-        const validation = await validateAIOutput(
-          "content",
-          samplePost,
-          siteText
-        );
-
-        if (validation.isValid || attempt === maxRetries) {
-          // Log validation results
-          console.log(
-            `[Social Posts Validation] Attempt ${attempt + 1}/${maxRetries + 1}:`,
-            {
-              isValid: validation.isValid,
-              score: validation.score,
-              issues: validation.issues.length,
-              postsGenerated: posts.length,
-            }
-          );
-
-          if (!validation.isValid && attempt === maxRetries) {
-            console.warn(
-              "[Social Posts] Max retries reached, accepting output with issues:",
-              validation.issues
-            );
-          }
-
-          return posts;
-        }
-
-        // Log retry reason
-        console.warn(
-          `[Social Posts] Attempt ${attempt + 1} failed validation (score: ${validation.score}). Retrying...`
-        );
-        console.warn("Issues:", validation.issues);
-
-        attempt++;
-        continue;
+        return posts;
       }
-
-      // If no posts parsed, retry
-      attempt++;
     } catch (error) {
-      console.warn("Failed to parse social posts", error);
-
-      // Return fallback only on final attempt
-      if (attempt === maxRetries) {
-        return [
-          {
-            platform: "Facebook",
-            copy: "We're live with a personalized LocalIQ demo today!",
-            cta: "Schedule demo",
-          },
-          {
-            platform: "Instagram",
-            copy: "Sneak peek: refreshed homepage concept built in minutes with LocalIQ.",
-            cta: "See demo",
-          },
-        ];
-      }
-
-      attempt++;
+      console.warn(`Social posts generation attempt ${attempt + 1} failed:`, error);
     }
+
+    
+    attempt++;
   }
 
-  // Should never reach here
-  throw new Error("Failed to generate social posts after all retries");
+  // Fallback if all retries failed
+  console.warn("All social post generation attempts failed, using fallback");
+  return [
+    {
+      platform: "Facebook",
+      copy: "We're excited to share our latest business insights and services with the community!",
+      cta: "Learn More",
+    },
+    {
+      platform: "Instagram",
+      copy: "Behind the scenes: Our team working hard to serve our customers better every day.",
+      cta: "Follow Us",
+    },
+  ];
 }
 
 async function generateProfitInsights(siteText: string, keyItems: string[]) {

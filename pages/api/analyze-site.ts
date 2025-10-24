@@ -59,17 +59,47 @@ function extractMenuItems($: ReturnType<typeof load>) {
   return Array.from(results).slice(0, 12);
 }
 
-function chunkContent(text: string, chunkSize = 750) {
-  const sentences = text.split(/(?<=[.!?])\s+/);
+function chunkContent(text: string, chunkSize = 1000) {
+  // Split by paragraphs first for better semantic coherence
+  const paragraphs = text.split(/\n\s*\n/).filter(Boolean);
   const chunks: string[] = [];
   let buffer = "";
 
-  for (const sentence of sentences) {
-    if ((buffer + sentence).length > chunkSize) {
-      chunks.push(buffer.trim());
-      buffer = sentence;
+  for (const paragraph of paragraphs) {
+    // If paragraph is too long, split by sentences
+    if (paragraph.length > chunkSize) {
+      if (buffer.trim()) {
+        chunks.push(buffer.trim());
+        buffer = "";
+      }
+      
+      const sentences = paragraph.split(/(?<=[.!?])\s+/);
+      let sentenceBuffer = "";
+      
+      for (const sentence of sentences) {
+        if ((sentenceBuffer + sentence).length > chunkSize) {
+          if (sentenceBuffer.trim()) {
+            chunks.push(sentenceBuffer.trim());
+          }
+          sentenceBuffer = sentence;
+        } else {
+          sentenceBuffer += (sentenceBuffer ? " " : "") + sentence;
+        }
+      }
+      
+      if (sentenceBuffer.trim()) {
+        buffer = sentenceBuffer;
+      }
     } else {
-      buffer += ` ${sentence}`;
+      // Add paragraph to buffer if it fits
+      if ((buffer + paragraph).length > chunkSize) {
+        if (buffer.trim()) {
+          chunks.push(buffer.trim());
+        }
+        buffer = paragraph;
+      } else {
+        buffer += (buffer ? "\n\n" : "") + paragraph;
+      }
     }
   }
 
@@ -77,7 +107,10 @@ function chunkContent(text: string, chunkSize = 750) {
     chunks.push(buffer.trim());
   }
 
-  return chunks.filter(Boolean);
+  // Filter out very short chunks and ensure minimum quality
+  return chunks
+    .filter(chunk => chunk.length > 100 && chunk.split(' ').length > 15)
+    .slice(0, 15); // Limit to top 15 chunks for quality
 }
 
 async function maybeStoreChunks({
@@ -102,7 +135,13 @@ async function maybeStoreChunks({
               : (embedding as number[])
             : [embedding as number];
 
-          const metadata: Record<string, string> = { source: sourceUrl };
+          const metadata: Record<string, string | number> = { 
+            source: sourceUrl,
+            chunkIndex: index,
+            contentType: headings[index] ? 'heading-section' : 'content',
+            extractedAt: new Date().toISOString(),
+            wordCount: content.split(' ').length,
+          };
           const heading = headings[index];
           if (heading) {
             metadata.heading = heading;
