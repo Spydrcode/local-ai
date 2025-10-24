@@ -121,7 +121,8 @@ export default function StrategicDashboard() {
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-600 to-blue-600 py-6">
         <div className="container mx-auto px-6">
-          <h1 className="text-3xl font-bold mb-2">Strategic Intelligence Dashboard</h1>
+          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-200 mb-1">We Build Apps</p>
+          <h1 className="text-3xl font-bold mb-2">Local AI - Strategic Intelligence Dashboard</h1>
           <p className="text-emerald-100">{data.businessName}</p>
           <p className="text-sm text-emerald-200">{data.websiteUrl}</p>
         </div>
@@ -277,28 +278,157 @@ export default function StrategicDashboard() {
             </div>
 
             {data.porterAnalysis?.fiveForces && (
-              <div className="bg-slate-900 rounded-xl p-6">
-                <h3 className="text-xl font-semibold mb-4">Five Forces Analysis Results</h3>
-                <div className="prose prose-invert max-w-none whitespace-pre-wrap text-slate-300">
-                  {data.porterAnalysis.fiveForces}
+              <div className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+                <h3 className="text-2xl font-bold mb-6 text-emerald-400">Five Forces Analysis Results</h3>
+                <div className="prose prose-invert prose-lg max-w-none">
+                  <style jsx global>{`
+                    .prose h3 {
+                      font-size: 1.5rem;
+                      font-weight: 700;
+                      margin-top: 2.5rem;
+                      margin-bottom: 1rem;
+                      padding-bottom: 0.75rem;
+                      border-bottom: 2px solid rgb(16 185 129 / 0.3);
+                      color: rgb(110 231 183);
+                    }
+                    .prose h4 {
+                      font-size: 1.25rem;
+                      font-weight: 600;
+                      margin-top: 1.5rem;
+                      margin-bottom: 0.75rem;
+                      color: rgb(52 211 153);
+                    }
+                    .prose ul {
+                      margin-top: 1rem;
+                      margin-bottom: 1.5rem;
+                      padding-left: 1.5rem;
+                    }
+                    .prose li {
+                      margin-top: 0.5rem;
+                      margin-bottom: 0.5rem;
+                      line-height: 1.7;
+                      color: rgb(203 213 225);
+                    }
+                    .prose strong {
+                      font-weight: 600;
+                      color: rgb(248 250 252);
+                    }
+                    .prose p {
+                      margin-top: 1rem;
+                      margin-bottom: 1rem;
+                      line-height: 1.7;
+                      color: rgb(203 213 225);
+                    }
+                    .prose hr {
+                      margin-top: 3rem;
+                      margin-bottom: 3rem;
+                      border-color: rgb(51 65 85);
+                    }
+                    .prose ol {
+                      margin-top: 1rem;
+                      margin-bottom: 1.5rem;
+                      padding-left: 1.5rem;
+                    }
+                    .prose blockquote {
+                      border-left: 4px solid rgb(16 185 129);
+                      padding-left: 1rem;
+                      margin: 1.5rem 0;
+                      font-style: italic;
+                      color: rgb(226 232 240);
+                    }
+                  `}</style>
+                  <div className="formatted-analysis">
+                    {data.porterAnalysis.fiveForces.split('\n').map((line, idx) => {
+                      // Convert markdown-style headers
+                      if (line.startsWith('### ')) {
+                        return <h3 key={idx}>{line.replace('### ', '')}</h3>;
+                      }
+                      if (line.startsWith('#### ')) {
+                        return <h4 key={idx}>{line.replace('#### ', '')}</h4>;
+                      }
+                      if (line.startsWith('**') && line.endsWith('**')) {
+                        return <p key={idx}><strong>{line.replace(/\*\*/g, '')}</strong></p>;
+                      }
+                      if (line.startsWith('- ')) {
+                        return <li key={idx}>{line.replace('- ', '')}</li>;
+                      }
+                      if (line.trim() === '---') {
+                        return <hr key={idx} />;
+                      }
+                      if (line.trim()) {
+                        return <p key={idx}>{line}</p>;
+                      }
+                      return <div key={idx} className="h-2" />;
+                    })}
+                  </div>
                 </div>
               </div>
             )}
 
             {data.porterAnalysis?.valueChain && (
-              <div className="bg-slate-900 rounded-xl p-6">
-                <h3 className="text-xl font-semibold mb-4">Value Chain Analysis Results</h3>
-                <div className="prose prose-invert max-w-none whitespace-pre-wrap text-slate-300">
-                  {data.porterAnalysis.valueChain}
+              <div className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+                <h3 className="text-2xl font-bold mb-6 text-blue-400">Value Chain Analysis Results</h3>
+                <div className="prose prose-invert prose-lg max-w-none">
+                  <div className="formatted-analysis">
+                    {data.porterAnalysis.valueChain.split('\n').map((line, idx) => {
+                      if (line.startsWith('### ')) {
+                        return <h3 key={idx} className="text-blue-300 border-blue-500/30">{line.replace('### ', '')}</h3>;
+                      }
+                      if (line.startsWith('#### ')) {
+                        return <h4 key={idx} className="text-blue-400">{line.replace('#### ', '')}</h4>;
+                      }
+                      if (line.startsWith('**') && line.endsWith('**')) {
+                        return <p key={idx}><strong>{line.replace(/\*\*/g, '')}</strong></p>;
+                      }
+                      if (line.startsWith('- ')) {
+                        return <li key={idx}>{line.replace('- ', '')}</li>;
+                      }
+                      if (line.match(/^\d+\.\s/)) {
+                        return <li key={idx} className="list-decimal">{line.replace(/^\d+\.\s/, '')}</li>;
+                      }
+                      if (line.trim() === '---') {
+                        return <hr key={idx} />;
+                      }
+                      if (line.trim()) {
+                        return <p key={idx}>{line}</p>;
+                      }
+                      return <div key={idx} className="h-2" />;
+                    })}
+                  </div>
                 </div>
               </div>
             )}
 
             {data.porterAnalysis?.positioning && (
-              <div className="bg-slate-900 rounded-xl p-6">
-                <h3 className="text-xl font-semibold mb-4">Strategic Positioning Results</h3>
-                <div className="prose prose-invert max-w-none whitespace-pre-wrap text-slate-300">
-                  {data.porterAnalysis.positioning}
+              <div className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+                <h3 className="text-2xl font-bold mb-6 text-purple-400">Strategic Positioning Results</h3>
+                <div className="prose prose-invert prose-lg max-w-none">
+                  <div className="formatted-analysis">
+                    {data.porterAnalysis.positioning.split('\n').map((line, idx) => {
+                      if (line.startsWith('### ')) {
+                        return <h3 key={idx} className="text-purple-300 border-purple-500/30">{line.replace('### ', '')}</h3>;
+                      }
+                      if (line.startsWith('#### ')) {
+                        return <h4 key={idx} className="text-purple-400">{line.replace('#### ', '')}</h4>;
+                      }
+                      if (line.startsWith('**') && line.endsWith('**')) {
+                        return <p key={idx}><strong>{line.replace(/\*\*/g, '')}</strong></p>;
+                      }
+                      if (line.startsWith('- ')) {
+                        return <li key={idx}>{line.replace('- ', '')}</li>;
+                      }
+                      if (line.match(/^\d+\.\s/)) {
+                        return <li key={idx} className="list-decimal">{line.replace(/^\d+\.\s/, '')}</li>;
+                      }
+                      if (line.trim() === '---') {
+                        return <hr key={idx} />;
+                      }
+                      if (line.trim()) {
+                        return <p key={idx}>{line}</p>;
+                      }
+                      return <div key={idx} className="h-2" />;
+                    })}
+                  </div>
                 </div>
               </div>
             )}
@@ -307,25 +437,50 @@ export default function StrategicDashboard() {
 
         {activeSection === 'competitive' && (
           <div className="space-y-6">
-            <div className="bg-slate-900 rounded-xl p-6">
-              <h3 className="text-xl font-semibold mb-4">Competitive Intelligence</h3>
+            <div className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+              <h3 className="text-2xl font-bold mb-4 text-amber-400">Competitive Intelligence</h3>
               {!data.competitiveIntel ? (
                 <div>
-                  <p className="text-slate-400 mb-4">
+                  <p className="text-slate-300 mb-6 text-lg">
                     Run competitive intelligence analysis to gather insights about your competitors
                     and identify market opportunities.
                   </p>
                   <button
                     onClick={runCompetitiveIntel}
                     disabled={loading.competitive}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white py-2 px-6 rounded-lg transition-colors"
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white py-3 px-8 rounded-lg transition-colors font-semibold"
                   >
                     {loading.competitive ? 'Gathering Intelligence...' : 'Run Analysis'}
                   </button>
                 </div>
               ) : (
-                <div className="prose prose-invert max-w-none whitespace-pre-wrap text-slate-300">
-                  {data.competitiveIntel.intelligence}
+                <div className="prose prose-invert prose-lg max-w-none">
+                  <div className="formatted-analysis">
+                    {data.competitiveIntel.intelligence.split('\n').map((line, idx) => {
+                      if (line.startsWith('### ')) {
+                        return <h3 key={idx} className="text-amber-300 border-amber-500/30">{line.replace('### ', '')}</h3>;
+                      }
+                      if (line.startsWith('#### ')) {
+                        return <h4 key={idx} className="text-amber-400">{line.replace('#### ', '')}</h4>;
+                      }
+                      if (line.startsWith('**') && line.endsWith('**')) {
+                        return <p key={idx}><strong>{line.replace(/\*\*/g, '')}</strong></p>;
+                      }
+                      if (line.startsWith('- ')) {
+                        return <li key={idx}>{line.replace('- ', '')}</li>;
+                      }
+                      if (line.match(/^\d+\.\s/)) {
+                        return <li key={idx} className="list-decimal">{line.replace(/^\d+\.\s/, '')}</li>;
+                      }
+                      if (line.trim() === '---') {
+                        return <hr key={idx} />;
+                      }
+                      if (line.trim()) {
+                        return <p key={idx}>{line}</p>;
+                      }
+                      return <div key={idx} className="h-2" />;
+                    })}
+                  </div>
                 </div>
               )}
             </div>

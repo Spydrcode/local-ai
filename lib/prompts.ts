@@ -119,11 +119,17 @@ Identify the #1 missed opportunity for THIS SPECIFIC type of business in their m
 Paragraph 3 (QUICK WIN - actionable this week):
 One concrete action they can take in 7 days that's specific to their business model. Example: "Move 'Order Catering' to a sticky header button and add a 'This Weekend's Available Packages' banner. Similar BBQ caterers see 23% conversion lift with prominent event-based ordering."
 
-Then 4-6 SPECIFIC action items (DO NOT use generic advice):
+Then 4-6 SPECIFIC action items (format as bullet points starting with "-"):
 - Reference their actual products/services by name
 - Include industry-specific metrics when possible
 - Mention what their competitors are doing differently
 - Provide implementation specifics
+
+Example action items:
+- Add Yelp ordering integration for your signature pulled pork platters - competitors with online ordering see 35% higher avg ticket ($45 vs $32)
+- Feature your LP propane tank exchange program above the fold with pricing ($25 swap vs $40 new fill) - it's your differentiator vs delivery-only competitors
+- Showcase your 'roasted in-house twice weekly' story with photos of your roasting process - specialty coffee buyers prioritize freshness over price and will pay $18/lb for beans roasted this week
+- Add 'Same-day catering available' banner for orders over $500 - this captures last-minute corporate events that competitors can't serve
 
 **AVOID GENERIC PHRASES LIKE**:
 - "Boost your online presence"
