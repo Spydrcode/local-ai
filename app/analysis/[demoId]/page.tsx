@@ -326,6 +326,193 @@ export default function AnalysisPage() {
             </div>
           </div>
         )}
+
+        {activeTab === 'competitors' && (
+          <div className="space-y-6">
+            <div className="bg-slate-900 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-white">Competitive Analysis</h2>
+                <button
+                  onClick={() => window.location.href = `/strategic/${demoId}`}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                >
+                  View Strategic Dashboard →
+                </button>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {analysisData.competitorAnalysis.competitors.map((competitor, index) => (
+                  <div key={index} className="bg-slate-800 rounded-lg p-5">
+                    <h3 className="text-lg font-semibold text-white mb-2">{competitor.name}</h3>
+                    <a 
+                      href={competitor.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 text-sm hover:underline mb-4 block"
+                    >
+                      {competitor.url}
+                    </a>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-emerald-400 mb-2">Strengths</h4>
+                        <ul className="space-y-1">
+                          {competitor.strengths.map((strength, i) => (
+                            <li key={i} className="text-slate-300 text-sm flex items-start gap-2">
+                              <span className="text-emerald-400">✓</span>
+                              {strength}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-red-400 mb-2">Weaknesses</h4>
+                        <ul className="space-y-1">
+                          {competitor.weaknesses.map((weakness, i) => (
+                            <li key={i} className="text-slate-300 text-sm flex items-start gap-2">
+                              <span className="text-red-400">✗</span>
+                              {weakness}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 bg-slate-800 rounded-lg p-5">
+                <h3 className="text-lg font-semibold text-white mb-4">Market Opportunities</h3>
+                <div className="space-y-2">
+                  {analysisData.competitorAnalysis.opportunities.map((opportunity, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <span className="text-emerald-400 mt-1">💡</span>
+                      <p className="text-slate-300 text-sm">{opportunity}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'brand' && (
+          <div className="space-y-6">
+            <div className="bg-slate-900 rounded-xl p-6">
+              <h2 className="text-xl font-semibold text-white mb-6">Brand Voice Analysis</h2>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-slate-800 rounded-lg p-5">
+                  <h3 className="text-lg font-medium text-emerald-400 mb-3">Tone</h3>
+                  <p className="text-slate-300">{analysisData.brandAnalysis.tone}</p>
+                </div>
+                
+                <div className="bg-slate-800 rounded-lg p-5">
+                  <h3 className="text-lg font-medium text-emerald-400 mb-3">Voice</h3>
+                  <p className="text-slate-300">{analysisData.brandAnalysis.voice}</p>
+                </div>
+              </div>
+
+              <div className="mt-6 bg-slate-800 rounded-lg p-5">
+                <h3 className="text-lg font-medium text-emerald-400 mb-4">Key Messaging</h3>
+                <div className="space-y-3">
+                  {analysisData.brandAnalysis.messaging.map((message, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <span className="text-emerald-400 font-bold text-lg">{index + 1}.</span>
+                      <p className="text-slate-300">{message}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'conversion' && (
+          <div className="space-y-6">
+            <div className="bg-slate-900 rounded-xl p-6">
+              <h2 className="text-xl font-semibold text-white mb-6">Conversion Optimization</h2>
+              
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-5 mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-3xl">📈</span>
+                  <div>
+                    <h3 className="text-lg font-semibold text-emerald-400">Projected Improvement</h3>
+                    <p className="text-2xl font-bold text-white">{analysisData.conversionAnalysis.projectedImprovement}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-800 rounded-lg p-5 mb-6">
+                <h3 className="text-lg font-medium text-white mb-4">Current Conversion Path</h3>
+                <div className="flex flex-wrap items-center gap-2">
+                  {analysisData.conversionAnalysis.currentPath.map((step, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="bg-slate-700 px-4 py-2 rounded-lg">
+                        <span className="text-slate-300 text-sm">{step}</span>
+                      </div>
+                      {index < analysisData.conversionAnalysis.currentPath.length - 1 && (
+                        <span className="text-slate-500">→</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-slate-800 rounded-lg p-5">
+                <h3 className="text-lg font-medium text-white mb-4">Recommendations</h3>
+                <div className="space-y-3">
+                  {analysisData.conversionAnalysis.recommendations.map((rec, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <span className="text-emerald-400 text-xl">→</span>
+                      <p className="text-slate-300">{rec}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'content' && (
+          <div className="space-y-6">
+            <div className="bg-slate-900 rounded-xl p-6">
+              <h2 className="text-xl font-semibold text-white mb-6">Content Strategy</h2>
+              
+              <div className="space-y-6">
+                {analysisData.blogPosts.map((post, index) => (
+                  <div key={index} className="bg-slate-800 rounded-lg p-5">
+                    <h3 className="text-lg font-semibold text-white mb-4">{post.title}</h3>
+                    
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-emerald-400 mb-2">Outline</h4>
+                      <ol className="space-y-2">
+                        {post.outline.map((point, i) => (
+                          <li key={i} className="text-slate-300 text-sm flex items-start gap-2">
+                            <span className="text-emerald-400">{i + 1}.</span>
+                            {point}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-medium text-emerald-400 mb-2">Target Keywords</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {post.keywords.map((keyword, i) => (
+                          <span key={i} className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs">
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
