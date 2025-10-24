@@ -185,17 +185,31 @@ export default function AnalysisPage() {
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">{analysisData.businessName}</h1>
+              <p className="text-xs font-semibold uppercase tracking-widest text-emerald-300 mb-1">
+                We Build Apps
+              </p>
+              <h1 className="text-2xl font-bold text-white mb-1">
+                <span className="text-emerald-400">Local AI</span> - {analysisData.businessName}
+              </h1>
               <a 
                 href={analysisData.websiteUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-slate-400 hover:text-emerald-400 transition-colors"
+                className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
               >
                 {analysisData.websiteUrl}
               </a>
             </div>
             <div className="flex gap-3">
+              <a 
+                href={`/strategic/${demoId}`}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                View Strategic Dashboard
+              </a>
               <button 
                 onClick={handleGeneratePresentation}
                 disabled={actionLoading === 'presentation'}

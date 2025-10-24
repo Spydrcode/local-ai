@@ -70,11 +70,16 @@ export default function Home() {
       <div className="container mx-auto px-6 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="h-12 w-12 rounded-full bg-emerald-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">AI</span>
+          <div className="mb-6">
+            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-300 mb-3">
+              We Build Apps
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <div className="h-12 w-12 rounded-full bg-emerald-500 flex items-center justify-center">
+                <span className="text-white font-bold text-xl">AI</span>
+              </div>
+              <h1 className="text-4xl font-bold text-white">Local AI</h1>
             </div>
-            <h1 className="text-4xl font-bold text-white">Business Intelligence Tool</h1>
           </div>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto">
             Get comprehensive AI-powered insights about any business website in minutes

@@ -333,12 +333,26 @@ Make this so specific that someone could identify their exact industry in 3 seco
         },
       ],
       temperature: 0.8,
-      maxTokens: 1800,
-      jsonMode: true,
+      maxTokens: 2500, // Increased from 1800 to prevent truncation
+      jsonMode: false, // Disable JSON mode - it's causing parse errors
     });
 
     try {
-      const parsed = JSON.parse(response);
+      // Try to parse as JSON first
+      let parsed;
+      try {
+        parsed = JSON.parse(response);
+      } catch (jsonError) {
+        // If JSON parsing fails, log and try to extract JSON from markdown
+        console.warn('[Homepage] JSON parse failed, attempting to extract JSON from response');
+        const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/) || response.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+        } else {
+          throw new Error('Could not extract valid JSON from response');
+        }
+      }
+      
       const homepage: DemoHomepageMock = {
         hero: {
           headline:
@@ -401,8 +415,9 @@ Make this so specific that someone could identify their exact industry in 3 seco
 
       attempt++;
     } catch (error) {
-      console.warn("Failed to parse homepage blueprint", error);
-
+      console.error("Failed to parse homepage blueprint:", error);
+      console.error("Response received:", response?.substring(0, 500)); // Log first 500 chars
+      
       // Return fallback only on final attempt
       if (attempt === maxRetries) {
         return {

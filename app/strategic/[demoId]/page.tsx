@@ -256,43 +256,158 @@ export default function StrategicDashboard() {
 
         {activeSection === 'porter' && (
           <div className="space-y-6">
-            <div className="grid lg:grid-cols-3 gap-6">
-              <button
-                onClick={() => runPorterAnalysis('forces')}
-                className="bg-slate-900 rounded-xl p-6 hover:bg-slate-800 transition-colors text-left"
-              >
-                <h3 className="text-xl font-semibold mb-2">Five Forces Analysis</h3>
-                <p className="text-slate-400 text-sm">
-                  Analyze industry structure and competitive intensity
-                </p>
-                {loading.forces && <p className="mt-2 text-emerald-400">Analyzing...</p>}
-              </button>
-
-              <button
-                onClick={() => runPorterAnalysis('valuechain')}
-                className="bg-slate-900 rounded-xl p-6 hover:bg-slate-800 transition-colors text-left"
-              >
-                <h3 className="text-xl font-semibold mb-2">Value Chain Analysis</h3>
-                <p className="text-slate-400 text-sm">
-                  Identify competitive advantages in operations
-                </p>
-                {loading.valuechain && <p className="mt-2 text-emerald-400">Analyzing...</p>}
-              </button>
-
-              <button
-                onClick={() => runPorterAnalysis('positioning')}
-                className="bg-slate-900 rounded-xl p-6 hover:bg-slate-800 transition-colors text-left"
-              >
-                <h3 className="text-xl font-semibold mb-2">Strategic Positioning</h3>
-                <p className="text-slate-400 text-sm">
-                  Determine optimal competitive strategy
-                </p>
-                {loading.positioning && <p className="mt-2 text-emerald-400">Analyzing...</p>}
-              </button>
+            {/* Action Bar */}
+            <div className="bg-slate-900 rounded-xl p-6 border border-slate-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Porter's Framework Analysis</h3>
+                  <p className="text-slate-400">Generate comprehensive strategic insights using Michael Porter's proven frameworks</p>
+                </div>
+                <button
+                  onClick={() => runPorterAnalysis('all')}
+                  disabled={loading.all}
+                  className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/50 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+                >
+                  {loading.all ? 'Analyzing All...' : 'Run Full Analysis'}
+                </button>
+              </div>
             </div>
 
+            {/* Analysis Cards Grid */}
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Five Forces Card */}
+              <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 p-4">
+                  <h3 className="text-lg font-semibold text-white">Five Forces Analysis</h3>
+                </div>
+                <div className="p-6">
+                  {loading.forces || loading.all ? (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mb-4"></div>
+                      <p className="text-emerald-400">Analyzing...</p>
+                    </div>
+                  ) : data.porterAnalysis?.fiveForces ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-emerald-400 mb-3">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="font-semibold">Analysis Complete</span>
+                      </div>
+                      <p className="text-slate-300 text-sm line-clamp-4">
+                        {data.porterAnalysis.fiveForces.substring(0, 200)}...
+                      </p>
+                      <a href="#five-forces-results" className="text-emerald-400 hover:text-emerald-300 text-sm font-medium inline-flex items-center gap-1">
+                        View Full Analysis 
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-slate-400 mb-4 text-sm">Analyze industry structure and competitive intensity</p>
+                      <button
+                        onClick={() => runPorterAnalysis('forces')}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                      >
+                        Run Analysis
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Value Chain Card */}
+              <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4">
+                  <h3 className="text-lg font-semibold text-white">Value Chain Analysis</h3>
+                </div>
+                <div className="p-6">
+                  {loading.valuechain || loading.all ? (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                      <p className="text-blue-400">Analyzing...</p>
+                    </div>
+                  ) : data.porterAnalysis?.valueChain ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-blue-400 mb-3">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="font-semibold">Analysis Complete</span>
+                      </div>
+                      <p className="text-slate-300 text-sm line-clamp-4">
+                        {data.porterAnalysis.valueChain.substring(0, 200)}...
+                      </p>
+                      <a href="#value-chain-results" className="text-blue-400 hover:text-blue-300 text-sm font-medium inline-flex items-center gap-1">
+                        View Full Analysis
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-slate-400 mb-4 text-sm">Identify competitive advantages in operations</p>
+                      <button
+                        onClick={() => runPorterAnalysis('valuechain')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                      >
+                        Run Analysis
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Strategic Positioning Card */}
+              <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
+                  <h3 className="text-lg font-semibold text-white">Strategic Positioning</h3>
+                </div>
+                <div className="p-6">
+                  {loading.positioning || loading.all ? (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mb-4"></div>
+                      <p className="text-purple-400">Analyzing...</p>
+                    </div>
+                  ) : data.porterAnalysis?.positioning ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-purple-400 mb-3">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="font-semibold">Analysis Complete</span>
+                      </div>
+                      <p className="text-slate-300 text-sm line-clamp-4">
+                        {data.porterAnalysis.positioning.substring(0, 200)}...
+                      </p>
+                      <a href="#positioning-results" className="text-purple-400 hover:text-purple-300 text-sm font-medium inline-flex items-center gap-1">
+                        View Full Analysis
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-slate-400 mb-4 text-sm">Determine optimal competitive strategy</p>
+                      <button
+                        onClick={() => runPorterAnalysis('positioning')}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                      >
+                        Run Analysis
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Full Results Sections */}
             {data.porterAnalysis?.fiveForces && (
-              <div className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+              <div id="five-forces-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
                 <h3 className="text-2xl font-bold mb-6 text-emerald-400">Five Forces Analysis Results</h3>
                 <div className="prose prose-invert prose-lg max-w-none">
                   <style jsx global>{`
@@ -380,7 +495,7 @@ export default function StrategicDashboard() {
             )}
 
             {data.porterAnalysis?.valueChain && (
-              <div className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+              <div id="value-chain-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
                 <h3 className="text-2xl font-bold mb-6 text-blue-400">Value Chain Analysis Results</h3>
                 <div className="prose prose-invert prose-lg max-w-none">
                   <div className="formatted-analysis">
@@ -414,7 +529,7 @@ export default function StrategicDashboard() {
             )}
 
             {data.porterAnalysis?.positioning && (
-              <div className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+              <div id="positioning-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
                 <h3 className="text-2xl font-bold mb-6 text-purple-400">Strategic Positioning Results</h3>
                 <div className="prose prose-invert prose-lg max-w-none">
                   <div className="formatted-analysis">
