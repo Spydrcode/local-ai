@@ -265,44 +265,37 @@ export const SOCIAL_POST_PROMPT = `Generate 3-4 highly specific, conversion-focu
    ❌ "Learn More", "Contact Us", "Check it out"
    ✅ "Order for Your Event", "Schedule Same-Day Delivery", "Reserve Your Bag", "Get Free Quote", "Book Your Spot"
 
-Return JSON array with 3-4 posts:
-[
-	{
-		"platform": "Instagram|Facebook|LinkedIn|TikTok",
-		"copy": "Hook + Specific offering + Reason to act now + Emojis that match industry",
-		"cta": "Exact action customer should take"
-	}
-]
+**OUTPUT FORMAT** (Use this exact format, NOT JSON - emojis are important):
+
+Platform: Instagram
+Copy: Hook + Specific offering + Reason to act now + Emojis that match industry
+CTA: Exact action customer should take
+
+Platform: Facebook
+Copy: Another specific post...
+CTA: Specific action...
 
 **EXAMPLES BY INDUSTRY**:
 
 BBQ CATERING:
-{
-	"platform": "Facebook",
-	"copy": "Super Bowl Sunday catering is 80% booked! 🏈 Our Championship Brisket Package feeds 20 with sides, sauce trio, and setup. Only 6 slots left for Feb 9th delivery across Denver Metro. Don't serve frozen apps when you can serve competition BBQ! 🔥",
-	"cta": "Reserve Your Package"
-}
+Platform: Facebook
+Copy: Super Bowl Sunday catering is 80% booked! 🏈 Our Championship Brisket Package feeds 20 with sides, sauce trio, and setup. Only 6 slots left for Feb 9th delivery across Denver Metro. Don't serve frozen apps when you can serve competition BBQ! 🔥
+CTA: Reserve Your Package
 
 PROPANE SERVICE:
-{
-	"platform": "Facebook",
-	"copy": "🔥 Pool heater won't fire up? We deliver propane same-day across Phoenix East Valley - average 4hr response. It's 85° today - perfect pool weather! Call before noon for today's delivery. Family-owned, reliable since 1997.",
-	"cta": "Schedule Delivery Now"
-}
+Platform: Facebook
+Copy: 🔥 Pool heater won't fire up? We deliver propane same-day across Phoenix East Valley - average 4hr response. It's 85° today - perfect pool weather! Call before noon for today's delivery. Family-owned, reliable since 1997.
+CTA: Schedule Delivery Now
 
 COFFEE ROASTER:
-{
-	"platform": "Instagram",
-	"copy": "THIS WEEK: Ethiopian Yirgacheffe ☕✨ Roasted yesterday morning in our Denver shop. Tasting notes: Blueberry, dark chocolate, jasmine. Absolutely perfect for pour-over. Only 50 bags available - fresh coffee sells out by Thursday! Who's brewing this weekend?",
-	"cta": "Order Fresh Beans"
-}
+Platform: Instagram
+Copy: THIS WEEK: Ethiopian Yirgacheffe ☕✨ Roasted yesterday morning in our Denver shop. Tasting notes: Blueberry, dark chocolate, jasmine. Absolutely perfect for pour-over. Only 50 bags available - fresh coffee sells out by Thursday! Who's brewing this weekend?
+CTA: Order Fresh Beans
 
 HOME SERVICES:
-{
-	"platform": "Facebook", 
-	"copy": "That weird noise from your HVAC? It won't fix itself. 🥶 We offer free diagnostic visits in [City area] with same-day appointments available. Licensed, certified, and we've been keeping [City] comfortable for 15 years. Don't wait for a breakdown!",
-	"cta": "Book Free Inspection"
-}
+Platform: Facebook
+Copy: That weird noise from your HVAC? It won't fix itself. 🥶 We offer free diagnostic visits in [City area] with same-day appointments available. Licensed, certified, and we've been keeping [City] comfortable for 15 years. Don't wait for a breakdown!
+CTA: Book Free Inspection
 
 **CRITICAL**: Every post must pass this test: "Could this exact post be used by any other business in their category?" If yes, make it MORE specific.
 

@@ -397,10 +397,17 @@ export function validateProfitInsights(
   // Check for action items with specificity (look for bullet points or numbered lists)
   const bulletPoints = insights.match(/[-•*]\s*[A-Z]/g)?.length || 0;
   const numberedItems = insights.match(/^\d+\.\s+[A-Z]/gm)?.length || 0;
-  const actionVerbs = insights.match(/\b(Add|Create|Feature|Showcase|Implement|Launch|Build|Optimize|Integrate|Update|Highlight)\s+[a-z]/gi)?.length || 0;
-  
-  const totalActionableItems = Math.max(bulletPoints, numberedItems, actionVerbs);
-  
+  const actionVerbs =
+    insights.match(
+      /\b(Add|Create|Feature|Showcase|Implement|Launch|Build|Optimize|Integrate|Update|Highlight)\s+[a-z]/gi
+    )?.length || 0;
+
+  const totalActionableItems = Math.max(
+    bulletPoints,
+    numberedItems,
+    actionVerbs
+  );
+
   if (totalActionableItems < 3) {
     issues.push("Lacks sufficient actionable recommendations");
     suggestions.push(

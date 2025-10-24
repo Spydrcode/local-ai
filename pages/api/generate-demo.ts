@@ -131,24 +131,40 @@ Generate 3-4 posts that mention their specific products/services and appeal to t
         ],
         temperature: 0.85,
         maxTokens: 500,
-        jsonMode: true,
+        // Don't use JSON mode - emojis cause unterminated string errors
+        jsonMode: false,
       });
 
-      const parsed = JSON.parse(response);
-      let posts: Array<{ platform: string; copy: string; cta: string }> = [];
-
-      if (Array.isArray(parsed)) {
-        posts = parsed
-          .slice(0, 4)
-          .map((post: { platform?: string; copy?: string; cta?: string }) => ({
-            platform: post.platform ?? "Facebook",
-            copy: post.copy ?? "",
-            cta: post.cta ?? "Book now",
-          }));
+      // Parse markdown-style formatted posts instead of JSON
+      const postBlocks = response.split(/\n\n+/).filter(block => block.trim());
+      const posts: Array<{ platform: string; copy: string; cta: string }> = [];
+      
+      for (const block of postBlocks) {
+        const lines = block.split('\n').filter(line => line.trim());
+        let platform = "Facebook";
+        let copy = "";
+        let cta = "Learn More";
+        
+        for (const line of lines) {
+          if (line.match(/^Platform:/i)) {
+            platform = line.replace(/^Platform:/i, '').trim();
+          } else if (line.match(/^Copy:/i)) {
+            copy = line.replace(/^Copy:/i, '').trim();
+          } else if (line.match(/^CTA:/i)) {
+            cta = line.replace(/^CTA:/i, '').trim();
+          } else if (!line.match(/^(Platform|Copy|CTA):/i) && copy === "") {
+            // If no labels, treat as copy
+            copy = line;
+          }
+        }
+        
+        if (copy.length > 10) {
+          posts.push({ platform, copy, cta });
+        }
       }
 
       if (posts.length > 0) {
-        return posts;
+        return posts.slice(0, 4);
       }
     } catch (error) {
       console.warn(`Social posts generation attempt ${attempt + 1} failed:`, error);

@@ -66,6 +66,12 @@ export default function StrategicDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ demoId, analysisType: type }),
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+      
       const result = await response.json();
       setData(prev => prev ? {
         ...prev,
@@ -77,6 +83,7 @@ export default function StrategicDashboard() {
       } : prev);
     } catch (error) {
       console.error(`Failed to run ${type} analysis:`, error);
+      alert(`Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading({ ...loading, [type]: false });
     }
@@ -93,6 +100,12 @@ export default function StrategicDashboard() {
           competitorUrls: [] // Can add competitor URLs
         }),
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+      
       const result = await response.json();
       setData(prev => ({
         ...prev!,
@@ -103,6 +116,7 @@ export default function StrategicDashboard() {
       }));
     } catch (error) {
       console.error('Failed to run competitive intelligence:', error);
+      alert(`Competitive intelligence failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading({ ...loading, competitive: false });
     }
