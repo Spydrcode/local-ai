@@ -11,7 +11,8 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import ChatWidget from './ChatWidget';
 import DemoOverview from './DemoOverview';
-import HomepageMockup from './HomepageMockup';
+import SocialMediaManager from './SocialMediaManager';
+import WebsiteDesignGallery from './WebsiteDesignGallery';
 
 export interface DemoPreviewData {
   id: string;
@@ -86,23 +87,18 @@ export default function DemoPreviewClient({ demo, presentMode = false }: DemoPre
           </div>
         </header>
 
-        {/* Full Homepage Mockup */}
+        {/* Website Design Section */}
         {demo.homepage ? (
           <div className="space-y-3 md:space-y-4">
             <div className="flex flex-col gap-2 px-2 md:flex-row md:items-center md:justify-between">
               <h2 className="text-lg font-bold text-white md:text-2xl">
-                <span className="text-emerald-400">✨</span> AI-Generated Homepage Redesign
+                <span className="text-emerald-400">✨</span> Professional Website Designs
               </h2>
               <span className="inline-flex w-fit rounded-full bg-emerald-500/20 px-3 py-1.5 text-xs font-semibold text-emerald-300 md:px-4 md:py-2 md:text-sm">
-                Live Preview
+                AI-Powered
               </span>
             </div>
-            <HomepageMockup
-              homepage={demo.homepage}
-              insights={demo.insights}
-              businessName={demo.name}
-              brandColor={brandColor}
-            />
+            <WebsiteDesignGallery demoId={demo.id} />
           </div>
         ) : null}
 
@@ -124,30 +120,10 @@ export default function DemoPreviewClient({ demo, presentMode = false }: DemoPre
             />
           </div>
 
-          {/* Social Media Content */}
-          {demo.socialPosts && demo.socialPosts.length > 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/5 to-white/10 p-4 shadow-xl backdrop-blur-sm md:rounded-3xl md:p-6">
-              <h2 className="mb-3 text-base font-semibold text-white md:mb-4 md:text-xl">Social Media Campaign</h2>
-              <div className="space-y-3">
-                {demo.socialPosts.slice(0, 3).map((post, idx) => (
-                  <div key={idx} className="rounded-xl border border-white/20 bg-black/40 p-4 backdrop-blur-sm md:rounded-2xl md:p-5">
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="text-xl md:text-2xl">
-                        {post.platform === 'Facebook' ? '📘' : post.platform === 'Instagram' ? '📸' : '💼'}
-                      </span>
-                      <span className="text-xs font-semibold uppercase tracking-wide text-emerald-300">
-                        {post.platform}
-                      </span>
-                    </div>
-                    <p className="text-sm leading-relaxed text-slate-200">{post.copy}</p>
-                    <div className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1.5 text-xs font-semibold text-emerald-300 md:mt-3 md:px-4">
-                      {post.cta}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : null}
+          {/* Enhanced Social Media Manager */}
+          <div className="lg:col-span-2">
+            <SocialMediaManager demoId={demo.id} initialPosts={demo.socialPosts} />
+          </div>
         </div>
 
         {/* Blog Content Preview */}

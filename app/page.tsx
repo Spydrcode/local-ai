@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Home() {
   const [websiteUrl, setWebsiteUrl] = useState('');
-  const [businessName, setBusinessName] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -21,44 +20,25 @@ export default function Home() {
     setError('');
 
     try {
-      const response = await fetch('/api/analyze-site', {
+      // Only do quick site scraping to get basic info
+      const response = await fetch('/api/quick-analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          url: websiteUrl, 
-          demoName: businessName || undefined 
-        }),
+        body: JSON.stringify({ url: websiteUrl }),
       });
 
       if (!response.ok) {
-        throw new Error('Analysis failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Analysis failed');
       }
 
       const data = await response.json();
       
-      // Generate full demo
-      const demoResponse = await fetch('/api/generate-demo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clientId: businessName || websiteUrl,
-          siteText: data.summary,
-          metadata: {
-            url: websiteUrl,
-            keyItems: data.keyItems,
-            embeddingsId: data.embeddingsId,
-          },
-        }),
-      });
-
-      if (!demoResponse.ok) {
-        throw new Error('Demo generation failed');
-      }
-
-      const demoData = await demoResponse.json();
-      router.push(`/analysis/${demoData.demoId}`);
+      // Navigate directly to dashboard with minimal data
+      router.push(`/analysis/${data.demoId}`);
     } catch (err) {
-      setError('Analysis failed. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load website. Please check the URL and try again.';
+      setError(errorMessage);
       console.error(err);
     } finally {
       setIsAnalyzing(false);
@@ -66,7 +46,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/20">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950/20">
       <div className="container mx-auto px-6 py-12">
         {/* Header */}
         <div className="text-center mb-12">
@@ -82,7 +62,10 @@ export default function Home() {
             </div>
           </div>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Get comprehensive AI-powered insights about any business website in minutes
+            Instant AI-powered business intelligence dashboard - Just paste a URL
+          </p>
+          <p className="text-sm text-slate-400 max-w-2xl mx-auto mt-3">
+            Get immediate access to your dashboard. All analyses run on-demand when you need them.
           </p>
         </div>
 
@@ -92,29 +75,19 @@ export default function Home() {
             <form onSubmit={handleAnalyze} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  Website URL *
+                  Website URL
                 </label>
                 <input
                   type="url"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
                   placeholder="https://example.com"
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none"
+                  className="w-full px-4 py-4 bg-slate-800 border border-slate-600 rounded-lg text-white text-lg placeholder-slate-400 focus:border-emerald-500 focus:outline-none"
                   required
                 />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Business Name (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="Business Name"
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none"
-                />
+                <p className="text-xs text-slate-400 mt-2">
+                  💡 Tip: Dashboard loads instantly - all analyses are on-demand
+                </p>
               </div>
 
               {error && (
@@ -129,24 +102,39 @@ export default function Home() {
                 {isAnalyzing ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    Analyzing Website...
+                    Loading Dashboard...
                   </>
                 ) : (
-                  'Generate Business Intelligence Report'
+                  <>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Open Dashboard
+                  </>
                 )}
               </button>
             </form>
           </div>
 
           {/* Features Preview */}
-          <div className="mt-12 grid md:grid-cols-2 gap-6">
+          <div className="mt-12 grid md:grid-cols-3 gap-6">
             <div className="bg-slate-900/30 rounded-xl p-6 border border-white/5">
-              <h3 className="text-lg font-semibold text-white mb-3">📊 Comprehensive Analysis</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">⚡ Instant Access</h3>
               <ul className="text-sm text-slate-300 space-y-2">
-                <li>• Competitor landscape analysis</li>
-                <li>• Brand voice & messaging audit</li>
-                <li>• Conversion path optimization</li>
-                <li>• ROI projections & opportunities</li>
+                <li>• Dashboard loads in &lt;3 seconds</li>
+                <li>• No waiting for full analysis</li>
+                <li>• Run only what you need</li>
+                <li>• Cost-efficient on-demand AI</li>
+              </ul>
+            </div>
+            
+            <div className="bg-slate-900/30 rounded-xl p-6 border border-white/5">
+              <h3 className="text-lg font-semibold text-white mb-3">📊 Strategic Intelligence</h3>
+              <ul className="text-sm text-slate-300 space-y-2">
+                <li>• Porter's Five Forces analysis</li>
+                <li>• Competitor intelligence</li>
+                <li>• Brand & conversion insights</li>
+                <li>• ROI improvement opportunities</li>
               </ul>
             </div>
             
@@ -154,9 +142,9 @@ export default function Home() {
               <h3 className="text-lg font-semibold text-white mb-3">🚀 Marketing Assets</h3>
               <ul className="text-sm text-slate-300 space-y-2">
                 <li>• Social media content calendar</li>
-                <li>• Blog post recommendations</li>
-                <li>• Website redesign mockups</li>
-                <li>• Branded content suggestions</li>
+                <li>• Platform-specific posts</li>
+                <li>• Website grade & redesign</li>
+                <li>• AI-powered recommendations</li>
               </ul>
             </div>
           </div>

@@ -2,7 +2,6 @@ import { customAlphabet } from "nanoid";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import {
-  validateAIOutput,
   validateHomepageBlueprint,
   validateProfitInsights,
 } from "../../lib/ai-validation";
@@ -136,28 +135,30 @@ Generate 3-4 posts that mention their specific products/services and appeal to t
       });
 
       // Parse markdown-style formatted posts instead of JSON
-      const postBlocks = response.split(/\n\n+/).filter(block => block.trim());
+      const postBlocks = response
+        .split(/\n\n+/)
+        .filter((block) => block.trim());
       const posts: Array<{ platform: string; copy: string; cta: string }> = [];
-      
+
       for (const block of postBlocks) {
-        const lines = block.split('\n').filter(line => line.trim());
+        const lines = block.split("\n").filter((line) => line.trim());
         let platform = "Facebook";
         let copy = "";
         let cta = "Learn More";
-        
+
         for (const line of lines) {
           if (line.match(/^Platform:/i)) {
-            platform = line.replace(/^Platform:/i, '').trim();
+            platform = line.replace(/^Platform:/i, "").trim();
           } else if (line.match(/^Copy:/i)) {
-            copy = line.replace(/^Copy:/i, '').trim();
+            copy = line.replace(/^Copy:/i, "").trim();
           } else if (line.match(/^CTA:/i)) {
-            cta = line.replace(/^CTA:/i, '').trim();
+            cta = line.replace(/^CTA:/i, "").trim();
           } else if (!line.match(/^(Platform|Copy|CTA):/i) && copy === "") {
             // If no labels, treat as copy
             copy = line;
           }
         }
-        
+
         if (copy.length > 10) {
           posts.push({ platform, copy, cta });
         }
@@ -167,10 +168,12 @@ Generate 3-4 posts that mention their specific products/services and appeal to t
         return posts.slice(0, 4);
       }
     } catch (error) {
-      console.warn(`Social posts generation attempt ${attempt + 1} failed:`, error);
+      console.warn(
+        `Social posts generation attempt ${attempt + 1} failed:`,
+        error
+      );
     }
 
-    
     attempt++;
   }
 
@@ -334,7 +337,7 @@ Make this so specific that someone could identify their exact industry in 3 seco
       ],
       temperature: 0.8,
       maxTokens: 2500, // Increased from 1800 to prevent truncation
-      jsonMode: false, // Disable JSON mode - it's causing parse errors
+      jsonMode: true, // Use JSON mode for structured output
     });
 
     try {
@@ -343,42 +346,65 @@ Make this so specific that someone could identify their exact industry in 3 seco
       try {
         parsed = JSON.parse(response);
       } catch (jsonError) {
-        // If JSON parsing fails, log and try to extract JSON from markdown
-        console.warn('[Homepage] JSON parse failed, attempting to extract JSON from response');
-        const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/) || response.match(/\{[\s\S]*\}/);
+        // If JSON parsing fails, log detailed error
+        console.error(
+          "[Homepage] JSON parse failed:",
+          (jsonError as Error).message
+        );
+        console.error("[Homepage] Response length:", response.length);
+        console.error("[Homepage] Response start:", response.substring(0, 200));
+        console.error(
+          "[Homepage] Response end:",
+          response.substring(response.length - 200)
+        );
+
+        // Try to extract JSON from markdown
+        const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
         if (jsonMatch) {
-          parsed = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+          console.log("[Homepage] Found JSON in markdown, attempting to parse");
+          parsed = JSON.parse(jsonMatch[1]);
         } else {
-          throw new Error('Could not extract valid JSON from response');
+          // Try to find JSON object
+          const objectMatch = response.match(/\{[\s\S]*\}/);
+          if (objectMatch) {
+            console.log("[Homepage] Found JSON object, attempting to parse");
+            parsed = JSON.parse(objectMatch[0]);
+          } else {
+            throw new Error("Could not extract valid JSON from response");
+          }
         }
       }
-      
+
+      // Validate that AI provided all required fields
+      if (!parsed.hero?.headline || !parsed.hero?.subheadline) {
+        throw new Error("AI failed to generate required hero content");
+      }
+      if (!Array.isArray(parsed.sections) || parsed.sections.length === 0) {
+        throw new Error("AI failed to generate homepage sections");
+      }
+      if (!parsed.style?.primaryColor) {
+        throw new Error("AI failed to generate color scheme");
+      }
+
       const homepage: DemoHomepageMock = {
         hero: {
-          headline:
-            parsed.hero?.headline ?? "Your neighborhood favorite, refreshed.",
-          subheadline:
-            parsed.hero?.subheadline ??
-            "We combined your signature offerings with a modern flow to boost conversions.",
-          ctaLabel: parsed.hero?.ctaLabel ?? "Book Now",
+          headline: parsed.hero.headline,
+          subheadline: parsed.hero.subheadline,
+          ctaLabel: parsed.hero.ctaLabel || "Get Started",
           backgroundIdea:
-            parsed.hero?.backgroundIdea ??
-            "Showcase high-energy hero photography",
+            parsed.hero.backgroundIdea || "Hero image showcasing the business",
         },
-        sections: Array.isArray(parsed.sections)
-          ? parsed.sections.slice(0, 6).map((section: any) => ({
-              title: section.title ?? "Why locals love us",
-              body:
-                section.body ??
-                "Highlight testimonials, hours, and top services.",
-              ctaLabel: section.ctaLabel,
-            }))
-          : [],
+        sections: parsed.sections.slice(0, 6).map((section: any) => ({
+          title: section.title,
+          body: section.body,
+          ctaLabel: section.ctaLabel,
+        })),
         style: {
-          primaryColor: parsed.style?.primaryColor ?? "#0f172a",
-          secondaryColor: parsed.style?.secondaryColor ?? "#1e293b",
-          accentColor: parsed.style?.accentColor ?? "#34d399",
-          tone: parsed.style?.tone ?? "Friendly, expert, community first",
+          primaryColor: parsed.style.primaryColor,
+          secondaryColor:
+            parsed.style.secondaryColor || parsed.style.primaryColor,
+          accentColor: parsed.style.accentColor || "#34d399",
+          tone: parsed.style.tone || "Professional and engaging",
         },
       };
 
@@ -417,7 +443,7 @@ Make this so specific that someone could identify their exact industry in 3 seco
     } catch (error) {
       console.error("Failed to parse homepage blueprint:", error);
       console.error("Response received:", response?.substring(0, 500)); // Log first 500 chars
-      
+
       // Return fallback only on final attempt
       if (attempt === maxRetries) {
         return {
@@ -492,26 +518,27 @@ Create a blog post that showcases their expertise in their specific industry and
 
   try {
     const parsed = JSON.parse(response);
+
+    // Validate AI generated all required fields
+    if (!parsed.title || !parsed.body) {
+      throw new Error("AI failed to generate required blog content");
+    }
+
     return {
-      title: parsed.title ?? "LocalIQ insights for your neighborhood brand",
-      excerpt:
-        parsed.excerpt ??
-        "A quick look at how to boost local engagement this month.",
+      title: parsed.title,
+      excerpt: parsed.excerpt || parsed.title,
       outline: Array.isArray(parsed.outline) ? parsed.outline.slice(0, 6) : [],
-      body: parsed.body ?? response,
+      body: parsed.body,
       suggestedTags: Array.isArray(parsed.suggestedTags)
         ? parsed.suggestedTags.slice(0, 6)
-        : ["local-marketing", "smartlocal"],
+        : [],
     };
   } catch (error) {
-    console.warn("Failed to parse blog post JSON", error);
-    return {
-      title: "How this demo drives more local conversions",
-      excerpt: "Key takeaways from the LocalIQ SmartLocal assessment.",
-      outline: ["Headline win", "Opportunities", "Next step CTA"],
-      body: response,
-      suggestedTags: ["localiq", "demo"],
-    };
+    console.error("Failed to parse blog post JSON:", error);
+    // Re-throw to fail fast rather than returning generic content
+    throw new Error(
+      `Blog post generation failed: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
   }
 }
 

@@ -10,6 +10,8 @@
     "format": "prettier --check .",
     "test": "vitest",
     "setup:pinecone": "npx tsx scripts/setup-pinecone.ts",
+    "setup:pinecone-porter": "npx tsx scripts/setup-pinecone-porter.ts",
+    "setup:pinecone-economic": "npx tsx scripts/setup-pinecone-economic.ts",
     "migrate:vectors": "npx tsx --env-file=.env.local scripts/migrate-vectors.ts"
   },
   "dependencies": {

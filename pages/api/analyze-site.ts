@@ -72,10 +72,10 @@ function chunkContent(text: string, chunkSize = 1000) {
         chunks.push(buffer.trim());
         buffer = "";
       }
-      
+
       const sentences = paragraph.split(/(?<=[.!?])\s+/);
       let sentenceBuffer = "";
-      
+
       for (const sentence of sentences) {
         if ((sentenceBuffer + sentence).length > chunkSize) {
           if (sentenceBuffer.trim()) {
@@ -86,7 +86,7 @@ function chunkContent(text: string, chunkSize = 1000) {
           sentenceBuffer += (sentenceBuffer ? " " : "") + sentence;
         }
       }
-      
+
       if (sentenceBuffer.trim()) {
         buffer = sentenceBuffer;
       }
@@ -109,7 +109,7 @@ function chunkContent(text: string, chunkSize = 1000) {
 
   // Filter out very short chunks and ensure minimum quality
   return chunks
-    .filter(chunk => chunk.length > 100 && chunk.split(' ').length > 15)
+    .filter((chunk) => chunk.length > 100 && chunk.split(" ").length > 15)
     .slice(0, 15); // Limit to top 15 chunks for quality
 }
 
@@ -135,17 +135,27 @@ async function maybeStoreChunks({
               : (embedding as number[])
             : [embedding as number];
 
-          const metadata: Record<string, string | number> = { 
+          const heading = headings[index];
+
+          const metadata = {
+            demoId: embeddingsId,
+            analysisType: "website" as const,
+            category: "strategic" as const,
+            heading: heading || undefined,
+            chunkType: (heading ? "heading" : "content") as
+              | "heading"
+              | "content",
             source: sourceUrl,
             chunkIndex: index,
-            contentType: headings[index] ? 'heading-section' : 'content',
+            contentType: headings[index] ? "heading-section" : "content",
             extractedAt: new Date().toISOString(),
-            wordCount: content.split(' ').length,
+            timestamp: new Date().toISOString(),
+            wordCount: content.split(" ").length,
+            contentLength: content.length,
+            confidence: 0.9,
+            relevanceScore: 0.85,
+            tags: ["website-analysis", "initial-scan"],
           };
-          const heading = headings[index];
-          if (heading) {
-            metadata.heading = heading;
-          }
 
           return {
             id: `${embeddingsId}-${index}`,

@@ -49,6 +49,17 @@ export interface DemoBlogPost {
   suggestedTags: string[];
 }
 
+export interface ContentCalendarItem {
+  day: string;
+  date: string;
+  time: string;
+  content: string;
+  platform: string;
+  hashtags: string[];
+  postType: string;
+  engagement: string;
+}
+
 export interface GeneratedDemo {
   id: string;
   clientId: string;

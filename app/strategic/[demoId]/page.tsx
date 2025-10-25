@@ -10,6 +10,217 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+// Collapsible Analysis Section Component
+function CollapsibleSection({ 
+  title, 
+  content, 
+  color = 'emerald',
+  defaultOpen = false 
+}: { 
+  title: string; 
+  content: string; 
+  color?: 'emerald' | 'blue' | 'purple' | 'amber';
+  defaultOpen?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  
+  const colorClasses = {
+    emerald: {
+      border: 'border-emerald-500/30',
+      bg: 'bg-emerald-500/10',
+      text: 'text-emerald-400',
+      hover: 'hover:bg-emerald-500/20',
+    },
+    blue: {
+      border: 'border-blue-500/30',
+      bg: 'bg-blue-500/10',
+      text: 'text-blue-400',
+      hover: 'hover:bg-blue-500/20',
+    },
+    purple: {
+      border: 'border-purple-500/30',
+      bg: 'bg-purple-500/10',
+      text: 'text-purple-400',
+      hover: 'hover:bg-purple-500/20',
+    },
+    amber: {
+      border: 'border-amber-500/30',
+      bg: 'bg-amber-500/10',
+      text: 'text-amber-400',
+      hover: 'hover:bg-amber-500/20',
+    },
+  };
+
+  const colors = colorClasses[color];
+
+  return (
+    <div className={`border ${colors.border} rounded-lg overflow-hidden mb-4`}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full px-6 py-4 ${colors.bg} ${colors.hover} transition-colors flex items-center justify-between`}
+      >
+        <h4 className={`text-lg font-semibold ${colors.text}`}>{title}</h4>
+        <svg 
+          className={`w-5 h-5 ${colors.text} transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="px-6 py-4 bg-slate-900/50">
+          <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">
+            {content}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Five Forces Summary Component
+function FiveForcesSummary({ analysis }: { analysis: string }) {
+  // Parse the analysis into sections
+  const sections = analysis.split(/(?=\d+\.\s+[A-Z\s]+\n)/g).filter(s => s.trim());
+  const intro = sections[0] || '';
+  const forces = sections.slice(1, 6);
+  const overall = sections.slice(6).join('\n\n');
+
+  return (
+    <div id="five-forces-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+      <h3 className="text-2xl font-bold mb-6 text-emerald-400">Five Forces Analysis Results</h3>
+      
+      {intro && <p className="text-slate-300 mb-6 leading-relaxed">{intro}</p>}
+      
+      <div className="space-y-3">
+        {forces.map((force, idx) => {
+          const titleMatch = force.match(/\d+\.\s+([A-Z\s]+(?:\([^)]+\))?)/);
+          const title = titleMatch ? titleMatch[1].trim() : `Force ${idx + 1}`;
+          return (
+            <CollapsibleSection
+              key={idx}
+              title={title}
+              content={force}
+              color="emerald"
+              defaultOpen={idx === 0}
+            />
+          );
+        })}
+      </div>
+
+      {overall && (
+        <div className="mt-8 p-6 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+          <h4 className="text-xl font-bold text-emerald-400 mb-4">Overall Analysis Summary</h4>
+          <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">
+            {overall}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Value Chain Summary Component
+function ValueChainSummary({ analysis }: { analysis: string }) {
+  // Parse sections
+  const primaryMatch = analysis.match(/PRIMARY ACTIVITIES:([\s\S]*?)(?=SUPPORT ACTIVITIES:|$)/);
+  const supportMatch = analysis.match(/SUPPORT ACTIVITIES:([\s\S]*?)(?=Final Deliverables:|$)/);
+  const finalsMatch = analysis.match(/Final Deliverables:([\s\S]*$)/);
+
+  const primaryActivities = primaryMatch ? primaryMatch[1].split(/(?=\*\*[A-Z\s]+\*\*)/).filter(s => s.trim()) : [];
+  const supportActivities = supportMatch ? supportMatch[1].split(/(?=\*\*[A-Z\s]+\*\*)/).filter(s => s.trim()) : [];
+  const finals = finalsMatch ? finalsMatch[1] : '';
+
+  return (
+    <div id="value-chain-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+      <h3 className="text-2xl font-bold mb-6 text-blue-400">Value Chain Analysis Results</h3>
+      
+      <div className="mb-8">
+        <h4 className="text-xl font-semibold text-blue-300 mb-4">Primary Activities</h4>
+        <div className="space-y-3">
+          {primaryActivities.map((activity, idx) => {
+            const titleMatch = activity.match(/\*\*([A-Z\s&]+)\*\*/);
+            const title = titleMatch ? titleMatch[1].trim() : `Activity ${idx + 1}`;
+            return (
+              <CollapsibleSection
+                key={idx}
+                title={title}
+                content={activity}
+                color="blue"
+                defaultOpen={idx === 0}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <h4 className="text-xl font-semibold text-blue-300 mb-4">Support Activities</h4>
+        <div className="space-y-3">
+          {supportActivities.map((activity, idx) => {
+            const titleMatch = activity.match(/\*\*([A-Z\s]+)\*\*/);
+            const title = titleMatch ? titleMatch[1].trim() : `Support ${idx + 1}`;
+            return (
+              <CollapsibleSection
+                key={idx}
+                title={title}
+                content={activity}
+                color="blue"
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {finals && (
+        <div className="p-6 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+          <h4 className="text-xl font-bold text-blue-400 mb-4">Key Recommendations</h4>
+          <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">
+            {finals}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Strategic Positioning Summary Component
+function StrategicPositioningSummary({ analysis }: { analysis: string }) {
+  const sections = [
+    { title: 'Current Strategy Diagnosis', match: /Current Strategy Diagnosis:([\s\S]*?)(?=Recommended Positioning|$)/ },
+    { title: 'Recommended Positioning', match: /Recommended Positioning[\s\S]*?:([\s\S]*?)(?=Competitive Position Map|$)/ },
+    { title: 'Competitive Position Map', match: /Competitive Position Map([\s\S]*?)(?=Action Plan|$)/ },
+    { title: 'Action Plan', match: /Action Plan([\s\S]*?)(?=Risk Assessment|$)/ },
+    { title: 'Risk Assessment', match: /Risk Assessment([\s\S]*$)/ },
+  ];
+
+  return (
+    <div id="positioning-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+      <h3 className="text-2xl font-bold mb-6 text-purple-400">Strategic Positioning Results</h3>
+      
+      <div className="space-y-3">
+        {sections.map((section, idx) => {
+          const match = analysis.match(section.match);
+          const content = match ? match[1] || match[0] : '';
+          if (!content.trim()) return null;
+          
+          return (
+            <CollapsibleSection
+              key={idx}
+              title={section.title}
+              content={content}
+              color="purple"
+              defaultOpen={idx === 0}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 interface StrategicDashboardData {
   demoId: string;
   businessName: string;
@@ -133,7 +344,7 @@ export default function StrategicDashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-600 to-blue-600 py-6">
+      <div className="bg-linear-to-r from-emerald-600 to-blue-600 py-6">
         <div className="container mx-auto px-6">
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-200 mb-1">We Build Apps</p>
           <h1 className="text-3xl font-bold mb-2">Local AI - Strategic Intelligence Dashboard</h1>
@@ -277,7 +488,7 @@ export default function StrategicDashboard() {
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Five Forces Card */}
               <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
-                <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 p-4">
+                <div className="bg-linear-to-r from-emerald-600 to-emerald-700 p-4">
                   <h3 className="text-lg font-semibold text-white">Five Forces Analysis</h3>
                 </div>
                 <div className="p-6">
@@ -320,7 +531,7 @@ export default function StrategicDashboard() {
 
               {/* Value Chain Card */}
               <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4">
+                <div className="bg-linear-to-r from-blue-600 to-blue-700 p-4">
                   <h3 className="text-lg font-semibold text-white">Value Chain Analysis</h3>
                 </div>
                 <div className="p-6">
@@ -363,7 +574,7 @@ export default function StrategicDashboard() {
 
               {/* Strategic Positioning Card */}
               <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
+                <div className="bg-linear-to-r from-purple-600 to-purple-700 p-4">
                   <h3 className="text-lg font-semibold text-white">Strategic Positioning</h3>
                 </div>
                 <div className="p-6">
@@ -407,159 +618,15 @@ export default function StrategicDashboard() {
 
             {/* Full Results Sections */}
             {data.porterAnalysis?.fiveForces && (
-              <div id="five-forces-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
-                <h3 className="text-2xl font-bold mb-6 text-emerald-400">Five Forces Analysis Results</h3>
-                <div className="prose prose-invert prose-lg max-w-none">
-                  <style jsx global>{`
-                    .prose h3 {
-                      font-size: 1.5rem;
-                      font-weight: 700;
-                      margin-top: 2.5rem;
-                      margin-bottom: 1rem;
-                      padding-bottom: 0.75rem;
-                      border-bottom: 2px solid rgb(16 185 129 / 0.3);
-                      color: rgb(110 231 183);
-                    }
-                    .prose h4 {
-                      font-size: 1.25rem;
-                      font-weight: 600;
-                      margin-top: 1.5rem;
-                      margin-bottom: 0.75rem;
-                      color: rgb(52 211 153);
-                    }
-                    .prose ul {
-                      margin-top: 1rem;
-                      margin-bottom: 1.5rem;
-                      padding-left: 1.5rem;
-                    }
-                    .prose li {
-                      margin-top: 0.5rem;
-                      margin-bottom: 0.5rem;
-                      line-height: 1.7;
-                      color: rgb(203 213 225);
-                    }
-                    .prose strong {
-                      font-weight: 600;
-                      color: rgb(248 250 252);
-                    }
-                    .prose p {
-                      margin-top: 1rem;
-                      margin-bottom: 1rem;
-                      line-height: 1.7;
-                      color: rgb(203 213 225);
-                    }
-                    .prose hr {
-                      margin-top: 3rem;
-                      margin-bottom: 3rem;
-                      border-color: rgb(51 65 85);
-                    }
-                    .prose ol {
-                      margin-top: 1rem;
-                      margin-bottom: 1.5rem;
-                      padding-left: 1.5rem;
-                    }
-                    .prose blockquote {
-                      border-left: 4px solid rgb(16 185 129);
-                      padding-left: 1rem;
-                      margin: 1.5rem 0;
-                      font-style: italic;
-                      color: rgb(226 232 240);
-                    }
-                  `}</style>
-                  <div className="formatted-analysis">
-                    {data.porterAnalysis.fiveForces.split('\n').map((line, idx) => {
-                      // Convert markdown-style headers
-                      if (line.startsWith('### ')) {
-                        return <h3 key={idx}>{line.replace('### ', '')}</h3>;
-                      }
-                      if (line.startsWith('#### ')) {
-                        return <h4 key={idx}>{line.replace('#### ', '')}</h4>;
-                      }
-                      if (line.startsWith('**') && line.endsWith('**')) {
-                        return <p key={idx}><strong>{line.replace(/\*\*/g, '')}</strong></p>;
-                      }
-                      if (line.startsWith('- ')) {
-                        return <li key={idx}>{line.replace('- ', '')}</li>;
-                      }
-                      if (line.trim() === '---') {
-                        return <hr key={idx} />;
-                      }
-                      if (line.trim()) {
-                        return <p key={idx}>{line}</p>;
-                      }
-                      return <div key={idx} className="h-2" />;
-                    })}
-                  </div>
-                </div>
-              </div>
+              <FiveForcesSummary analysis={data.porterAnalysis.fiveForces} />
             )}
 
             {data.porterAnalysis?.valueChain && (
-              <div id="value-chain-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
-                <h3 className="text-2xl font-bold mb-6 text-blue-400">Value Chain Analysis Results</h3>
-                <div className="prose prose-invert prose-lg max-w-none">
-                  <div className="formatted-analysis">
-                    {data.porterAnalysis.valueChain.split('\n').map((line, idx) => {
-                      if (line.startsWith('### ')) {
-                        return <h3 key={idx} className="text-blue-300 border-blue-500/30">{line.replace('### ', '')}</h3>;
-                      }
-                      if (line.startsWith('#### ')) {
-                        return <h4 key={idx} className="text-blue-400">{line.replace('#### ', '')}</h4>;
-                      }
-                      if (line.startsWith('**') && line.endsWith('**')) {
-                        return <p key={idx}><strong>{line.replace(/\*\*/g, '')}</strong></p>;
-                      }
-                      if (line.startsWith('- ')) {
-                        return <li key={idx}>{line.replace('- ', '')}</li>;
-                      }
-                      if (line.match(/^\d+\.\s/)) {
-                        return <li key={idx} className="list-decimal">{line.replace(/^\d+\.\s/, '')}</li>;
-                      }
-                      if (line.trim() === '---') {
-                        return <hr key={idx} />;
-                      }
-                      if (line.trim()) {
-                        return <p key={idx}>{line}</p>;
-                      }
-                      return <div key={idx} className="h-2" />;
-                    })}
-                  </div>
-                </div>
-              </div>
+              <ValueChainSummary analysis={data.porterAnalysis.valueChain} />
             )}
 
             {data.porterAnalysis?.positioning && (
-              <div id="positioning-results" className="bg-slate-900 rounded-xl p-8 border border-slate-800">
-                <h3 className="text-2xl font-bold mb-6 text-purple-400">Strategic Positioning Results</h3>
-                <div className="prose prose-invert prose-lg max-w-none">
-                  <div className="formatted-analysis">
-                    {data.porterAnalysis.positioning.split('\n').map((line, idx) => {
-                      if (line.startsWith('### ')) {
-                        return <h3 key={idx} className="text-purple-300 border-purple-500/30">{line.replace('### ', '')}</h3>;
-                      }
-                      if (line.startsWith('#### ')) {
-                        return <h4 key={idx} className="text-purple-400">{line.replace('#### ', '')}</h4>;
-                      }
-                      if (line.startsWith('**') && line.endsWith('**')) {
-                        return <p key={idx}><strong>{line.replace(/\*\*/g, '')}</strong></p>;
-                      }
-                      if (line.startsWith('- ')) {
-                        return <li key={idx}>{line.replace('- ', '')}</li>;
-                      }
-                      if (line.match(/^\d+\.\s/)) {
-                        return <li key={idx} className="list-decimal">{line.replace(/^\d+\.\s/, '')}</li>;
-                      }
-                      if (line.trim() === '---') {
-                        return <hr key={idx} />;
-                      }
-                      if (line.trim()) {
-                        return <p key={idx}>{line}</p>;
-                      }
-                      return <div key={idx} className="h-2" />;
-                    })}
-                  </div>
-                </div>
-              </div>
+              <StrategicPositioningSummary analysis={data.porterAnalysis.positioning} />
             )}
           </div>
         )}
