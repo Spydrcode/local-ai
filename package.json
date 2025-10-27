@@ -12,6 +12,9 @@
     "setup:pinecone": "npx tsx scripts/setup-pinecone.ts",
     "setup:pinecone-porter": "npx tsx scripts/setup-pinecone-porter.ts",
     "setup:pinecone-economic": "npx tsx scripts/setup-pinecone-economic.ts",
+    "setup:pinecone-hbs": "npx tsx scripts/setup-pinecone-hbs.ts",
+    "setup:pinecone-optimized": "npx tsx scripts/setup-pinecone-optimized.ts",
+    "test:vectors": "npx tsx scripts/test-vector-search.ts",
     "migrate:vectors": "npx tsx --env-file=.env.local scripts/migrate-vectors.ts"
   },
   "dependencies": {

@@ -1,5 +1,8 @@
-'use client';
-
+"use client";
+// Add missing AnalysisStatus type
+type AnalysisStatus = {
+  [key: string]: 'not-run' | 'running' | 'completed' | 'error';
+};
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -7,11 +10,9 @@ interface AnalysisData {
   demoId: string;
   businessName: string;
   websiteUrl: string;
-  // Initial Analysis
   siteSummary?: string;
   keyItems?: string[];
   aiInsights?: string[];
-  // Social Media
   socialPosts?: Array<{
     platform: string;
     content: string;
@@ -27,7 +28,6 @@ interface AnalysisData {
     postType?: string;
     engagement?: string;
   }>;
-  // Strategic Analysis
   competitorAnalysis?: {
     competitors: Array<{
       name: string;
@@ -47,7 +47,6 @@ interface AnalysisData {
     recommendations: string[];
     projectedImprovement: string;
   };
-  // Website Redesign
   websiteGrade?: {
     score: number;
     improvements: string[];
@@ -57,8 +56,267 @@ interface AnalysisData {
   implementationRoadmap?: any;
 }
 
-interface AnalysisStatus {
-  [key: string]: 'not-run' | 'running' | 'completed' | 'error';
+const analysisModules = [
+  {
+    id: 'site-analysis',
+    title: 'Business DNA Analysis',
+    description: 'What makes your business unique in your market',
+    icon: '🧬',
+    category: 'foundation',
+    endpoint: (demoId: string) => `/api/analyze-site-data/${demoId}`,
+    color: 'emerald',
+    tier: 'free'
+  },
+  {
+    id: 'local-market-intelligence',
+    title: 'Local Market Position',
+    description: 'How you stack up against nearby competitors',
+    icon: '📍',
+    category: 'foundation',
+    endpoint: (demoId: string) => `/api/local-market-analysis/${demoId}`,
+    color: 'blue'
+  },
+  {
+    id: 'customer-sentiment-tracker',
+    title: 'Customer Voice Dashboard',
+    description: 'What customers say about you online (reviews, social)',
+    icon: '💬',
+    category: 'foundation',
+    endpoint: (demoId: string) => `/api/customer-sentiment/${demoId}`,
+    color: 'purple'
+  },
+  {
+    id: 'economic-intelligence',
+    title: 'Economic Reality Check',
+    description: 'How economic trends affect your local market',
+    icon: '�',
+    category: 'foundation',
+    endpoint: (demoId: string) => `/api/economic-intelligence/${demoId}`,
+    color: 'amber'
+  },
+  // Strategic Advantage (SMB-Optimized Strategic Frameworks)
+  {
+    id: 'competitive-moat',
+    title: 'Your Competitive Moat',
+    description: 'Why customers choose you over competitors (Porter simplified)',
+    icon: '�',
+    category: 'strategic',
+    endpoint: (demoId: string) => `/api/competitive-moat/${demoId}`,
+    color: 'purple'
+  },
+  {
+    id: 'value-chain-optimizer',
+    title: 'Business Process Optimizer',
+    description: 'Where you make money vs where you lose it',
+    icon: '⚙️',
+    category: 'strategic',
+    endpoint: (demoId: string) => `/api/value-chain-optimizer/${demoId}`,
+    color: 'blue'
+  },
+  {
+    id: 'swot-live-dashboard',
+    title: 'Live SWOT Dashboard',
+    description: 'Real-time strengths/weaknesses from customer feedback',
+    icon: '📊',
+    category: 'strategic',
+    endpoint: (demoId: string) => `/api/swot-live-dashboard/${demoId}`,
+    color: 'emerald'
+  },
+  {
+    id: 'pricing-power-analysis',
+    title: 'Pricing Power Analysis',
+    description: 'How much more can you charge (and why)',
+    icon: '💰',
+    category: 'strategic',
+    endpoint: (demoId: string) => `/api/pricing-power/${demoId}`,
+    color: 'amber'
+  },
+  {
+    id: 'local-expansion-roadmap',
+    title: 'Local Growth Playbook',
+    description: 'Next 3 moves to dominate your local market',
+    icon: '�️',
+    category: 'strategic',
+    endpoint: (demoId: string) => `/api/local-expansion/${demoId}`,
+    color: 'violet'
+  },
+  {
+    id: 'quick-wins-generator',
+    title: 'This Week\'s Action Plan',
+    description: 'High-impact moves you can execute immediately',
+    icon: '⚡',
+    category: 'strategic',
+    endpoint: (demoId: string) => `/api/quick-wins/${demoId}`,
+    color: 'red'
+  },
+  // Marketing Engine (Content that Converts)
+  {
+    id: 'customer-magnet-posts',
+    title: 'Customer Magnet Posts',
+    description: 'Social content that brings in new customers',
+    icon: '🧲',
+    category: 'content',
+    endpoint: (demoId: string) => `/api/customer-magnet-posts/${demoId}`,
+    color: 'pink'
+  },
+  {
+    id: 'local-seo-content',
+    title: 'Local SEO Content Engine',
+    description: 'Content that gets you found by nearby customers',
+    icon: '�',
+    category: 'content',
+    endpoint: (demoId: string) => `/api/local-seo-content/${demoId}`,
+    color: 'emerald'
+  },
+  {
+    id: 'conversion-website',
+    title: 'High-Converting Website',
+    description: 'Website designs that turn visitors into customers',
+    icon: '�',
+    category: 'content',
+    endpoint: (demoId: string) => `/api/generate-mockup`,
+    method: 'POST',
+    body: (demoId: string) => ({ demoId }),
+    color: 'blue'
+  },
+  {
+    id: 'email-nurture-sequences',
+    title: 'Email Follow-Up Sequences',
+    description: 'Automated emails that close more sales',
+    icon: '�',
+    category: 'content',
+    endpoint: (demoId: string) => `/api/email-sequences/${demoId}`,
+    color: 'purple'
+  },
+  {
+    id: 'review-generation-system',
+    title: 'Review Generation System',
+    description: 'Get more 5-star reviews automatically',
+    icon: '⭐',
+    category: 'content',
+    endpoint: (demoId: string) => `/api/review-system/${demoId}`,
+    color: 'amber'
+  },
+  // Growth Accelerator (Track & Improve)
+  {
+    id: 'revenue-leaks-detector',
+    title: 'Revenue Leaks Detector',
+    description: 'Find where you\'re losing money right now',
+    icon: '�',
+    category: 'optimization',
+    endpoint: (demoId: string) => `/api/revenue-leaks/${demoId}`,
+    color: 'red'
+  },
+  {
+    id: 'kpi-dashboard',
+    title: 'Small Business KPI Dashboard',
+    description: 'Track the metrics that actually matter',
+    icon: '📊',
+    category: 'optimization',
+    endpoint: (demoId: string) => `/api/kpi-dashboard/${demoId}`,
+    color: 'blue'
+  },
+  {
+    id: 'profit-optimizer',
+    title: 'Profit Optimizer',
+    description: 'Increase margins without raising prices',
+    icon: '�',
+    category: 'optimization',
+    endpoint: (demoId: string) => `/api/profit-optimizer/${demoId}`,
+    color: 'emerald'
+  },
+  {
+    id: 'customer-lifetime-maximizer',
+    title: 'Customer Lifetime Maximizer',
+    description: 'Get more value from existing customers',
+    icon: '🎯',
+    category: 'optimization',
+    endpoint: (demoId: string) => `/api/customer-lifetime/${demoId}`,
+    color: 'purple'
+  },
+  {
+    id: 'automation-opportunities',
+    title: 'Automation Opportunities',
+    description: 'Save 10+ hours per week with smart automation',
+    icon: '🤖',
+    category: 'optimization',
+    endpoint: (demoId: string) => `/api/automation-opportunities/${demoId}`,
+    color: 'cyan'
+  },
+  {
+    id: 'growth-accelerator-plan',
+    title: '90-Day Growth Plan',
+    description: 'Your step-by-step path to 25% more revenue',
+    icon: '�',
+    category: 'optimization',
+    endpoint: (demoId: string) => `/api/growth-plan/${demoId}`,
+    color: 'amber'
+  }
+];
+
+const categories = [
+  { id: 'foundation', label: '🧭 Business Intelligence', description: 'What makes you the go-to choice locally' },
+  { id: 'strategic', label: '🎯 Strategic Advantage', description: 'Proven strategic frameworks simplified for small business' },
+  { id: 'content', label: '📱 Marketing Engine', description: 'Content that converts visitors to customers' },
+  { id: 'optimization', label: '📈 Growth Accelerator', description: 'Track & improve what matters most' }
+];
+
+// Helper function to provide action-oriented button text
+function getActionButtonText(moduleId: string): string {
+  const buttonTexts: Record<string, string> = {
+    'competitive-moat': 'Find My Competitive Edge',
+    'value-chain-optimizer': 'Optimize My Processes',
+    'swot-live-dashboard': 'Check My Reputation',
+    'pricing-power-analysis': 'Analyze My Pricing',
+    'local-expansion-roadmap': 'Plan My Growth',
+    'quick-wins-generator': 'Get Quick Wins',
+    'customer-magnet-posts': 'Create Magnet Content',
+    'local-seo-content': 'Boost Local SEO',
+    'conversion-website': 'Design High-Converting Site',
+    'email-nurture-sequences': 'Build Email Sequences',
+    'review-generation-system': 'Get More Reviews',
+    'revenue-leaks-detector': 'Find Revenue Leaks',
+    'kpi-dashboard': 'Track Key Metrics',
+    'profit-optimizer': 'Increase Profits',
+    'customer-lifetime-maximizer': 'Maximize Customer Value',
+    'automation-opportunities': 'Automate My Work',
+    'growth-accelerator-plan': 'Accelerate Growth',
+    'business-dna-analysis': 'Discover My DNA',
+    'local-market-intelligence': 'Map My Market',
+    'customer-sentiment-tracker': 'Track Customer Voice',
+    'economic-intelligence': 'Check Market Reality'
+  };
+  
+  return buttonTexts[moduleId] || 'Run Analysis';
+}
+
+// Helper function to provide action-oriented next steps
+function getModuleActionSteps(moduleId: string): string {
+  const actionSteps: Record<string, string> = {
+    'competitive-moat': 'List your top 3 differentiators and update your website homepage to feature them prominently.',
+    'value-chain-optimizer': 'Identify the 1-2 processes taking most of your time and research automation tools.',
+    'swot-live-dashboard': 'Check your Google Business reviews and respond to any negative feedback within 24 hours.',
+    'pricing-power-analysis': 'Test a 10-15% price increase on your premium service with new customers.',
+    'local-expansion-roadmap': 'Claim your Google Business listing and add photos, hours, and contact info.',
+    'quick-wins-generator': 'Pick the top 3 recommended actions and schedule time to complete them this week.',
+    'customer-magnet-posts': 'Schedule the first week of social posts and track which ones get the most engagement.',
+    'local-seo-content': 'Add location-based keywords to your homepage title and meta description.',
+    'conversion-website': 'Update your homepage headline to focus on customer benefits, not features.',
+    'email-nurture-sequences': 'Set up a simple email sequence for new leads using your existing email platform.',
+    'review-generation-system': 'Send follow-up emails to your last 10 customers asking for reviews.',
+    'revenue-leaks-detector': 'Track where potential customers drop off and fix the biggest leak first.',
+    'kpi-dashboard': 'Start tracking these 3 metrics weekly: new leads, conversion rate, average transaction value.',
+    'profit-optimizer': 'Review your pricing and identify 1-2 low-margin services to raise prices on.',
+    'customer-lifetime-maximizer': 'Create an upsell offer for existing customers and test it this month.',
+    'automation-opportunities': 'Automate your most time-consuming weekly task using available tools.',
+    'growth-accelerator-plan': 'Focus on the first 30 days of recommendations and track progress weekly.',
+    'business-dna-analysis': 'Update your elevator pitch to focus on customer outcomes, not what you do.',
+    'local-market-intelligence': 'Visit or call your top 3 competitors to understand their pricing and offerings.',
+    'customer-sentiment-tracker': 'Set up Google Alerts for your business name and respond to mentions.',
+    'economic-intelligence': 'Adjust your marketing message to address current economic concerns customers have.'
+  };
+  
+  return actionSteps[moduleId] || 'Review the analysis results and implement the top 3 recommendations this week.';
 }
 
 export default function AnalysisPage() {
@@ -66,44 +324,14 @@ export default function AnalysisPage() {
   const demoId = (params?.demoId as string) || '';
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('initial');
-  const [newUrl, setNewUrl] = useState('');
-  const [isLoadingNewUrl, setIsLoadingNewUrl] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('foundation');
+  const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>({});
   const [analysisErrors, setAnalysisErrors] = useState<Record<string, string>>({});
-  const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>({
-    'site-analysis': 'not-run',
-    'ai-insights': 'not-run',
-    'social-posts': 'not-run',
-    'content-calendar': 'not-run',
-    'competitor-research': 'not-run',
-    'brand-analysis': 'not-run',
-    'conversion-analysis': 'not-run',
-    'website-grade': 'not-run',
-    'mockup-generation': 'not-run',
-    'implementation-roadmap': 'not-run'
-  });
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      // Reset state when loading new demo
       setIsLoading(true);
-      setAnalysisData(null);
-      setAnalysisErrors({});
-      setAnalysisStatus({
-        'site-analysis': 'not-run',
-        'ai-insights': 'not-run',
-        'social-posts': 'not-run',
-        'content-calendar': 'not-run',
-        'competitor-research': 'not-run',
-        'brand-analysis': 'not-run',
-        'conversion-analysis': 'not-run',
-        'website-grade': 'not-run',
-        'mockup-generation': 'not-run',
-        'implementation-roadmap': 'not-run'
-      });
-
       try {
-        // Add cache-busting parameter to force fresh data
         const response = await fetch(`/api/analyze-site-data/${demoId}?_t=${Date.now()}`);
         if (response.ok) {
           const data = await response.json();
@@ -121,117 +349,53 @@ export default function AnalysisPage() {
     }
   }, [demoId]);
 
-  useEffect(() => {
-    console.log('Analysis data updated:', analysisData);
-  }, [analysisData]);
+  const runAnalysis = async (moduleId: string) => {
+    if (analysisStatus[moduleId] === 'running') return;
 
-  const runAnalysis = async (analysisType: string) => {
-    if (analysisStatus[analysisType] === 'running') return;
+    const module = analysisModules.find(m => m.id === moduleId);
+    if (!module) return;
 
-    // Check prerequisites for mockup generation
-    if (analysisType === 'mockup-generation' && (!analysisData || !analysisData.siteSummary)) {
-      // Automatically run site analysis first
-      console.log('Mockup generation requires site analysis - running it first...');
-      setAnalysisErrors(prev => ({ 
-        ...prev, 
-        'mockup-generation': 'Running site analysis first...' 
-      }));
-      
-      try {
-        await runAnalysis('site-analysis');
-        // After site analysis completes, the user can click mockup generation again
-        setAnalysisErrors(prev => ({ 
-          ...prev, 
-          'mockup-generation': 'Site analysis complete! Click "Generate Mockup" again.' 
-        }));
-        return;
-      } catch (error) {
-        setAnalysisErrors(prev => ({ 
-          ...prev, 
-          'mockup-generation': 'Failed to run site analysis. Please run it manually first.' 
-        }));
-        return;
-      }
-    }
-
-    setAnalysisStatus(prev => ({ ...prev, [analysisType]: 'running' }));
+    setAnalysisStatus(prev => ({ ...prev, [moduleId]: 'running' }));
+    setAnalysisErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[moduleId];
+      return newErrors;
+    });
 
     try {
-      let endpoint = '';
-      let method = 'GET';
-      let body = undefined;
-
-      switch (analysisType) {
-        case 'site-analysis':
-          endpoint = `/api/analyze-site-data/${demoId}`;
-          break;
-        case 'ai-insights':
-          endpoint = `/api/ai-insights/${demoId}`;
-          break;
-        case 'social-posts':
-          endpoint = `/api/social-media-analysis/${demoId}`;
-          break;
-        case 'content-calendar':
-          endpoint = `/api/content-calendar/${demoId}`;
-          break;
-        case 'competitor-research':
-          endpoint = `/api/competitor-analysis/${demoId}`;
-          break;
-        case 'brand-analysis':
-          endpoint = `/api/brand-analysis/${demoId}`;
-          break;
-        case 'conversion-analysis':
-          endpoint = `/api/conversion-analysis/${demoId}`;
-          break;
-        case 'website-grade':
-          endpoint = `/api/website-grade/${demoId}`;
-          break;
-        case 'mockup-generation':
-          endpoint = `/api/generate-mockup`;
-          method = 'POST';
-          body = JSON.stringify({ demoId });
-          break;
-        case 'implementation-roadmap':
-          endpoint = `/api/implementation-roadmap/${demoId}`;
-          break;
-        default:
-          throw new Error('Unknown analysis type');
-      }
-
-      const response = await fetch(endpoint, {
+      const method = (module as any).method || 'GET';
+      const body = (module as any).body ? JSON.stringify((module as any).body(demoId)) : undefined;
+      
+      const response = await fetch(module.endpoint(demoId), {
         method,
         headers: method === 'POST' ? { 'Content-Type': 'application/json' } : {},
         body,
       });
-
+      
       if (!response.ok) {
-        // Try to get error details from response
         let errorMessage = 'Analysis failed';
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorData.details || errorMessage;
         } catch (e) {
-          // If JSON parsing fails, use status text
           errorMessage = `${errorMessage} (${response.status} ${response.statusText})`;
         }
-        console.error(`${analysisType} failed:`, errorMessage);
         throw new Error(errorMessage);
       }
 
       const data = await response.json();
-      console.log(`${analysisType} response:`, data);
-
-      if (analysisType === 'mockup-generation' && data.redirectUrl) {
+      
+      // Handle redirects for mockup and presentation generators
+      if ((moduleId === 'website-mockup' || moduleId === 'presentation-generator') && data.redirectUrl) {
         window.location.href = data.redirectUrl;
         return;
       }
-
-      // Update analysis data
+      
       setAnalysisData(prev => {
         if (!prev) return prev;
         const updates: Partial<AnalysisData> = {};
 
-        switch (analysisType) {
+        switch (moduleId) {
           case 'site-analysis':
             updates.siteSummary = data.summary;
             updates.keyItems = data.keyItems;
@@ -244,7 +408,6 @@ export default function AnalysisPage() {
             break;
           case 'content-calendar':
             updates.contentCalendar = data.calendar;
-            console.log('Content calendar data:', data.calendar);
             break;
           case 'competitor-research':
             updates.competitorAnalysis = data;
@@ -258,71 +421,37 @@ export default function AnalysisPage() {
           case 'website-grade':
             updates.websiteGrade = data;
             break;
+          case 'economic-intelligence':
+          case 'porter-analysis':
+          case 'hbs-business-model':
+          case 'hbs-swot':
+          case 'hbs-gtm':
+          case 'roi-calculator':
           case 'implementation-roadmap':
-            updates.implementationRoadmap = data;
+          case 'website-mockup':
+          case 'presentation-generator':
+            // Store generic data for these modules
+            (updates as any)[moduleId] = data;
             break;
         }
 
-        console.log('Updates to apply:', updates);
         return { ...prev, ...updates };
       });
 
-      setAnalysisStatus(prev => ({ ...prev, [analysisType]: 'completed' }));
-      // Clear any previous error for this analysis type
-      setAnalysisErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[analysisType];
-        return newErrors;
-      });
-
+      setAnalysisStatus(prev => ({ ...prev, [moduleId]: 'completed' }));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Analysis failed';
-      console.error(`${analysisType} failed:`, errorMessage);
-      setAnalysisStatus(prev => ({ ...prev, [analysisType]: 'error' }));
-      setAnalysisErrors(prev => ({ ...prev, [analysisType]: errorMessage }));
+      setAnalysisStatus(prev => ({ ...prev, [moduleId]: 'error' }));
+      setAnalysisErrors(prev => ({ ...prev, [moduleId]: errorMessage }));
     }
   };
-
-  const handleNewUrl = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newUrl || isLoadingNewUrl) return;
-
-    setIsLoadingNewUrl(true);
-    try {
-      const response = await fetch('/api/quick-analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: newUrl }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Force full page reload with cache busting to ensure fresh data
-        window.location.href = `/analysis/${data.demoId}?t=${Date.now()}`;
-      } else {
-        alert('Failed to analyze URL. Please check the URL and try again.');
-      }
-    } catch (error) {
-      console.error('Failed to analyze new URL:', error);
-      alert('Failed to analyze URL. Please try again.');
-    } finally {
-      setIsLoadingNewUrl(false);
-    }
-  };
-
-  const tabs = [
-    { id: 'initial', label: 'Initial Analysis', icon: '🔍', description: 'Website scraping & AI insights' },
-    { id: 'social', label: 'Social Media', icon: '📱', description: 'Content & calendar planning' },
-    { id: 'strategic', label: 'Strategic Analysis', icon: '🎯', description: 'Porter & competitor analysis' },
-    { id: 'redesign', label: 'Website Redesign', icon: '🎨', description: 'Mockups & implementation' },
-  ];
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-white">Loading business analysis...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-white">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -331,113 +460,91 @@ export default function AnalysisPage() {
   if (!analysisData) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <p className="text-white">Analysis not found</p>
+        <div className="text-center">
+          <p className="text-white text-xl mb-4">Analysis not found</p>
+          <a href="/" className="text-emerald-400 hover:text-emerald-300">
+            ← Start new analysis
+          </a>
+        </div>
       </div>
     );
   }
 
+  const currentModules = analysisModules.filter(m => m.category === activeCategory);
+
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Header */}
-      <div className="bg-slate-900 border-b border-slate-800">
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-emerald-300 mb-1">
-                We Build Apps
-              </p>
-              <h1 className="text-2xl font-bold text-white mb-1">
-                <span className="text-emerald-400">Local AI</span> - {analysisData.businessName}
-              </h1>
-              <a
-                href={analysisData.websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
-              >
-                {analysisData.websiteUrl}
+      <div className="border-b border-white/10 bg-slate-900/50 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <a href="/" className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                🏠 New Business
               </a>
+              <div className="h-6 w-px bg-white/20"></div>
+              <div>
+                <h1 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <span>🎯</span>
+                  {analysisData.businessName}
+                  <span className="text-sm bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded">SMB Strategy Hub</span>
+                </h1>
+                <a 
+                  href={analysisData.websiteUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-slate-400 hover:text-emerald-400 flex items-center gap-1"
+                >
+                  <span>🌐</span>
+                  {analysisData.websiteUrl}
+                </a>
+              </div>
             </div>
-            <div className="flex gap-3">
+            
+            <div className="flex items-center gap-3">
               <a
                 href={`/economic/${demoId}`}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-sm font-medium"
               >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                Economic Intelligence
+                📊 Market Reality
+              </a>
+              <a
+                href={`/porter/${demoId}`}
+                className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-colors text-sm font-medium"
+              >
+                � Strategic Frameworks
               </a>
               <a
                 href={`/strategic-v2/${demoId}`}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-colors text-sm font-medium"
               >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                Strategic Dashboard
-              </a>
-              <a
-                href="/"
-                className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                New Analysis
+                🏰 Porter Intelligence
               </a>
             </div>
           </div>
-
-          {/* Quick URL Input */}
-          <form onSubmit={handleNewUrl} className="mt-4">
-            <div className="flex gap-2">
-              <input
-                type="url"
-                value={newUrl}
-                onChange={(e) => setNewUrl(e.target.value)}
-                placeholder="Analyze another website..."
-                className="flex-1 px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm placeholder-slate-400 focus:border-emerald-500 focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={isLoadingNewUrl}
-                className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2"
-              >
-                {isLoadingNewUrl ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Loading...
-                  </>
-                ) : (
-                  <>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    Analyze
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="bg-slate-900/50 border-b border-slate-800">
-        <div className="container mx-auto px-6">
+      {/* Category Navigation */}
+      <div className="border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-8">
-            {tabs.map((tab) => (
+            {categories.map((category) => (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                  activeTab === tab.id
+                key={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                  activeCategory === category.id
                     ? 'border-emerald-500 text-emerald-400'
-                    : 'border-transparent text-slate-400 hover:text-white'
+                    : 'border-transparent text-slate-400 hover:text-white hover:border-white/20'
                 }`}
               >
-                <span className="text-lg">{tab.icon}</span>
                 <div className="text-left">
-                  <div>{tab.label}</div>
-                  <div className="text-xs opacity-75">{tab.description}</div>
+                  <div>{category.label}</div>
+                  <div className="text-xs opacity-75">{category.description}</div>
                 </div>
               </button>
             ))}
@@ -446,842 +553,305 @@ export default function AnalysisPage() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-6 py-8">
-        {activeTab === 'initial' && (
-          <div className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2">Initial Website Analysis</h2>
-              <p className="text-slate-400">Get comprehensive insights about your website and business</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-2">
+            {categories.find(c => c.id === activeCategory)?.label}
+          </h2>
+          <p className="text-slate-400 mb-4">
+            {categories.find(c => c.id === activeCategory)?.description}
+          </p>
+          
+          {activeCategory === 'foundation' && (
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-blue-300 text-sm">
+                💡 <strong>What this means:</strong> Instead of generic analysis, we look at your specific market position. 
+                Think "What makes customers drive past your competitors to get to you?"
+              </p>
             </div>
-
-            {/* Site Analysis */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🌐</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Website Content Analysis</h3>
-                    <p className="text-slate-400 text-sm">Extract and analyze website content</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['site-analysis'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['site-analysis'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['site-analysis'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['site-analysis'] === 'completed' ? 'Completed' :
-                   analysisStatus['site-analysis'] === 'running' ? 'Analyzing...' :
-                   analysisStatus['site-analysis'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {/* Error message display */}
-              {analysisErrors['site-analysis'] && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <p className="text-sm text-red-400">
-                    <span className="font-medium">Error:</span> {analysisErrors['site-analysis']}
-                  </p>
-                </div>
-              )}
-
-              {analysisData.siteSummary && (
-                <div className="mb-4">
-                  <h4 className="font-medium text-white mb-2">Website Summary</h4>
-                  <p className="text-slate-300 text-sm leading-relaxed">{analysisData.siteSummary}</p>
-                </div>
-              )}
-
-              {analysisData.keyItems && analysisData.keyItems.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="font-medium text-white mb-2">Key Items Identified</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {analysisData.keyItems.map((item, index) => (
-                      <span key={index} className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('site-analysis')}
-                disabled={analysisStatus['site-analysis'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['site-analysis'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['site-analysis'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['site-analysis'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Analyzing Website...
-                  </div>
-                ) : analysisStatus['site-analysis'] === 'completed' ? (
-                  'Re-run Analysis'
-                ) : (
-                  'Run Website Analysis'
-                )}
-              </button>
+          )}
+          
+          {activeCategory === 'strategic' && (
+            <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+              <p className="text-purple-300 text-sm">
+                💡 <strong>Strategic Intelligence for Small Business:</strong> We take complex frameworks like Porter's Five Forces 
+                and translate them into plain English with actionable steps you can take this week.
+              </p>
             </div>
-
-            {/* AI Insights */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🤖</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">AI Business Insights</h3>
-                    <p className="text-slate-400 text-sm">Generate intelligent business recommendations</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['ai-insights'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['ai-insights'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['ai-insights'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['ai-insights'] === 'completed' ? 'Completed' :
-                   analysisStatus['ai-insights'] === 'running' ? 'Generating...' :
-                   analysisStatus['ai-insights'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {/* Error message display */}
-              {analysisErrors['ai-insights'] && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <p className="text-sm text-red-400">
-                    <span className="font-medium">Error:</span> {analysisErrors['ai-insights']}
-                  </p>
-                </div>
-              )}
-
-              {analysisData.aiInsights && analysisData.aiInsights.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="font-medium text-white mb-3">AI Insights</h4>
-                  <div className="space-y-3">
-                    {analysisData.aiInsights.map((insight, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <span className="text-emerald-400 text-lg">💡</span>
-                        <p className="text-slate-300 text-sm">{insight}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('ai-insights')}
-                disabled={analysisStatus['ai-insights'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['ai-insights'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['ai-insights'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['ai-insights'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Generating Insights...
-                  </div>
-                ) : analysisStatus['ai-insights'] === 'completed' ? (
-                  'Regenerate Insights'
-                ) : (
-                  'Generate AI Insights'
-                )}
-              </button>
+          )}
+          
+          {activeCategory === 'content' && (
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+              <p className="text-emerald-300 text-sm">
+                💡 <strong>Content that converts:</strong> Not just pretty posts, but marketing materials designed to bring in customers. 
+                Every piece has a purpose: get found, build trust, close sales.
+              </p>
             </div>
-          </div>
-        )}
-
-        {activeTab === 'social' && (
-          <div className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2">Social Media Dashboard</h2>
-              <p className="text-slate-400">Create and manage your social media content strategy</p>
+          )}
+          
+          {activeCategory === 'optimization' && (
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+              <p className="text-amber-300 text-sm">
+                💡 <strong>Measure what matters:</strong> Track the KPIs that actually impact your bottom line. 
+                Find hidden profit opportunities and automate time-consuming tasks.
+              </p>
             </div>
+          )}
+        </div>
 
-            {/* Social Posts */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">📱</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Social Media Posts</h3>
-                    <p className="text-slate-400 text-sm">Generate platform-specific social content</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['social-posts'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['social-posts'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['social-posts'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['social-posts'] === 'completed' ? 'Completed' :
-                   analysisStatus['social-posts'] === 'running' ? 'Generating...' :
-                   analysisStatus['social-posts'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {analysisData.socialPosts && analysisData.socialPosts.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="font-medium text-white mb-3">Generated Posts</h4>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {analysisData.socialPosts.map((post, index) => (
-                      <div key={index} className="bg-slate-800 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">{post.emojis}</span>
-                          <span className="font-medium text-white">{post.platform}</span>
-                        </div>
-                        <p className="text-slate-300 text-sm">{post.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('social-posts')}
-                disabled={analysisStatus['social-posts'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['social-posts'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['social-posts'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['social-posts'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Generating Posts...
-                  </div>
-                ) : analysisStatus['social-posts'] === 'completed' ? (
-                  'Regenerate Posts'
-                ) : (
-                  'Generate Social Posts'
-                )}
-              </button>
-            </div>
-
-            {/* Content Calendar */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">📅</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">90-Day Content Calendar</h3>
-                    <p className="text-slate-400 text-sm">Plan your content strategy for the next 90 days</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['content-calendar'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['content-calendar'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['content-calendar'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['content-calendar'] === 'completed' ? 'Completed' :
-                   analysisStatus['content-calendar'] === 'running' ? 'Planning...' :
-                   analysisStatus['content-calendar'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {analysisData.contentCalendar && analysisData.contentCalendar.length > 0 && (
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-medium text-white">Content Calendar ({analysisData.contentCalendar.length} posts)</h4>
-                    <button
-                      onClick={async () => {
-                        try {
-                          const response = await fetch('/api/export-content-calendar', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              contentCalendar: analysisData.contentCalendar,
-                              businessName: analysisData.businessName
-                            })
-                          });
-                          
-                          if (response.ok) {
-                            const data = await response.json();
-                            const blob = new Blob([data.csv], { type: 'text/csv' });
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = data.filename;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(url);
-                          }
-                        } catch (error) {
-                          console.error('Failed to export calendar:', error);
-                          alert('Failed to export calendar');
-                        }
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      Export to CSV
-                    </button>
-                  </div>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {analysisData.contentCalendar.map((item, index) => (
-                      <div key={index} className="bg-slate-800 rounded-lg p-4 border-l-4 border-emerald-500">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <span className="font-semibold text-white text-lg">{item.day}</span>
-                            <div className="text-xs text-slate-400 mt-1">
-                              📅 {item.date || 'Date TBD'} • ⏰ {item.time || 'Time TBD'} • 📱 {item.platform}
-                            </div>
-                          </div>
-                          <span className="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-xs font-medium">
-                            {item.postType || 'Post'}
-                          </span>
-                        </div>
-
-                        <p className="text-slate-300 text-sm mb-3 leading-relaxed">{item.content}</p>
-
-                        {item.engagement && (
-                          <div className="bg-slate-700/50 rounded p-2 mb-3">
-                            <span className="text-xs text-slate-400">💡 Engagement Strategy: </span>
-                            <span className="text-xs text-slate-300">{item.engagement}</span>
-                          </div>
-                        )}
-
-                        <div className="flex flex-wrap gap-1">
-                          {Array.isArray(item.hashtags) ? item.hashtags.map((tag, i) => (
-                            <span key={i} className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">
-                              {tag.startsWith('#') ? tag : `#${tag}`}
-                            </span>
-                          )) : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('content-calendar')}
-                disabled={analysisStatus['content-calendar'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['content-calendar'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['content-calendar'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['content-calendar'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Creating Calendar...
-                  </div>
-                ) : analysisStatus['content-calendar'] === 'completed' ? (
-                  'Update Calendar'
-                ) : (
-                  'Generate Content Calendar'
-                )}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'strategic' && (
-          <div className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2">Strategic Analysis Dashboard</h2>
-              <p className="text-slate-400">Michael Porter analysis and competitive intelligence</p>
-            </div>
-
-            {/* Competitor Research */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🏢</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Competitor Analysis</h3>
-                    <p className="text-slate-400 text-sm">Analyze competitors using Porter's Five Forces</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['competitor-research'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['competitor-research'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['competitor-research'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['competitor-research'] === 'completed' ? 'Completed' :
-                   analysisStatus['competitor-research'] === 'running' ? 'Analyzing...' :
-                   analysisStatus['competitor-research'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {analysisData.competitorAnalysis && (
-                <div className="mb-4">
-                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    {analysisData.competitorAnalysis.competitors.map((competitor, index) => (
-                      <div key={index} className="bg-slate-800 rounded-lg p-5">
-                        <h4 className="text-lg font-semibold text-white mb-2">{competitor.name}</h4>
-                        <a
-                          href={competitor.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-emerald-400 text-sm hover:underline mb-4 block"
-                        >
-                          {competitor.url}
-                        </a>
-
-                        <div className="space-y-3">
-                          <div>
-                            <h5 className="text-sm font-medium text-emerald-400 mb-2">Strengths</h5>
-                            <ul className="space-y-1">
-                              {competitor.strengths.map((strength, i) => (
-                                <li key={i} className="text-slate-300 text-sm flex items-start gap-2">
-                                  <span className="text-emerald-400">✓</span>
-                                  {strength}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div>
-                            <h5 className="text-sm font-medium text-red-400 mb-2">Weaknesses</h5>
-                            <ul className="space-y-1">
-                              {competitor.weaknesses.map((weakness, i) => (
-                                <li key={i} className="text-slate-300 text-sm flex items-start gap-2">
-                                  <span className="text-red-400">✗</span>
-                                  {weakness}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="bg-slate-800 rounded-lg p-5">
-                    <h4 className="text-lg font-semibold text-white mb-4">Market Opportunities</h4>
-                    <div className="space-y-2">
-                      {analysisData.competitorAnalysis.opportunities.map((opportunity, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <span className="text-emerald-400 mt-1">💡</span>
-                          <p className="text-slate-300 text-sm">{opportunity}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('competitor-research')}
-                disabled={analysisStatus['competitor-research'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['competitor-research'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['competitor-research'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['competitor-research'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Analyzing Competitors...
-                  </div>
-                ) : analysisStatus['competitor-research'] === 'completed' ? (
-                  'Re-analyze Competitors'
-                ) : (
-                  'Run Competitor Analysis'
-                )}
-              </button>
-            </div>
-
-            {/* Brand Analysis */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🎯</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Brand Voice Analysis</h3>
-                    <p className="text-slate-400 text-sm">Analyze and define your brand personality</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['brand-analysis'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['brand-analysis'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['brand-analysis'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['brand-analysis'] === 'completed' ? 'Completed' :
-                   analysisStatus['brand-analysis'] === 'running' ? 'Analyzing...' :
-                   analysisStatus['brand-analysis'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {analysisData.brandAnalysis && (
-                <div className="mb-4">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-slate-800 rounded-lg p-5">
-                      <h4 className="text-lg font-medium text-emerald-400 mb-3">Tone</h4>
-                      <p className="text-slate-300">{analysisData.brandAnalysis.tone}</p>
-                    </div>
-
-                    <div className="bg-slate-800 rounded-lg p-5">
-                      <h4 className="text-lg font-medium text-emerald-400 mb-3">Voice</h4>
-                      <p className="text-slate-300">{analysisData.brandAnalysis.voice}</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 bg-slate-800 rounded-lg p-5">
-                    <h4 className="text-lg font-medium text-emerald-400 mb-4">Key Messaging</h4>
-                    <div className="space-y-3">
-                      {analysisData.brandAnalysis.messaging.map((message, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <span className="text-emerald-400 font-bold text-lg">{index + 1}.</span>
-                          <p className="text-slate-300">{message}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('brand-analysis')}
-                disabled={analysisStatus['brand-analysis'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['brand-analysis'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['brand-analysis'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['brand-analysis'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Analyzing Brand...
-                  </div>
-                ) : analysisStatus['brand-analysis'] === 'completed' ? (
-                  'Re-analyze Brand'
-                ) : (
-                  'Run Brand Analysis'
-                )}
-              </button>
-            </div>
-
-            {/* Conversion Analysis */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🔄</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Conversion Optimization</h3>
-                    <p className="text-slate-400 text-sm">Optimize your customer journey and conversion funnel</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['conversion-analysis'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['conversion-analysis'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['conversion-analysis'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['conversion-analysis'] === 'completed' ? 'Completed' :
-                   analysisStatus['conversion-analysis'] === 'running' ? 'Analyzing...' :
-                   analysisStatus['conversion-analysis'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {analysisData.conversionAnalysis && (
-                <div className="mb-4">
-                  <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-5 mb-6">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-3xl">📈</span>
-                      <div>
-                        <h4 className="text-lg font-semibold text-emerald-400">Projected Improvement</h4>
-                        <p className="text-2xl font-bold text-white">{analysisData.conversionAnalysis.projectedImprovement}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-800 rounded-lg p-5 mb-6">
-                    <h4 className="text-lg font-medium text-white mb-4">Current Conversion Path</h4>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {analysisData.conversionAnalysis.currentPath.map((step, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <div className="bg-slate-700 px-4 py-2 rounded-lg">
-                            <span className="text-slate-300 text-sm">{step}</span>
-                          </div>
-                          {index < analysisData.conversionAnalysis!.currentPath.length - 1 && (
-                            <span className="text-slate-500">→</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-800 rounded-lg p-5">
-                    <h4 className="text-lg font-medium text-white mb-4">Recommendations</h4>
-                    <div className="space-y-3">
-                      {analysisData.conversionAnalysis.recommendations.map((rec, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <span className="text-emerald-400 text-xl">→</span>
-                          <p className="text-slate-300">{rec}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('conversion-analysis')}
-                disabled={analysisStatus['conversion-analysis'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['conversion-analysis'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['conversion-analysis'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['conversion-analysis'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Analyzing Conversion...
-                  </div>
-                ) : analysisStatus['conversion-analysis'] === 'completed' ? (
-                  'Re-analyze Conversion'
-                ) : (
-                  'Run Conversion Analysis'
-                )}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'redesign' && (
-          <div className="space-y-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2">Website Redesign Dashboard</h2>
-              <p className="text-slate-400">Mockups, ROI analysis, and implementation planning</p>
-            </div>
-
-            {/* Website Grade & ROI */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">📊</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Website Performance Grade</h3>
-                    <p className="text-slate-400 text-sm">Analyze current website performance and ROI potential</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['website-grade'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['website-grade'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['website-grade'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['website-grade'] === 'completed' ? 'Completed' :
-                   analysisStatus['website-grade'] === 'running' ? 'Analyzing...' :
-                   analysisStatus['website-grade'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {analysisData.websiteGrade && (
-                <div className="mb-4">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="text-4xl font-bold text-emerald-400">
-                      {analysisData.websiteGrade.score}/100
-                    </div>
-                    <div>
-                      <p className="text-white font-medium">Current Performance</p>
-                      <p className="text-slate-400 text-sm">{analysisData.websiteGrade.roiProjection}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    {analysisData.websiteGrade.improvements.map((improvement, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <span className="text-emerald-400">•</span>
-                        <span className="text-slate-300 text-sm">{improvement}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('website-grade')}
-                disabled={analysisStatus['website-grade'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['website-grade'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['website-grade'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['website-grade'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Grading Website...
-                  </div>
-                ) : analysisStatus['website-grade'] === 'completed' ? (
-                  'Re-grade Website'
-                ) : (
-                  'Grade Website Performance'
-                )}
-              </button>
-            </div>
-
-            {/* Mockup Generation */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🎨</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Website Redesign Mockups</h3>
-                    <p className="text-slate-400 text-sm">Generate professional website mockups and design concepts</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['mockup-generation'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['mockup-generation'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['mockup-generation'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['mockup-generation'] === 'completed' ? 'Completed' :
-                   analysisStatus['mockup-generation'] === 'running' ? 'Generating...' :
-                   analysisStatus['mockup-generation'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {analysisData.mockupUrl && (
-                <div className="mb-4">
-                  <h4 className="font-medium text-white mb-3">Generated Mockup</h4>
-                  <div className="bg-slate-800 rounded-lg p-4">
-                    <p className="text-emerald-400 text-sm mb-2">Mockup generated successfully!</p>
-                    <a
-                      href={analysisData.mockupUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 text-sm underline"
-                    >
-                      View Mockup →
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              {analysisErrors['mockup-generation'] && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <p className="text-red-400 text-sm">{analysisErrors['mockup-generation']}</p>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('mockup-generation')}
-                disabled={analysisStatus['mockup-generation'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['mockup-generation'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['mockup-generation'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['mockup-generation'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Generating Mockups...
-                  </div>
-                ) : analysisStatus['mockup-generation'] === 'completed' ? (
-                  'Regenerate Mockups'
-                ) : (
-                  'Generate Website Mockups'
-                )}
-              </button>
-            </div>
-
-            {/* Implementation Roadmap */}
-            <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🗺️</span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Implementation Roadmap</h3>
-                    <p className="text-slate-400 text-sm">Create a step-by-step plan for website redesign implementation</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  analysisStatus['implementation-roadmap'] === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
-                  analysisStatus['implementation-roadmap'] === 'running' ? 'bg-blue-500/20 text-blue-400' :
-                  analysisStatus['implementation-roadmap'] === 'error' ? 'bg-red-500/20 text-red-400' :
-                  'bg-slate-700/50 text-slate-400'
-                }`}>
-                  {analysisStatus['implementation-roadmap'] === 'completed' ? 'Completed' :
-                   analysisStatus['implementation-roadmap'] === 'running' ? 'Planning...' :
-                   analysisStatus['implementation-roadmap'] === 'error' ? 'Error' :
-                   'Not Run'}
-                </div>
-              </div>
-
-              {analysisData.implementationRoadmap && (
-                <div className="mb-4">
-                  <h4 className="font-medium text-white mb-3">Implementation Plan</h4>
-                  <div className="bg-slate-800 rounded-lg p-4">
-                    <p className="text-slate-300 text-sm">Implementation roadmap generated successfully!</p>
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={() => runAnalysis('implementation-roadmap')}
-                disabled={analysisStatus['implementation-roadmap'] === 'running'}
-                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-                  analysisStatus['implementation-roadmap'] === 'completed'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                    : analysisStatus['implementation-roadmap'] === 'running'
-                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                }`}
-              >
-                {analysisStatus['implementation-roadmap'] === 'running' ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    Creating Roadmap...
-                  </div>
-                ) : analysisStatus['implementation-roadmap'] === 'completed' ? (
-                  'Update Roadmap'
-                ) : (
-                  'Generate Implementation Roadmap'
-                )}
-              </button>
-            </div>
-          </div>
-        )}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {currentModules.map((module) => (
+            <AnalysisModule
+              key={module.id}
+              module={module}
+              status={analysisStatus[module.id] || 'not-run'}
+              error={analysisErrors[module.id]}
+              data={analysisData}
+              onRun={() => runAnalysis(module.id)}
+            />
+          ))}
+        </div>
       </div>
+    </div>
+  );
+}
+
+interface AnalysisModuleProps {
+  module: typeof analysisModules[0];
+  status: 'not-run' | 'running' | 'completed' | 'error';
+  error?: string;
+  data: AnalysisData;
+  onRun: () => void;
+}
+
+function AnalysisModule({ module, status, error, data, onRun }: AnalysisModuleProps) {
+  const getStatusColor = () => {
+    switch (status) {
+      case 'completed': return 'bg-emerald-500/20 text-emerald-400';
+      case 'running': return 'bg-blue-500/20 text-blue-400';
+      case 'error': return 'bg-red-500/20 text-red-400';
+      default: return 'bg-slate-700/50 text-slate-400';
+    }
+  };
+
+  const getButtonStyle = () => {
+    switch (status) {
+      case 'completed': return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30';
+      case 'running': return 'bg-blue-500/20 text-blue-400 border border-blue-500/30 cursor-not-allowed';
+      default: return 'bg-emerald-500 hover:bg-emerald-600 text-white';
+    }
+  };
+
+  const handleExport = async () => {
+    if (module.id === 'content-calendar' && data.contentCalendar) {
+      try {
+        const response = await fetch('/api/export-content-calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contentCalendar: data.contentCalendar,
+            businessName: data.businessName
+          })
+        });
+        
+        if (response.ok) {
+          const exportData = await response.json();
+          const blob = new Blob([exportData.csv], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = exportData.filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }
+      } catch (error) {
+        console.error('Failed to export:', error);
+      }
+    }
+  };
+
+  const renderContent = () => {
+    switch (module.id) {
+      case 'site-analysis':
+        return (
+          <>
+            {data.siteSummary && (
+              <div className="mb-4">
+                <h4 className="font-medium text-white mb-2">Website Summary</h4>
+                <p className="text-slate-300 text-sm leading-relaxed">{data.siteSummary}</p>
+              </div>
+            )}
+            {data.keyItems && data.keyItems.length > 0 && (
+              <div>
+                <h4 className="font-medium text-white mb-2">Key Items</h4>
+                <div className="flex flex-wrap gap-2">
+                  {data.keyItems.map((item, index) => (
+                    <span key={index} className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        );
+      
+      case 'ai-insights':
+        return data.aiInsights && data.aiInsights.length > 0 ? (
+          <div className="space-y-3">
+            {data.aiInsights.map((insight, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <span className="text-emerald-400 text-lg">💡</span>
+                <p className="text-slate-300 text-sm">{insight}</p>
+              </div>
+            ))}
+          </div>
+        ) : null;
+
+      case 'social-posts':
+        return data.socialPosts && data.socialPosts.length > 0 ? (
+          <div className="grid gap-4">
+            {data.socialPosts.slice(0, 2).map((post, index) => (
+              <div key={index} className="bg-slate-800/50 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">{post.emojis}</span>
+                  <span className="font-medium text-white text-sm">{post.platform}</span>
+                </div>
+                <p className="text-slate-300 text-sm">{post.content}</p>
+              </div>
+            ))}
+            {data.socialPosts.length > 2 && (
+              <p className="text-slate-400 text-xs">+{data.socialPosts.length - 2} more posts</p>
+            )}
+          </div>
+        ) : null;
+
+      case 'content-calendar':
+        return data.contentCalendar && data.contentCalendar.length > 0 ? (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-white">Content Calendar ({data.contentCalendar.length} posts)</h4>
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-xs font-medium transition-colors"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {data.contentCalendar.slice(0, 3).map((item, index) => (
+                <div key={index} className="bg-slate-800/50 rounded-lg p-3 text-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-medium text-white">{item.day}</span>
+                    <span className="text-xs text-slate-400">{item.platform}</span>
+                  </div>
+                  <p className="text-slate-300 text-xs line-clamp-2">{item.content}</p>
+                </div>
+              ))}
+              {data.contentCalendar.length > 3 && (
+                <p className="text-slate-400 text-xs text-center">+{data.contentCalendar.length - 3} more posts</p>
+              )}
+            </div>
+          </div>
+        ) : null;
+
+      default:
+        // Action-oriented content display for other modules
+        const moduleData = (data as any)[module.id];
+        if (moduleData && status === 'completed') {
+          return (
+            <div className="space-y-2">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
+                <p className="text-emerald-400 text-sm font-medium">✅ Analysis Complete</p>
+                <p className="text-slate-300 text-xs mt-1">Strategic insights generated</p>
+              </div>
+              
+              {/* Action-oriented next steps based on module type */}
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+                <p className="text-blue-400 text-xs font-semibold mb-1">🎯 Here's what to do this week:</p>
+                <p className="text-slate-300 text-xs">
+                  {getModuleActionSteps(module.id)}
+                </p>
+              </div>
+            </div>
+          );
+        }
+        return null;
+    }
+  };
+
+  return (
+    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start gap-3">
+          <div className={`w-10 h-10 bg-${module.color}-500/20 rounded-xl flex items-center justify-center`}>
+            <span className="text-lg">{module.icon}</span>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-lg font-semibold text-white">{module.title}</h3>
+              {(module as any).tier === 'free' && (
+                <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-xs font-bold">FREE</span>
+              )}
+              {(module as any).tier === 'pro' && (
+                <span className="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs font-bold">PRO</span>
+              )}
+              {(module as any).tier === 'consultation' && (
+                <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs font-bold">CONSULTATION</span>
+              )}
+            </div>
+            <p className="text-slate-400 text-sm">{module.description}</p>
+          </div>
+        </div>
+        <div className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
+          {status === 'completed' ? 'Completed' :
+           status === 'running' ? 'Running...' :
+           status === 'error' ? 'Error' :
+           'Ready'}
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+          <p className="text-sm text-red-400">
+            <span className="font-medium">Error:</span> {error}
+          </p>
+        </div>
+      )}
+
+      {status === 'completed' && (
+        <div className="mb-4">
+          {renderContent()}
+        </div>
+      )}
+
+      <button
+        onClick={onRun}
+        disabled={status === 'running'}
+        className={`w-full py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${getButtonStyle()}`}
+      >
+        {status === 'running' ? (
+          <div className="flex items-center justify-center gap-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
+            Analyzing...
+          </div>
+        ) : status === 'completed' ? (
+          <div className="flex items-center justify-center gap-2">
+            <span>🔄</span>
+            Update Analysis
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2">
+            <span>🚀</span>
+            {getActionButtonText(module.id)}
+          </div>
+        )}
+      </button>
     </div>
   );
 }

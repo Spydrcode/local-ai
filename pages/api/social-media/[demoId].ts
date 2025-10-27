@@ -111,7 +111,7 @@ export default async function handler(
       // Get demo data
       const { data: demo, error: demoError } = await supabase
         .from("demos")
-        .select("summary, site_url, key_items")
+        .select("summary, key_items")
         .eq("id", demoId)
         .single();
 

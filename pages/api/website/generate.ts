@@ -151,128 +151,90 @@ const DESIGN_TEMPLATES = {
 const WEBSITE_GENERATION_PROMPT = `You are an expert web designer creating PRODUCTION-READY website designs with detailed specifications for implementation.
 
 **CRITICAL REQUIREMENTS**:
-1. **Business Alignment**: Design must reflect the business's unique value proposition and positioning
-2. **Conversion Focused**: Every section should guide visitors toward a specific action
+1. **Business Alignment**: Design MUST reflect THIS SPECIFIC BUSINESS's unique value proposition, industry, and positioning - NOT generic template defaults
+2. **Conversion Focused**: Every section should guide visitors toward a specific action relevant to THIS BUSINESS
 3. **Modern UX**: Follow 2024 best practices for spacing, typography, and user flow
 4. **Responsive**: Design must work beautifully on mobile, tablet, and desktop
 5. **Accessible**: WCAG AA compliant color contrast and navigation
 
-**TEMPLATE STYLE CHARACTERISTICS**:
+**ABSOLUTELY MANDATORY - BUSINESS CUSTOMIZATION**:
+- Analyze the business's actual industry (home remodeling? restaurant? HVAC? legal? etc.)
+- Use industry-appropriate colors (construction: oranges/browns/grays, healthcare: blues/greens, food: warm reds/yellows, legal: navy/burgundy, etc.)
+- Write headlines and content specific to THEIR services, NOT generic template filler
+- Choose design name that reflects THEIR business type (e.g., "Professional Contractor Showcase" NOT "Modern Tech")
+- Features section must list THEIR actual services/offerings, NOT generic benefits
+- CTA must match THEIR conversion goal (consultation, reservation, quote, appointment, etc.)
 
-**Modern Tech**: Clean, minimal, tech-forward
+**TEMPLATE STYLE CHARACTERISTICS** (adapt these to the actual business):
+
+**Modern**: Clean, minimal design style
 - Large whitespace, bold sans-serif typography
 - Smooth scroll animations, parallax effects
-- Glassmorphism, subtle gradients
-- Best for: SaaS, tech services, modern agencies
+- Contemporary feel with professional polish
 
-**Classic Professional**: Timeless, trust-building
+**Classic**: Timeless, trust-building design style
 - Traditional grid layouts, serif headings
 - Subtle animations, professional imagery
 - Clear hierarchy, established credibility
-- Best for: Law firms, finance, medical, B2B services
 
-**Bold Statement**: High-contrast, attention-grabbing
-- Large typography, vivid colors, dark backgrounds
+**Bold**: High-contrast, attention-grabbing design style
+- Large typography, vivid colors
 - Dramatic animations, asymmetric layouts
 - Creative, unexpected interactions
-- Best for: Creative agencies, restaurants, retail, entertainment
 
-**Minimal Elegance**: Ultra-clean, whitespace-focused
-- Extreme simplicity, serif typography
+**Minimal**: Ultra-clean, whitespace-focused design style
+- Extreme simplicity, elegant typography
 - Subtle animations, lots of breathing room
-- Monochromatic with accent color
-- Best for: Luxury brands, design studios, high-end services
+- Monochromatic with single accent color
 
-**Luxury Premium**: Sophisticated, high-end
-- Gold/earth tones, elegant serif fonts
+**Luxury**: Sophisticated, high-end design style
+- Rich colors, elegant fonts
 - Smooth, refined animations
-- Premium imagery, exclusive feel
-- Best for: Fine dining, spas, boutiques, premium services
+- Premium feel, exclusive atmosphere
+
+**INDUSTRY-SPECIFIC EXAMPLES**:
+
+Home Remodeling/Construction:
+- Design name: "Professional Contractor Showcase" or "Renovation Portfolio"
+- Colors: Warm oranges (#FF6B35), construction browns (#5C4033), professional grays (#4A5568)
+- Hero: "Transform Your Home with Expert Craftsmanship" + before/after imagery
+- Features: Kitchen Remodeling, Bathroom Renovations, Home Additions, Custom Carpentry
+- CTA: "Get Free Consultation" or "Request Quote"
+
+Restaurant/Food Service:
+- Design name: "Culinary Experience Gallery" or "Restaurant Showcase"
+- Colors: Appetizing reds (#DC2626), warm yellows (#FBBF24), elegant blacks
+- Hero: Restaurant name + signature dish imagery + reservation button
+- Features: Menu highlights, Chef's specials, Catering, Private events
+- CTA: "Make Reservation" or "Order Online"
+
+Professional Services (Legal/Medical/Financial):
+- Design name: "Trust & Expertise Professional" or "Client-Focused Practice"
+- Colors: Trustworthy navy (#1E3A8A), professional burgundy (#7C2D12), clean whites
+- Hero: "Protecting Your [Rights/Health/Future]" + credentials
+- Features: Practice areas, Team expertise, Client success stories, Free consultation
+- CTA: "Schedule Consultation" or "Speak with Specialist"
+
+HVAC/Home Services:
+- Design name: "Reliable Service Professionals" or "24/7 Home Comfort"
+- Colors: Cool blues (#3B82F6), reliable greens (#10B981), warning oranges
+- Hero: "Fast, Professional [Service Type]" + emergency availability
+- Features: Installation, Repair, Maintenance, Emergency Service
+- CTA: "Call Now" or "Book Service"
 
 **OUTPUT FORMAT**: Return valid JSON matching the WebsiteDesign interface. Include:
 
-1. **Colors**: Specific hex codes appropriate for the style
-2. **Sections**: Detailed content for hero, features (4-6), CTA, optional testimonials
-3. **Animations**: Specific Framer Motion animation names for each element
-4. **Suitability Score**: 0-100 score of how well this style fits the business with detailed reasons
+1. **Name**: MUST reflect actual business industry (NOT "Modern Tech" or generic template names)
+2. **Description**: MUST describe how design fits THIS SPECIFIC BUSINESS
+3. **Colors**: Industry-appropriate hex codes matching the business type
+4. **Sections**: Detailed content using THEIR actual services and value propositions
+5. **Animations**: Specific Framer Motion animation names appropriate for the content
+6. **Suitability Score**: 0-100 score of how well this style fits THIS SPECIFIC BUSINESS with detailed reasons
 
-**EXAMPLE OUTPUT** (Modern Tech for SaaS business):
+**CRITICAL FINAL INSTRUCTION**: 
+Before generating the design, identify the business's industry from their summary. Then create a design that would make sense ONLY for that specific industry. A home remodeling company should get construction-focused designs, a restaurant should get food-focused designs, etc. NEVER generate generic "Modern Tech" or "SaaS" content unless the business is actually a tech/SaaS company.
 
-{
-  "id": "modern-tech-1",
-  "name": "Modern Tech",
-  "style": "modern",
-  "description": "Clean, minimal design with bold typography and smooth animations for tech-forward SaaS businesses",
-  "colors": {
-    "primary": "#3B82F6",
-    "secondary": "#1E40AF",
-    "accent": "#F59E0B",
-    "background": "#F9FAFB",
-    "text": "#111827"
-  },
-  "typography": {
-    "headingFont": "Inter",
-    "bodyFont": "Inter"
-  },
-  "sections": {
-    "hero": {
-      "headline": "Streamline Your Workflow with AI-Powered Automation",
-      "subheadline": "Save 20+ hours per week with intelligent task automation. Trusted by 10,000+ teams.",
-      "ctaLabel": "Start Free Trial",
-      "ctaAction": "/signup",
-      "backgroundImage": "gradient-mesh-blue",
-      "animation": "fadeInUp"
-    },
-    "features": [
-      {
-        "title": "Smart Automation",
-        "description": "AI learns your workflows and automates repetitive tasks automatically",
-        "icon": "⚡",
-        "animation": "slideInLeft"
-      },
-      {
-        "title": "Real-Time Collaboration",
-        "description": "Work together seamlessly with your team across any device",
-        "icon": "👥",
-        "animation": "slideInRight"
-      },
-      {
-        "title": "Enterprise Security",
-        "description": "Bank-level encryption and SOC 2 compliance built-in",
-        "icon": "🔒",
-        "animation": "scaleIn"
-      },
-      {
-        "title": "Advanced Analytics",
-        "description": "Visualize productivity metrics and identify bottlenecks instantly",
-        "icon": "📊",
-        "animation": "fadeIn"
-      }
-    ],
-    "cta": {
-      "headline": "Ready to 10x Your Productivity?",
-      "description": "Join thousands of teams already saving time with AI automation. Start your free 14-day trial today.",
-      "ctaLabel": "Get Started Free",
-      "animation": "slideInUp"
-    }
-  },
-  "animations": {
-    "pageEntry": "stagger",
-    "scrollEffects": ["parallax", "fadeInOnScroll", "slideUpOnScroll"],
-    "hoverEffects": ["scaleUp", "glow", "lift"]
-  },
-  "suitability": {
-    "score": 95,
-    "reasons": [
-      "Modern tech aesthetic matches SaaS product positioning",
-      "Clean design emphasizes product benefits over visual clutter",
-      "Blue color palette signals trust and technology",
-      "Smooth animations create premium feel without distraction"
-    ]
-  }
-}
-
-Be specific to the ACTUAL business. Use their real offerings, differentiators, and value propositions.`;
+Return ONLY valid JSON - no markdown code blocks, no explanations.`;
 
 export default async function handler(
   req: NextApiRequest,
@@ -342,8 +304,11 @@ Choose from: modern, classic, bold, minimal, luxury`,
       max_tokens: 500,
     });
 
-    const analysisContent = businessAnalysis.choices[0]?.message?.content || "{}";
-    const cleanedAnalysis = analysisContent.replace(/```json\n?|```\n?/g, '').trim();
+    const analysisContent =
+      businessAnalysis.choices[0]?.message?.content || "{}";
+    const cleanedAnalysis = analysisContent
+      .replace(/```json\n?|```\n?/g, "")
+      .trim();
     const analysis = JSON.parse(cleanedAnalysis);
     const recommendedStyles = analysis.recommendedStyles || [
       "modern",
@@ -364,24 +329,33 @@ Choose from: modern, classic, bold, minimal, luxury`,
           { role: "system", content: WEBSITE_GENERATION_PROMPT },
           {
             role: "user",
-            content: `Generate a ${style} style website design for this business.
+            content: `You MUST create a website design specifically for THIS business's industry and services. DO NOT use generic tech/SaaS content.
 
-**BUSINESS CONTEXT**:
+**ACTUAL BUSINESS TO DESIGN FOR**:
 ${demo.summary}
 
-**ENRICHED INSIGHTS**:
+**ADDITIONAL CONTEXT**:
 ${businessContext}
 
-**KEY ITEMS**:
+**KEY SERVICES/OFFERINGS**:
 ${JSON.stringify(demo.key_items, null, 2)}
 
-**TEMPLATE STYLE**: ${template.name}
-- ${template.description}
-- Base colors: ${JSON.stringify(template.colors.base)}
-- Typography: ${template.typography.heading} / ${template.typography.body}
-- Animation types: ${template.animations.join(", ")}
+**DESIGN STYLE TO APPLY**: ${style} (${template.name})
+Use this style approach: ${template.description}
+Suggested color palette direction: ${JSON.stringify(template.colors.base)}
+Suggested fonts: ${template.typography.heading} / ${template.typography.body}
+Animation approach: ${template.animations.join(", ")}
 
-Create a SPECIFIC design using ACTUAL business offerings and differentiators. Return valid JSON only.`,
+**MANDATORY REQUIREMENTS**:
+1. Design name must reflect THIS business's industry (e.g., "Professional Contractor Portfolio" for construction, "Culinary Showcase" for restaurants)
+2. Hero headline must use THIS business's actual value proposition
+3. Features must list THIS business's actual services
+4. Colors must match THIS business's industry (construction: oranges/browns, healthcare: blues/greens, food: warm reds/yellows, legal: navy/burgundy)
+5. CTA must match THIS business's conversion goal (quote, reservation, consultation, appointment)
+
+Read the business summary carefully. If it's home remodeling, create a construction-focused design. If it's a restaurant, create a food-focused design. DO NOT default to "Modern Tech" or generic SaaS content.
+
+Return ONLY valid JSON matching the WebsiteDesign interface - no markdown, no explanations.`,
           },
         ],
         temperature: 0.8,
@@ -392,7 +366,7 @@ Create a SPECIFIC design using ACTUAL business offerings and differentiators. Re
       if (!content) continue;
 
       try {
-        const cleanedContent = content.replace(/```json\n?|```\n?/g, '').trim();
+        const cleanedContent = content.replace(/```json\n?|```\n?/g, "").trim();
         const design = JSON.parse(cleanedContent) as WebsiteDesign;
         design.id = `${style}-${Date.now()}-${designs.length}`;
         designs.push(design);

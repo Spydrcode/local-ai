@@ -1,4 +1,5 @@
 import SocialPostCard from "@/components/SocialPostCard";
+import WebsiteDesignGallery from "@/components/WebsiteDesignGallery";
 import type {
     DemoBlogPost,
     DemoChatbotConfig,
@@ -62,6 +63,12 @@ export default function DemoOverview({
         </div>
       </div>
       <div className="space-y-6">
+        {/* Website Design Gallery */}
+        <div>
+          <p className="text-sm font-semibold text-white mb-3">Professional Website Designs</p>
+          <WebsiteDesignGallery demoId={demoId} />
+        </div>
+
         <div>
           <p className="text-sm font-semibold text-white">Social post ideas</p>
           <div className="mt-2 grid gap-3 md:grid-cols-2">

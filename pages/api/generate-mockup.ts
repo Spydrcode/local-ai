@@ -76,8 +76,8 @@ export default async function handler(
     // Generate homepage blueprint if it doesn't exist
     console.log("🔨 Homepage blueprint doesn't exist, generating now...");
 
-    // Check if we have site_summary
-    if (!demo.site_summary) {
+    // Check if we have summary
+    if (!demo.summary) {
       return res.status(400).json({
         error:
           "Site analysis required first. Please run site analysis before generating mockup.",
@@ -88,10 +88,10 @@ export default async function handler(
     const contextPrompt = `Analyze this business and create a custom homepage blueprint.
 
 BUSINESS INTELLIGENCE:
-${demo.site_summary}
+${demo.summary}
 
-Business Name: ${demo.business_name || "Unknown Business"}
-Website: ${demo.website_url}
+Business Name: ${demo.client_id || "Unknown Business"}
+Website: ${demo.site_url}
 Industry: ${demo.industry || "Unknown"}
 
 DESIGN REQUIREMENTS:

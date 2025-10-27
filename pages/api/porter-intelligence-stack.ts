@@ -48,9 +48,29 @@ export default async function handler(
     }
 
     // Build agent context
+    // Try to infer a business name when missing: prefer business_name, then business_description, then domain
+    const inferBusinessName = (d: any) => {
+      if (d.business_name) return d.business_name;
+      if (d.business_description) {
+        // Take first sentence or up to 6 words
+        const first = d.business_description.split(/[\.\n]/)[0];
+        const words = first.split(/\s+/).slice(0, 6).join(' ');
+        return words;
+      }
+      try {
+        if (d.website_url) {
+          const u = new URL(d.website_url);
+          return u.hostname.replace('www.', '');
+        }
+      } catch (e) {
+        // ignore
+      }
+      return 'Unknown Business';
+    };
+
     const context: AgentContext = {
       demoId,
-      businessName: demo.business_name || "Unknown Business",
+      businessName: inferBusinessName(demo),
       websiteUrl: demo.website_url,
       siteSummary: demo.site_summary,
       industry: demo.industry || undefined,
@@ -79,21 +99,25 @@ export default async function handler(
     );
 
     // Update demo with porter analysis results
-    const { error: updateError } = await supabaseAdmin
-      .from("demos")
-      .update({
-        porter_analysis: JSON.stringify(result),
-        porter_synthesis: JSON.stringify(result.synthesis),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", demoId);
+    // Note: some deployments may be missing the porter_synthesis column (migration not applied).
+    // To avoid write failures we only update porter_analysis (JSONB) which contains full results + synthesis.
+    try {
+      const { error: updateError } = await supabaseAdmin
+        .from("demos")
+        .update({
+          porter_analysis: JSON.stringify(result),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", demoId);
 
-    if (updateError) {
-      console.error(
-        "[Porter Intelligence Stack] Failed to save results:",
-        updateError
-      );
-      // Don't fail the request - results are still returned
+      if (updateError) {
+        console.error(
+          "[Porter Intelligence Stack] Failed to save results:",
+          updateError
+        );
+      }
+    } catch (e) {
+      console.error("[Porter Intelligence Stack] Exception saving results:", e);
     }
 
     return res.status(200).json({

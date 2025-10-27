@@ -86,21 +86,27 @@ export default function EconomicIntelligencePage() {
   const [businessName, setBusinessName] = useState('Business');
 
   useEffect(() => {
-    // Fetch basic demo info
-    const fetchDemoInfo = async () => {
+    // Fetch existing economic intelligence and demo info
+    const fetchData = async () => {
       try {
-        const response = await fetch(`/api/analyze-site-data/${demoId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setBusinessName(data.businessName || 'Business');
+        // Fetch demo with economic intelligence
+        const demoResponse = await fetch(`/api/demos/${demoId}`);
+        if (demoResponse.ok) {
+          const demoData = await demoResponse.json();
+          setBusinessName(demoData.client_id || 'Business');
+          
+          // Load existing economic intelligence if it exists
+          if (demoData.economic_intelligence) {
+            setIntelligence(demoData.economic_intelligence);
+          }
         }
       } catch (error) {
-        console.error('Failed to fetch demo info:', error);
+        console.error('Failed to fetch demo data:', error);
       }
     };
 
     if (demoId) {
-      fetchDemoInfo();
+      fetchData();
     }
   }, [demoId]);
 
@@ -494,20 +500,26 @@ export default function EconomicIntelligencePage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {['year1', 'year2', 'year3'].map((year, idx) => (
-                        <tr key={year} className="border-b border-slate-800">
-                          <td className="py-3 px-3 text-white font-medium">Year {idx + 1}</td>
-                          <td className="text-right py-3 px-3 text-slate-300">
-                            {intelligence.profitPrediction.baselineForecast[year]?.revenue || 'N/A'}
-                          </td>
-                          <td className="text-right py-3 px-3 text-emerald-400 font-semibold">
-                            {intelligence.profitPrediction.adjustedForecast[year]?.revenue || 'N/A'}
-                          </td>
-                          <td className="text-right py-3 px-3 text-slate-400 text-xs">
-                            {intelligence.profitPrediction.adjustedForecast[year]?.adjustment || 'N/A'}
-                          </td>
-                        </tr>
-                      ))}
+                      {['year1', 'year2', 'year3'].map((year, idx) => {
+                        const yearKey = year as 'year1' | 'year2' | 'year3';
+                        const baseline = intelligence.profitPrediction?.baselineForecast?.[yearKey];
+                        const adjusted = intelligence.profitPrediction?.adjustedForecast?.[yearKey];
+                        
+                        return (
+                          <tr key={year} className="border-b border-slate-800">
+                            <td className="py-3 px-3 text-white font-medium">Year {idx + 1}</td>
+                            <td className="text-right py-3 px-3 text-slate-300">
+                              {baseline?.revenue || 'N/A'}
+                            </td>
+                            <td className="text-right py-3 px-3 text-emerald-400 font-semibold">
+                              {adjusted?.revenue || 'N/A'}
+                            </td>
+                            <td className="text-right py-3 px-3 text-slate-400 text-xs">
+                              {adjusted?.adjustment || 'N/A'}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

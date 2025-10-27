@@ -1,16 +1,15 @@
 /**
- * SWOT Analysis API Endpoint
+ * Business Model Canvas API Endpoint
  *
- * Executes SWOTAgent to generate SWOT + TOWS + PESTEL analysis,
- * stores results in database, and integrates with vector storage.
+ * Executes OsterwalderAgent to generate 9-block Business Model Canvas
  */
 
 import type {
   AgentOutput,
   BusinessContext,
 } from "@/lib/agents/hbs/core/HBSAgent";
-import type { SWOTAnalysis } from "@/lib/agents/hbs/strategy/SWOTAgent";
-import { SWOTAgent } from "@/lib/agents/hbs/strategy/SWOTAgent";
+import type { BusinessModelCanvas } from "@/lib/agents/hbs/strategy/OsterwalderAgent";
+import { OsterwalderAgent } from "@/lib/agents/hbs/strategy/OsterwalderAgent";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabaseAdmin } from "../../../../server/supabaseAdmin";
 
@@ -29,7 +28,9 @@ export default async function handler(
   }
 
   try {
-    console.log(`[SWOT API] Starting analysis for demo ${demoId}`);
+    console.log(
+      `[Business Model Canvas API] Starting analysis for demo ${demoId}`
+    );
 
     // Check database configuration
     if (!supabaseAdmin) {
@@ -44,7 +45,7 @@ export default async function handler(
       .single();
 
     if (demoError || !demo) {
-      console.error("[SWOT API] Demo not found:", demoError);
+      console.error("[Business Model Canvas API] Demo not found:", demoError);
       return res.status(404).json({ error: "Demo not found" });
     }
 
@@ -61,6 +62,10 @@ export default async function handler(
     // Add previous analyses if available
     const previousAnalyses: any = {};
 
+    if (demo.swot_analysis) {
+      previousAnalyses.swot = demo.swot_analysis;
+    }
+
     if (demo.porter_analysis) {
       previousAnalyses.porter = demo.porter_analysis;
     }
@@ -73,44 +78,51 @@ export default async function handler(
       context.previousAnalyses = previousAnalyses;
     }
 
-    // Initialize and run SWOT agent
-    const agent = new SWOTAgent();
+    // Initialize and run Osterwalder agent
+    const agent = new OsterwalderAgent();
 
-    const output: AgentOutput<SWOTAnalysis> = await agent.analyze(context);
+    const output: AgentOutput<BusinessModelCanvas> =
+      await agent.analyze(context);
 
     console.log(
-      `[SWOT API] Analysis completed in ${output.execution_time_ms}ms`
+      `[Business Model Canvas API] Analysis completed in ${output.execution_time_ms}ms`
     );
-    console.log(`[SWOT API] Confidence: ${output.confidence_score}`);
-    console.log(`[SWOT API] Insights: ${output.insights.length}`);
-    console.log(`[SWOT API] Recommendations: ${output.recommendations.length}`);
+    console.log(
+      `[Business Model Canvas API] Confidence: ${output.confidence_score}`
+    );
+    console.log(
+      `[Business Model Canvas API] Canvas coherence: ${output.analysis.canvas_coherence_score}`
+    );
 
     // Store in database
     const { error: updateError } = await supabaseAdmin
       .from("demos")
       .update({
-        swot_analysis: output,
+        business_model_canvas: output,
         updated_at: new Date().toISOString(),
       })
       .eq("id", demoId);
 
     if (updateError) {
-      console.error("[SWOT API] Failed to save SWOT analysis:", updateError);
+      console.error("[Business Model Canvas API] Failed to save:", updateError);
       return res.status(500).json({
-        error: "Failed to save SWOT analysis",
+        error: "Failed to save Business Model Canvas",
         details: updateError.message,
       });
     }
 
-    console.log(`[SWOT API] SWOT analysis saved to database`);
+    console.log(`[Business Model Canvas API] Saved to database`);
 
     // Store vectors in Pinecone/Supabase for similarity search
     try {
-      const { storeSWOTVectors } = await import("@/lib/vector-hbs");
-      await storeSWOTVectors(demoId, output);
-      console.log(`[SWOT API] SWOT vectors stored successfully`);
+      const { storeBusinessModelVectors } = await import("@/lib/vector-hbs");
+      await storeBusinessModelVectors(demoId, output);
+      console.log(`[Business Model Canvas API] Vectors stored successfully`);
     } catch (vectorError) {
-      console.error("[SWOT API] Failed to store vectors:", vectorError);
+      console.error(
+        "[Business Model Canvas API] Failed to store vectors:",
+        vectorError
+      );
       // Don't fail the entire request if vector storage fails
     }
 
@@ -118,17 +130,17 @@ export default async function handler(
     return res.status(200).json({
       success: true,
       demoId,
-      analysis: output.analysis,
+      canvas: output.analysis,
       insights: output.insights,
       recommendations: output.recommendations,
       confidence_score: output.confidence_score,
       execution_time_ms: output.execution_time_ms,
     });
   } catch (error) {
-    console.error("[SWOT API] Error:", error);
+    console.error("[Business Model Canvas API] Error:", error);
 
     return res.status(500).json({
-      error: "Failed to generate SWOT analysis",
+      error: "Failed to generate Business Model Canvas",
       message: error instanceof Error ? error.message : "Unknown error",
     });
   }

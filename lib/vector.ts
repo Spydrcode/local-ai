@@ -16,7 +16,11 @@ export type AnalysisType =
   | "content_generation"
   | "strategic"
   | "porter_agent" // Individual Porter Intelligence agent results
-  | "economic_intelligence"; // Economic Intelligence & Predictive Analytics
+  | "economic_intelligence" // Economic Intelligence & Predictive Analytics
+  | "hbs_swot" // Harvard Business School SWOT + TOWS + PESTEL
+  | "hbs_business_model" // Business Model Canvas (Osterwalder)
+  | "hbs_gtm" // Go-To-Market Strategy
+  | "hbs_synthesis"; // Cross-agent HBS synthesis
 
 export type Priority = "High" | "Medium" | "Low";
 export type Status = "not_started" | "in_progress" | "completed" | "blocked";
