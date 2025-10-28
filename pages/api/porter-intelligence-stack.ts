@@ -54,18 +54,18 @@ export default async function handler(
       if (d.business_description) {
         // Take first sentence or up to 6 words
         const first = d.business_description.split(/[\.\n]/)[0];
-        const words = first.split(/\s+/).slice(0, 6).join(' ');
+        const words = first.split(/\s+/).slice(0, 6).join(" ");
         return words;
       }
       try {
         if (d.website_url) {
           const u = new URL(d.website_url);
-          return u.hostname.replace('www.', '');
+          return u.hostname.replace("www.", "");
         }
       } catch (e) {
         // ignore
       }
-      return 'Unknown Business';
+      return "Unknown Business";
     };
 
     const context: AgentContext = {
