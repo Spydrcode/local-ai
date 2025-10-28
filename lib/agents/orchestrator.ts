@@ -6,7 +6,8 @@
  */
 
 import { createChatCompletion } from "../openai";
-import { embedText, upsertChunks, VectorChunk } from "../vector";
+import { generateEmbedding } from "../vector-utils";
+import { VectorRepository } from "../repositories/vector-repository";
 import { getPorterAgentSystemPrompt } from "./porter-base-prompt";
 
 export interface AgentContext {
@@ -995,63 +996,54 @@ Return JSON:
     results: AgentResult[],
     synthesis: StrategySynthesis
   ) {
-    const chunks: VectorChunk[] = [];
+    const vectorRepo = new VectorRepository(process.env.VECTOR_PROVIDER as 'supabase' | 'pinecone');
+    const vectors = [];
 
     // Store each agent result as a vector
     for (const result of results) {
       if (result.status === "success" && result.data) {
         const content = `${result.agentName}: ${JSON.stringify(result.data)}`;
-        const { embedding } = await embedText(content);
+        const embedding = await generateEmbedding(content);
 
-        chunks.push({
+        vectors.push({
           id: `${this.context.demoId}-agent-${result.agentName}`,
-          demoId: this.context.demoId,
-          content,
+          values: embedding,
           metadata: {
             demoId: this.context.demoId,
-            analysisType: "strategic" as const,
-            category: "strategic" as const,
-            agentName: result.agentName as
-              | "strategy-architect"
-              | "value-chain"
-              | "market-forces"
-              | "differentiation-designer"
-              | "profit-pool"
-              | "operational-effectiveness-optimizer"
-              | "local-strategy"
-              | "executive-advisor"
-              | "shared-value"
-              | "synthesizer",
+            analysisType: "strategic",
+            category: "strategic",
+            agentName: result.agentName,
             confidence: result.confidence || 0.85,
             timestamp: new Date().toISOString(),
             tags: ["porter-intelligence", result.agentName],
           },
-          embedding: embedding as number[],
         });
       }
     }
 
     // Store synthesis
     const synthesisContent = `Strategy Synthesis: ${JSON.stringify(synthesis)}`;
-    const { embedding: synthesisEmbedding } = await embedText(synthesisContent);
+    const synthesisEmbedding = await generateEmbedding(synthesisContent);
 
-    chunks.push({
+    vectors.push({
       id: `${this.context.demoId}-synthesis`,
-      demoId: this.context.demoId,
-      content: synthesisContent,
+      values: synthesisEmbedding,
       metadata: {
         demoId: this.context.demoId,
-        analysisType: "strategic" as const,
-        category: "strategic" as const,
+        analysisType: "strategic",
+        category: "strategic",
         agentName: "synthesizer",
         confidence: 0.9,
         timestamp: new Date().toISOString(),
         tags: ["porter-intelligence", "synthesis", "action-plan"],
       },
-      embedding: synthesisEmbedding as number[],
     });
 
-    await upsertChunks(chunks);
+    try {
+      await vectorRepo.provider.upsert(vectors);
+    } catch (error) {
+      console.error('Error storing vectors:', error);
+    }
   }
 }
 

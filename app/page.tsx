@@ -250,12 +250,41 @@ export default function Home() {
         body: JSON.stringify({ url: websiteUrl }),
       });
 
+      const contentType = response.headers.get('content-type') || '';
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Analysis failed');
+        // Try to parse JSON error body, but fall back to text if server returned HTML (e.g., Next.js error page)
+        if (contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Analysis failed');
+        } else {
+          const text = await response.text();
+          // If it's an HTML page (Next.js error / 404), avoid showing the full HTML to the user.
+          const isHtml = /^\s*<!doctype\s+html|^\s*<html/i.test(text) || text.trim().startsWith('<');
+          if (isHtml) {
+            // Log full HTML server-side in console, but surface a short, actionable message to the user
+            console.error('Server returned HTML error page for /api/quick-analyze', text.slice(0, 500));
+            throw new Error('Server returned an HTML error (404/500). Check the dev server logs for details.');
+          }
+
+          const trimmed = text.length > 500 ? text.slice(0, 500) + '... (truncated)' : text;
+          throw new Error(trimmed || 'Analysis failed');
+        }
       }
 
-      const data = await response.json();
+      // Successful response: prefer JSON, but defensively fall back to parsing text
+      let data: any;
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error('Invalid response from server');
+        }
+      }
+
       router.push(`/analysis/${data.demoId}`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load website. Please check the URL and try again.';
