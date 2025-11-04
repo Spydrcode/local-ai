@@ -8,6 +8,8 @@
 import { createChatCompletion } from "../openai";
 import { generateEmbedding } from "../vector-utils";
 import { VectorRepository } from "../repositories/vector-repository";
+import { AgenticRAG } from "../rag/agentic-rag";
+import { getAgentPrompt } from "./prompt-loader";
 import { getPorterAgentSystemPrompt } from "./porter-base-prompt";
 
 export interface AgentContext {
@@ -91,9 +93,11 @@ export interface ActionItem {
  */
 export class AgentOrchestrator {
   private context: AgentContext;
+  private rag: AgenticRAG;
 
   constructor(context: AgentContext) {
     this.context = context;
+    this.rag = new AgenticRAG();
   }
 
   /**
@@ -190,6 +194,9 @@ export class AgentOrchestrator {
           break;
         case "shared-value":
           data = await this.runSharedValueInnovator();
+          break;
+        case "economic-intelligence":
+          data = await this.runEconomicIntelligenceAgent();
           break;
         default:
           throw new Error(`Unknown agent: ${agentName}`);
@@ -304,7 +311,7 @@ Return as JSON with structure:
       messages: [
         {
           role: "system",
-          content: getPorterAgentSystemPrompt("strategyArchitect"),
+          content: getAgentPrompt("strategy_architect"),
         },
         { role: "user", content: prompt },
       ],
@@ -1044,6 +1051,69 @@ Return JSON:
     } catch (error) {
       console.error('Error storing vectors:', error);
     }
+  }
+
+  /**
+   * Store ReAct agent results with reasoning steps
+   */
+  async storeReActResults(
+    agentName: string,
+    result: any,
+    steps: any[]
+  ) {
+    const vectorRepo = new VectorRepository(process.env.VECTOR_PROVIDER as 'supabase' | 'pinecone');
+    
+    // Store main result
+    const content = `${agentName} ReAct Analysis: ${JSON.stringify(result)}`;
+    const embedding = await generateEmbedding(content);
+
+    const vector = {
+      id: `${this.context.demoId}-react-${agentName}`,
+      values: embedding,
+      metadata: {
+        demoId: this.context.demoId,
+        analysisType: "react",
+        category: "strategic",
+        agentName,
+        agent_type: "react",
+        reasoning_steps: steps.length,
+        iteration_count: steps.length,
+        validation_score: 0.9,
+        timestamp: new Date().toISOString(),
+        tags: ["react-agent", agentName, "reasoning"],
+      },
+    };
+
+    try {
+      await vectorRepo.provider.upsert([vector]);
+    } catch (error) {
+      console.error('Error storing ReAct vectors:', error);
+    }
+  }
+
+  /**
+   * Economic Intelligence Agent (ReAct-enabled)
+   */
+  private async runEconomicIntelligenceAgent() {
+    const { ReActEconomicAgent } = await import('./react-economic-agent');
+    
+    const reactAgent = new ReActEconomicAgent();
+    const result = await reactAgent.analyzeEconomicEnvironment(
+      this.context.industry || 'General Business',
+      this.context.siteSummary || ''
+    );
+
+    // Store ReAct results
+    await this.storeReActResults('economic-intelligence', result.finalAnswer, result.steps);
+
+    return {
+      analysis: result.finalAnswer,
+      reasoning: result.steps,
+      success: result.success,
+      iterations: result.iterations,
+      generatedAt: new Date().toISOString(),
+      confidence: result.success ? 0.9 : 0.6
+    };
   }
 }
 

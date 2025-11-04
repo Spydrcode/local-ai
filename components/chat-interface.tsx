@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { useChat } from 'ai/react'
+import { useState, useCallback } from 'react'
 import { useDemoStore } from '@/stores/demo-store'
 
 interface Message {
@@ -13,6 +12,61 @@ interface Message {
 interface ChatInterfaceProps {
   initialHistory: Message[]
   demoId: string
+}
+
+// Custom useChat hook implementation
+function useChat({ api, initialMessages, body }: { api: string; initialMessages: Message[]; body: any }) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages || [])
+  const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
+  }, [])
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim() || isLoading) return
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input
+    }
+
+    setMessages(prev => [...prev, userMessage])
+    setInput('')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch(api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input, ...body })
+      })
+
+      const data = await response.json()
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: data.message || 'Sorry, I encountered an error.'
+      }
+
+      setMessages(prev => [...prev, assistantMessage])
+    } catch (error) {
+      console.error('Chat error:', error)
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.'
+      }
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [input, isLoading, api, body])
+
+  return { messages, input, handleInputChange, handleSubmit, isLoading }
 }
 
 export function ChatInterface({ initialHistory, demoId }: ChatInterfaceProps) {

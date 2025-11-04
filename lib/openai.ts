@@ -51,6 +51,8 @@ export interface ChatCompletionOptions {
   temperature?: number;
   maxTokens?: number;
   jsonMode?: boolean;
+  response_format?: { type: "json_object" };
+  max_tokens?: number;
 }
 
 export async function createChatCompletion({
@@ -59,6 +61,8 @@ export async function createChatCompletion({
   temperature = 0.7,
   maxTokens = 800,
   jsonMode = false,
+  response_format,
+  max_tokens,
 }: ChatCompletionOptions) {
   if (!apiKey) {
     throw new Error(
@@ -69,9 +73,9 @@ export async function createChatCompletion({
   const response = await client.chat.completions.create({
     model,
     temperature,
-    max_tokens: maxTokens,
+    max_tokens: max_tokens || maxTokens,
     messages,
-    ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
+    ...(response_format ? { response_format } : jsonMode ? { response_format: { type: "json_object" } } : {}),
   });
 
   const content = response.choices[0]?.message?.content;

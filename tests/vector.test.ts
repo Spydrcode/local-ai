@@ -9,7 +9,7 @@ vi.mock("../server/supabaseAdmin", () => ({
   },
 }));
 
-import { similaritySearch } from "../lib/vector";
+import { similaritySearch } from "../lib/vector-utils";
 
 describe("similaritySearch", () => {
   it("returns empty array when no data", async () => {

@@ -14,28 +14,30 @@ interface PorterKnowledge {
 }
 
 // Porter's Core Frameworks (condensed for RAG)
-const PORTER_KNOWLEDGE_BASE = [
+const PORTER_KNOWLEDGE_BASE: PorterKnowledge[] = [
   {
-    framework: 'five_forces',
+    framework: 'five_forces' as const,
     content: `Porter's Five Forces Framework:
 1. Threat of New Entrants - Barriers: economies of scale, capital requirements, access to distribution, government policy, brand identity
 2. Bargaining Power of Suppliers - Factors: supplier concentration, switching costs, differentiation, threat of forward integration
 3. Bargaining Power of Buyers - Factors: buyer concentration, volume, switching costs, price sensitivity, threat of backward integration
 4. Threat of Substitutes - Factors: relative price-performance, switching costs, buyer propensity to substitute
 5. Competitive Rivalry - Factors: industry growth, fixed costs, product differentiation, exit barriers, strategic stakes`,
-    source: 'Competitive Strategy (1980)'
+    source: 'Competitive Strategy (1980)',
+    relevance: 0
   },
   {
-    framework: 'generic_strategies',
+    framework: 'generic_strategies' as const,
     content: `Porter's Generic Strategies:
 1. Cost Leadership - Achieve lowest cost in industry through economies of scale, proprietary technology, preferential access to raw materials
 2. Differentiation - Create unique value through product features, brand image, technology, customer service, dealer network
 3. Focus - Target specific segment with either cost focus or differentiation focus
 CRITICAL: Stuck in the middle = competitive disadvantage. Must choose ONE strategy and make trade-offs.`,
-    source: 'Competitive Strategy (1980)'
+    source: 'Competitive Strategy (1980)',
+    relevance: 0
   },
   {
-    framework: 'value_chain',
+    framework: 'value_chain' as const,
     content: `Porter's Value Chain Analysis:
 Primary Activities: Inbound Logistics, Operations, Outbound Logistics, Marketing & Sales, Service
 Support Activities: Firm Infrastructure, HR Management, Technology Development, Procurement
@@ -43,17 +45,19 @@ Key Concepts:
 - Linkages between activities create competitive advantage
 - Cost drivers: economies of scale, learning, capacity utilization, linkages, interrelationships, integration, timing, policy choices
 - Differentiation drivers: policy choices, linkages, timing, location, interrelationships, learning, integration, scale`,
-    source: 'Competitive Advantage (1985)'
+    source: 'Competitive Advantage (1985)',
+    relevance: 0
   },
   {
-    framework: 'competitive_advantage',
+    framework: 'competitive_advantage' as const,
     content: `Sustainable Competitive Advantage Sources:
 1. Activities that are valuable, rare, difficult to imitate, and organizationally supported (VRIO)
 2. Trade-offs that prevent imitation (doing one thing well means not doing another)
 3. Fit among activities (system of activities reinforces strategy)
 4. Continuous improvement and innovation within chosen strategy
 NOT competitive advantage: operational effectiveness, best practices, benchmarking (these are table stakes)`,
-    source: 'What is Strategy? (1996)'
+    source: 'What is Strategy? (1996)',
+    relevance: 0
   }
 ]
 

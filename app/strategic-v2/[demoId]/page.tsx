@@ -609,7 +609,7 @@ function MarketForcesView({ data }: { data: any }) {
               <div className="flex items-start justify-between mb-3">
                 <h4 className="font-semibold text-lg">{comp.name}</h4>
                 <span className="px-2 py-1 rounded text-xs font-medium bg-black/20">
-                  {comp.threatLevel.toUpperCase()}
+                  {comp.threatLevel?.toUpperCase() || 'UNKNOWN'}
                 </span>
               </div>
               <p className="text-sm opacity-90">{comp.recentMoves}</p>

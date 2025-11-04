@@ -1,4 +1,5 @@
 import { DEFAULT_MODEL, openai } from "../config/openai.js";
+import { getIndustryData } from "../tools/IndustryDataTool.js";
 
 /**
  * HomepageDesignAgent
@@ -97,9 +98,17 @@ export async function designHomepage(
   differentiators: string
 ): Promise<string> {
   try {
+    // Extract industry from business info (simple heuristic)
+    const industryMatch = businessInfo.match(/\b(restaurant|hotel|service|retail|healthcare|tech|consulting)\b/i);
+    const industry = industryMatch ? industryMatch[0] : "business";
+    const benchmarks = getIndustryData(industry);
+    
     const contextPrompt = `Business Information: ${businessInfo}
 
 Key Differentiators: ${differentiators}
+
+Industry Best Practices:
+${benchmarks.bestPractices.map(p => `- ${p}`).join('\n')}
 
 Remember:
 - Design for THIS specific business sub-niche, not a generic industry template

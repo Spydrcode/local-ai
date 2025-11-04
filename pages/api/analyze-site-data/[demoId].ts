@@ -74,6 +74,8 @@ export default async function handler(
       websiteUrl,
       siteSummary: summary,
       keyItems,
+      'economic-intelligence': demo.economic_intelligence,
+      economic_intelligence: demo.economic_intelligence,
     });
   } catch (error) {
     console.error("Failed to fetch demo data:", error);

@@ -555,7 +555,7 @@ export default function Home() {
           <div className="text-center mt-16">
             <button
               onClick={() => setActiveSection('hero')}
-              className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-200 shadow-lg"
+              className="bg-linear-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-200 shadow-lg"
             >
               Access All Dashboards
             </button>

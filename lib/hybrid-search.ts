@@ -1,4 +1,13 @@
-import { embedText, similaritySearch, type SimilarityResult } from './vector';
+import { generateEmbedding, similaritySearch } from "./vector-utils";
+
+interface SimilarityResult {
+  id: string;
+  score: number;
+  metadata: Record<string, any>;
+  content?: string;
+  semanticScore?: number;
+  keywordScore?: number;
+}
 
 interface HybridSearchOptions {
   demoId: string;
@@ -18,11 +27,13 @@ export async function hybridSearch({
   semanticWeight = 0.7,
 }: HybridSearchOptions): Promise<SimilarityResult[]> {
   // Get semantic results
-  const { embedding } = await embedText(query);
-  const embeddingArray = Array.isArray(embedding) 
-    ? (Array.isArray(embedding[0]) ? embedding[0] : embedding)
+  const embedding = await generateEmbedding(query);
+  const embeddingArray = Array.isArray(embedding)
+    ? Array.isArray(embedding[0])
+      ? embedding[0]
+      : embedding
     : [embedding as number];
-    
+
   const semanticResults = await similaritySearch({
     demoId,
     queryEmbedding: embeddingArray as number[],
@@ -31,15 +42,16 @@ export async function hybridSearch({
 
   // Extract keywords from query for keyword matching
   const keywords = extractKeywords(query);
-  
+
   // Score results with hybrid approach
-  const hybridResults = semanticResults.map(result => {
+  const hybridResults = semanticResults.map((result) => {
     const semanticScore = result.score;
-    const keywordScore = calculateKeywordScore(result.content, keywords);
-    
+    const keywordScore = calculateKeywordScore(result.content || "", keywords);
+
     // Combine scores with weighting
-    const hybridScore = (semanticScore * semanticWeight) + (keywordScore * (1 - semanticWeight));
-    
+    const hybridScore =
+      semanticScore * semanticWeight + keywordScore * (1 - semanticWeight);
+
     return {
       ...result,
       score: hybridScore,
@@ -49,25 +61,56 @@ export async function hybridSearch({
   });
 
   // Sort by hybrid score and return top results
-  return hybridResults
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK);
+  return hybridResults.sort((a, b) => b.score - a.score).slice(0, topK);
 }
 
 function extractKeywords(query: string): string[] {
   // Remove common stop words and extract meaningful terms
   const stopWords = new Set([
-    'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
-    'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 
-    'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should',
-    'what', 'when', 'where', 'why', 'how', 'who', 'which'
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "but",
+    "in",
+    "on",
+    "at",
+    "to",
+    "for",
+    "of",
+    "with",
+    "by",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "will",
+    "would",
+    "could",
+    "should",
+    "what",
+    "when",
+    "where",
+    "why",
+    "how",
+    "who",
+    "which",
   ]);
 
   return query
     .toLowerCase()
-    .replace(/[^\w\s]/g, ' ')
+    .replace(/[^\w\s]/g, " ")
     .split(/\s+/)
-    .filter(word => word.length > 2 && !stopWords.has(word))
+    .filter((word) => word.length > 2 && !stopWords.has(word))
     .slice(0, 10); // Limit keywords
 }
 
@@ -79,9 +122,9 @@ function calculateKeywordScore(content: string, keywords: string[]): number {
   let totalScore = 0;
 
   for (const keyword of keywords) {
-    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+    const regex = new RegExp(`\\b${keyword}\\b`, "gi");
     const keywordMatches = (contentLower.match(regex) || []).length;
-    
+
     if (keywordMatches > 0) {
       matches++;
       // Score based on frequency and keyword importance
@@ -92,14 +135,17 @@ function calculateKeywordScore(content: string, keywords: string[]): number {
   // Normalize score (0-1) based on keyword coverage
   const coverageScore = matches / keywords.length;
   const frequencyScore = Math.min(totalScore, 1);
-  
-  return (coverageScore * 0.6) + (frequencyScore * 0.4);
+
+  return coverageScore * 0.6 + frequencyScore * 0.4;
 }
 
 /**
  * Enhanced context retrieval for AI agents with better ranking
  */
-export async function getEnhancedContext(demoId: string, query: string): Promise<string> {
+export async function getEnhancedContext(
+  demoId: string,
+  query: string
+): Promise<string> {
   const results = await hybridSearch({
     demoId,
     query,
@@ -113,11 +159,11 @@ export async function getEnhancedContext(demoId: string, query: string): Promise
 
   // Format context with relevance indicators
   const contextParts = results.map((result, index) => {
-    const relevanceIndicator = result.score > 0.8 ? "[HIGH]" : 
-                              result.score > 0.6 ? "[MED]" : "[LOW]";
-    
+    const relevanceIndicator =
+      result.score > 0.8 ? "[HIGH]" : result.score > 0.6 ? "[MED]" : "[LOW]";
+
     return `${relevanceIndicator} Context ${index + 1}: ${result.content}`;
   });
 
-  return contextParts.join('\n\n');
+  return contextParts.join("\n\n");
 }

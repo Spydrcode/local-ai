@@ -1,26 +1,26 @@
-import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 
 interface Demo {
-  id: string
-  businessName: string
-  websiteUrl: string
-  siteSummary?: string
-  porterAnalysis?: any
-  createdAt: string
+  id: string;
+  businessName: string;
+  websiteUrl: string;
+  siteSummary?: string;
+  porterAnalysis?: any;
+  createdAt: string;
 }
 
 interface DemoStore {
-  currentDemoId: string | null
-  demoData: Demo | null
-  loading: boolean
-  error: string | null
-  
+  currentDemoId: string | null;
+  demoData: Demo | null;
+  loading: boolean;
+  error: string | null;
+
   // Actions
-  setCurrentDemo: (id: string) => void
-  loadDemoData: (id: string) => Promise<void>
-  clearDemo: () => void
-  setError: (error: string | null) => void
+  setCurrentDemo: (id: string) => void;
+  loadDemoData: (id: string) => Promise<void>;
+  clearDemo: () => void;
+  setError: (error: string | null) => void;
 }
 
 export const useDemoStore = create<DemoStore>()(
@@ -31,33 +31,34 @@ export const useDemoStore = create<DemoStore>()(
       loading: false,
       error: null,
 
-      setCurrentDemo: (id) => set({ currentDemoId: id }),
+      setCurrentDemo: (id: string) => set({ currentDemoId: id }),
 
-      loadDemoData: async (id) => {
-        set({ loading: true, error: null })
-        
+      loadDemoData: async (id: string) => {
+        set({ loading: true, error: null });
+
         try {
-          const response = await fetch(`/api/demos/${id}`)
-          if (!response.ok) throw new Error('Failed to fetch demo')
-          
-          const data = await response.json()
-          set({ demoData: data, loading: false })
+          const response = await fetch(`/api/demos/${id}`);
+          if (!response.ok) throw new Error("Failed to fetch demo");
+
+          const data = await response.json();
+          set({ demoData: data, loading: false });
         } catch (error) {
-          set({ 
-            error: error instanceof Error ? error.message : 'Unknown error',
-            loading: false 
-          })
+          set({
+            error: error instanceof Error ? error.message : "Unknown error",
+            loading: false,
+          });
         }
       },
 
-      clearDemo: () => set({ 
-        currentDemoId: null, 
-        demoData: null, 
-        error: null 
-      }),
+      clearDemo: () =>
+        set({
+          currentDemoId: null,
+          demoData: null,
+          error: null,
+        }),
 
-      setError: (error) => set({ error })
+      setError: (error: string | null) => set({ error }),
     }),
-    { name: 'demo-store' }
+    { name: "demo-store" }
   )
-)
+);

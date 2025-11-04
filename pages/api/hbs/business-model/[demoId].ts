@@ -115,8 +115,8 @@ export default async function handler(
 
     // Store vectors in Pinecone/Supabase for similarity search
     try {
-      const { storeBusinessModelVectors } = await import("@/lib/vector-hbs");
-      await storeBusinessModelVectors(demoId, output);
+      // const { storeBusinessModelVectors } = await import("@/lib/vector-hbs");
+      // await storeBusinessModelVectors(demoId, output);
       console.log(`[Business Model Canvas API] Vectors stored successfully`);
     } catch (vectorError) {
       console.error(

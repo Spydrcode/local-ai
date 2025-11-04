@@ -48,35 +48,51 @@ export default async function handler(
     }
 
     // Build agent context
-    // Try to infer a business name when missing: prefer business_name, then business_description, then domain
     const inferBusinessName = (d: any) => {
-      if (d.business_name) return d.business_name;
-      if (d.business_description) {
-        // Take first sentence or up to 6 words
-        const first = d.business_description.split(/[\.\n]/)[0];
-        const words = first.split(/\s+/).slice(0, 6).join(" ");
-        return words;
+      // Try client_id first (set by quick-analyze)
+      if (d.client_id && d.client_id !== demoId && d.client_id !== 'unknown') {
+        return d.client_id;
       }
-      try {
-        if (d.website_url) {
-          const u = new URL(d.website_url);
-          return u.hostname.replace("www.", "");
-        }
-      } catch (e) {
-        // ignore
+      
+      // Try key_items array
+      if (d.key_items && Array.isArray(d.key_items) && d.key_items.length > 0) {
+        return d.key_items[0];
       }
+      
+      // Try summary
+      if (d.summary && d.summary.length > 10 && !d.summary.includes('pending')) {
+        const match = d.summary.match(/^([A-Z][^.!?]{3,50})/);
+        if (match) return match[1].trim();
+      }
+      
+      // Extract from URL
+      const url = d.site_url || d.website_url;
+      if (url) {
+        try {
+          const u = new URL(url);
+          const domain = u.hostname.replace('www.', '').split('.')[0];
+          return domain.charAt(0).toUpperCase() + domain.slice(1);
+        } catch (e) {}
+      }
+      
       return "Unknown Business";
     };
 
     const context: AgentContext = {
       demoId,
       businessName: inferBusinessName(demo),
-      websiteUrl: demo.website_url,
-      siteSummary: demo.site_summary,
+      websiteUrl: demo.site_url || demo.website_url || '',
+      siteSummary: demo.summary || demo.site_summary || '',
       industry: demo.industry || undefined,
-      // TODO: Add enrichedData from external APIs (Google Places, Yelp, etc.)
       enrichedData: undefined,
     };
+
+    console.log('[Porter Intelligence Stack] Context:', {
+      businessName: context.businessName,
+      websiteUrl: context.websiteUrl,
+      hasSummary: !!context.siteSummary,
+      demoData: { client_id: demo.client_id, key_items: demo.key_items, summary: demo.summary?.substring(0, 50) },
+    });
 
     console.log(
       `[Porter Intelligence Stack] Running orchestrator for ${context.businessName}`
@@ -106,7 +122,6 @@ export default async function handler(
         .from("demos")
         .update({
           porter_analysis: JSON.stringify(result),
-          updated_at: new Date().toISOString(),
         })
         .eq("id", demoId);
 

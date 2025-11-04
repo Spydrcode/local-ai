@@ -128,8 +128,8 @@ export default async function handler(
 
     // Store vectors in Pinecone/Supabase for similarity search
     try {
-      const { storeGTMStrategyVectors } = await import("@/lib/vector-hbs");
-      await storeGTMStrategyVectors(demoId, output);
+      // const { storeGTMStrategyVectors } = await import("@/lib/vector-hbs");
+      // await storeGTMStrategyVectors(demoId, output);
       console.log(`[GTM Strategy API] Vectors stored successfully`);
     } catch (vectorError) {
       console.error("[GTM Strategy API] Failed to store vectors:", vectorError);

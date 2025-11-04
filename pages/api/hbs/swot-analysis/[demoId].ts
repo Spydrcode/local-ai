@@ -106,8 +106,8 @@ export default async function handler(
 
     // Store vectors in Pinecone/Supabase for similarity search
     try {
-      const { storeSWOTVectors } = await import("@/lib/vector-hbs");
-      await storeSWOTVectors(demoId, output);
+      // const { storeSWOTVectors } = await import("@/lib/vector-hbs");
+      // await storeSWOTVectors(demoId, output);
       console.log(`[SWOT API] SWOT vectors stored successfully`);
     } catch (vectorError) {
       console.error("[SWOT API] Failed to store vectors:", vectorError);

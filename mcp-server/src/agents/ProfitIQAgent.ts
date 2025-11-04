@@ -1,4 +1,5 @@
 import { DEFAULT_MODEL, openai } from "../config/openai.js";
+import { getIndustryData } from "../tools/IndustryDataTool.js";
 
 /**
  * ProfitIQAgent
@@ -63,7 +64,16 @@ export async function generateProfitInsights(
   industry?: string
 ): Promise<string> {
   try {
+    // Get industry benchmarks
+    const benchmarks = industry ? getIndustryData(industry) : null;
+    
     const contextPrompt = `Business Information: ${businessInfo}${industry ? `\nIndustry: ${industry}` : ""}
+
+${benchmarks ? `Industry Benchmarks:
+- Avg conversion rate: ${benchmarks.avgConversionRate}
+- Key metrics: ${benchmarks.keyMetrics.join(', ')}
+- Best practices: ${benchmarks.bestPractices.join(', ')}
+- Common challenges: ${benchmarks.commonChallenges.join(', ')}` : ""}
 
 Remember: 
 - First, identify EXACT business sub-category (not just "restaurant" but "Tex-Mex BBQ restaurant specializing in...")

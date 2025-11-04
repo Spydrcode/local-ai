@@ -5,8 +5,6 @@ import { z } from "zod";
 import { hfSummarize } from "../../lib/hf";
 import { summarizeText } from "../../lib/openai";
 import { SITE_SUMMARY_PROMPT } from "../../lib/prompts";
-import { embedText, upsertChunks } from "../../lib/vector";
-import { throttle } from "../../server/rateLimiter";
 
 const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz1234567890", 12);
 
@@ -113,65 +111,6 @@ function chunkContent(text: string, chunkSize = 1000) {
     .slice(0, 15); // Limit to top 15 chunks for quality
 }
 
-async function maybeStoreChunks({
-  chunks,
-  headings,
-  sourceUrl,
-  embeddingsId,
-}: {
-  chunks: string[];
-  headings: string[];
-  sourceUrl: string;
-  embeddingsId: string;
-}) {
-  try {
-    await upsertChunks(
-      await Promise.all(
-        chunks.map(async (content, index) => {
-          const { embedding } = await embedText(content);
-          const vector = Array.isArray(embedding)
-            ? Array.isArray((embedding as unknown[])[0])
-              ? ((embedding as unknown[])[0] as number[])
-              : (embedding as number[])
-            : [embedding as number];
-
-          const heading = headings[index];
-
-          const metadata = {
-            demoId: embeddingsId,
-            analysisType: "website" as const,
-            category: "strategic" as const,
-            heading: heading || undefined,
-            chunkType: (heading ? "heading" : "content") as
-              | "heading"
-              | "content",
-            source: sourceUrl,
-            chunkIndex: index,
-            contentType: headings[index] ? "heading-section" : "content",
-            extractedAt: new Date().toISOString(),
-            timestamp: new Date().toISOString(),
-            wordCount: content.split(" ").length,
-            contentLength: content.length,
-            confidence: 0.9,
-            relevanceScore: 0.85,
-            tags: ["website-analysis", "initial-scan"],
-          };
-
-          return {
-            id: `${embeddingsId}-${index}`,
-            demoId: embeddingsId,
-            content,
-            metadata,
-            embedding: vector,
-          };
-        })
-      )
-    );
-  } catch (vectorError) {
-    console.warn("Vector upsert skipped", vectorError);
-  }
-}
-
 function fallbackSummaryFromHeadings({
   headings,
   menuItems,
@@ -192,17 +131,6 @@ export default async function handler(
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  try {
-    throttle(req.socket.remoteAddress ?? "anonymous:analyze");
-  } catch (throttleError) {
-    const retryAfter =
-      (throttleError as { retryAfter?: number }).retryAfter ?? 60;
-    return res
-      .status(429)
-      .setHeader("Retry-After", retryAfter)
-      .json({ error: "Too many requests" });
   }
 
   const parseResult = requestSchema.safeParse(req.body);
@@ -256,13 +184,6 @@ export default async function handler(
     const contentChunks = chunkContent(rawText).slice(0, 12);
 
     const embeddingsId = nanoid();
-
-    await maybeStoreChunks({
-      chunks: contentChunks,
-      headings,
-      sourceUrl: url,
-      embeddingsId,
-    });
 
     let summary: string;
     try {

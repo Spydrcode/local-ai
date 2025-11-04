@@ -5,6 +5,7 @@ type AnalysisStatus = {
 };
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import WebsiteDesignGallery from '@/components/WebsiteDesignGallery';
 
 interface AnalysisData {
   demoId: string;
@@ -174,7 +175,7 @@ const analysisModules = [
     description: 'Website designs that turn visitors into customers',
     icon: '�',
     category: 'content',
-    endpoint: (demoId: string) => `/api/generate-mockup`,
+    endpoint: (demoId: string) => `/api/website/generate`,
     method: 'POST',
     body: (demoId: string) => ({ demoId }),
     color: 'blue'
@@ -422,6 +423,28 @@ export default function AnalysisPage() {
             updates.websiteGrade = data;
             break;
           case 'economic-intelligence':
+            // Store economic intelligence data with both possible keys
+            (updates as any)['economic-intelligence'] = data.data || data;
+            (updates as any)['economic_intelligence'] = data.data || data;
+            break;
+          case 'competitive-moat':
+          case 'value-chain-optimizer':
+          case 'swot-live-dashboard':
+          case 'pricing-power-analysis':
+          case 'quick-wins-generator':
+          case 'revenue-leaks-detector':
+          case 'customer-magnet-posts':
+          case 'local-seo-content':
+          case 'email-nurture-sequences':
+          case 'review-generation-system':
+          case 'growth-accelerator-plan':
+          case 'profit-optimizer':
+          case 'automation-opportunities':
+          case 'kpi-dashboard':
+          case 'customer-lifetime-maximizer':
+            // Store data from APIs that return {success: true, data: ...}
+            (updates as any)[moduleId] = data.data || data;
+            break;
           case 'porter-analysis':
           case 'hbs-business-model':
           case 'hbs-swot':
@@ -760,10 +783,171 @@ function AnalysisModule({ module, status, error, data, onRun }: AnalysisModulePr
           </div>
         ) : null;
 
-      default:
-        // Action-oriented content display for other modules
+      case 'economic-intelligence':
+        const economicData = (data as any)['economic-intelligence'] || (data as any)['economic_intelligence'];
+        if (economicData && status === 'completed') {
+          return (
+            <div className="space-y-3">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
+                <p className="text-emerald-400 text-sm font-medium">✅ Economic Analysis Complete</p>
+                <p className="text-slate-300 text-xs mt-1">{economicData.industry || 'Industry'} risk assessment generated</p>
+              </div>
+              
+              {economicData.industryImpact && (
+                <div className="bg-slate-800/50 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-slate-400">Overall Risk Level</span>
+                    <span className={`px-2 py-1 rounded text-xs font-bold ${
+                      economicData.industryImpact.overallRisk === 'critical' ? 'bg-red-500 text-white' :
+                      economicData.industryImpact.overallRisk === 'high' ? 'bg-orange-500 text-white' :
+                      economicData.industryImpact.overallRisk === 'moderate' ? 'bg-yellow-500 text-white' :
+                      'bg-emerald-500 text-white'
+                    }`}>
+                      {economicData.industryImpact.overallRisk?.toUpperCase()}
+                    </span>
+                  </div>
+                  <a 
+                    href={`/economic/${data.demoId}`}
+                    className="text-blue-400 hover:text-blue-300 text-xs underline"
+                  >
+                    View Full Economic Intelligence Report →
+                  </a>
+                </div>
+              )}
+              
+              {economicData.profitPrediction && economicData.profitPrediction.adjustedForecast && (
+                <div className="bg-slate-800/50 rounded-lg p-3">
+                  <h5 className="text-white text-xs font-medium mb-2">💰 Revenue Predictions</h5>
+                  <div className="space-y-1">
+                    {['year1', 'year2', 'year3'].slice(0, 2).map((yearKey, index) => {
+                      const forecast = economicData.profitPrediction.adjustedForecast[yearKey];
+                      return forecast ? (
+                        <div key={yearKey} className="flex justify-between text-xs">
+                          <span className="text-slate-400">Year {index + 1}</span>
+                          <span className="text-emerald-400">{forecast.revenue}</span>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+        return null;
+
+      case 'pricing-power-analysis':
+        const pricingData = (data as any)[module.id];
+        if (pricingData && status === 'completed') {
+          return (
+            <div className="space-y-3">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
+                <p className="text-emerald-400 text-sm font-medium">✅ Pricing Analysis Complete</p>
+                <p className="text-slate-300 text-xs mt-1">{pricingData.product || 'Product'} pricing intelligence</p>
+              </div>
+              
+              {pricingData.currentMarketData && (
+                <div className="bg-slate-800/50 rounded-lg p-3">
+                  <h5 className="text-white text-xs font-medium mb-2">💰 Current Market Data</h5>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-slate-400">Wholesale Cost:</span>
+                      <span className="text-white ml-1">{pricingData.currentMarketData.wholesaleCost}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400">Retail Price:</span>
+                      <span className="text-white ml-1">{pricingData.currentMarketData.retailPrice}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400">Margin:</span>
+                      <span className="text-emerald-400 ml-1">{pricingData.currentMarketData.margin}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {pricingData.pricingRecommendations && (
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+                  <p className="text-blue-400 text-xs font-semibold mb-1">🎯 Pricing Recommendations:</p>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Current:</span>
+                      <span className="text-white">{pricingData.pricingRecommendations.currentPrice}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Recommended:</span>
+                      <span className="text-emerald-400">{pricingData.pricingRecommendations.recommendedPrice}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Increase:</span>
+                      <span className="text-emerald-400">{pricingData.pricingRecommendations.priceIncrease}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+        return null;
+
+      case 'competitive-moat':
+      case 'value-chain-optimizer':
+      case 'swot-live-dashboard':
+      case 'quick-wins-generator':
         const moduleData = (data as any)[module.id];
         if (moduleData && status === 'completed') {
+          return (
+            <div className="space-y-3">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
+                <p className="text-emerald-400 text-sm font-medium">✅ Analysis Complete</p>
+                <p className="text-slate-300 text-xs mt-1">Strategic insights generated</p>
+              </div>
+              
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+                <p className="text-blue-400 text-xs font-semibold mb-1">🎯 Here's what to do this week:</p>
+                <p className="text-slate-300 text-xs">
+                  {getModuleActionSteps(module.id)}
+                </p>
+              </div>
+            </div>
+          );
+        }
+        return null;
+
+      case 'conversion-website':
+        if (status === 'completed') {
+          return <WebsiteDesignGallery demoId={data.demoId} />;
+        }
+        return null;
+
+      case 'customer-magnet-posts':
+      case 'local-seo-content':
+      case 'email-nurture-sequences':
+      case 'review-generation-system':
+        const contentData = (data as any)[module.id];
+        if (contentData && status === 'completed') {
+          return (
+            <div className="space-y-3">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
+                <p className="text-emerald-400 text-sm font-medium">✅ Content Generated</p>
+                <p className="text-slate-300 text-xs mt-1">Marketing content ready to use</p>
+              </div>
+              
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+                <p className="text-blue-400 text-xs font-semibold mb-1">🎯 Here's what to do this week:</p>
+                <p className="text-slate-300 text-xs">
+                  {getModuleActionSteps(module.id)}
+                </p>
+              </div>
+            </div>
+          );
+        }
+        return null;
+
+      default:
+        // Generic display for other modules
+        const genericData = (data as any)[module.id];
+        if (genericData && status === 'completed') {
           return (
             <div className="space-y-2">
               <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
@@ -771,7 +955,6 @@ function AnalysisModule({ module, status, error, data, onRun }: AnalysisModulePr
                 <p className="text-slate-300 text-xs mt-1">Strategic insights generated</p>
               </div>
               
-              {/* Action-oriented next steps based on module type */}
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
                 <p className="text-blue-400 text-xs font-semibold mb-1">🎯 Here's what to do this week:</p>
                 <p className="text-slate-300 text-xs">

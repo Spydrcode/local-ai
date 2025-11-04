@@ -120,7 +120,7 @@ export default function HBSIntelligencePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+  <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-500 mx-auto mb-4"></div>
           <p className="text-slate-400">Loading HBS Intelligence...</p>
@@ -131,7 +131,7 @@ export default function HBSIntelligencePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+  <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 max-w-md">
           <h2 className="text-xl font-bold text-red-400 mb-2">Error</h2>
           <p className="text-slate-300">{error}</p>
@@ -147,7 +147,7 @@ export default function HBSIntelligencePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+  <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
       <div className="bg-slate-900/50 border-b border-slate-800 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-6">

@@ -1,12 +1,12 @@
 import { generateSocialCopy } from "@/lib/agents/SocialMediaCopyAgent";
 import { generateEmojiStrategy } from "@/lib/agents/SocialMediaEmojiAgent";
 import { generateSocialStyle } from "@/lib/agents/SocialMediaStyleAgent";
-import {
-  searchAudienceVectors,
-  searchBrandVoiceVectors,
-  searchCopyContextVectors,
-  searchSocialMediaVectors,
-} from "@/lib/vector";
+// import {
+//   searchAudienceVectors,
+//   searchBrandVoiceVectors,
+//   searchCopyContextVectors,
+//   searchSocialMediaVectors,
+// } from "@/lib/vector";
 import { createClient } from "@supabase/supabase-js";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
@@ -118,33 +118,13 @@ export default async function handler(
       if (demoError) throw demoError;
       if (!demo) return res.status(404).json({ error: "Demo not found" });
 
-      // Get enriched context from specialized vector searches
-      // Each search is optimized for different agent needs
-      const [generalContext, copyContext, brandVoiceContext, audienceContext] =
-        await Promise.all([
-          // General social media marketing context
-          searchSocialMediaVectors(
-            demoId,
-            `${platform} social media marketing opportunities and strategies`,
-            platform as "Facebook" | "Instagram" | "LinkedIn" | "Twitter",
-            5
-          ),
-          // Product/service details and differentiators for compelling copy
-          searchCopyContextVectors(
-            demoId,
-            `key products services features benefits value propositions`,
-            "promotional",
-            5
-          ),
-          // Brand voice and tone for consistent personality
-          searchBrandVoiceVectors(demoId, 4),
-          // Target audience insights for tailored messaging
-          searchAudienceVectors(
-            demoId,
-            platform as "Facebook" | "Instagram" | "LinkedIn" | "Twitter",
-            4
-          ),
-        ]);
+      // Use basic context from demo data instead of vector search
+      const generalContext = [
+        { content: demo.summary || "Business information" },
+      ];
+      const copyContext = [{ content: demo.summary || "Business information" }];
+      const brandVoiceContext = [{ content: "Professional and engaging tone" }];
+      const audienceContext = [{ content: "Target customers and prospects" }];
 
       // Organize context for different agent needs
       const generalBusinessContext = [

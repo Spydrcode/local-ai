@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
-import { rateLimit } from "../../lib/rateLimiter";
+import { analyzeSite } from "../../lib/agents/siteAnalysis";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,44 +21,22 @@ export default async function handler(
     return res.status(400).json({ error: "URL is required" });
   }
 
-  // Distributed rate limiting (Upstash Redis)
-  const ip =
-    req.headers["x-forwarded-for"]?.toString().split(",")[0] ||
-    req.socket.remoteAddress ||
-    "anonymous:quick";
-  const { allowed, remaining, reset } = await rateLimit(
-    `quick-analyze:${ip}`,
-    10,
-    60
-  );
-  if (!allowed) {
-    res.setHeader(
-      "Retry-After",
-      Math.max(1, reset - Math.floor(Date.now() / 1000))
-    );
-    return res
-      .status(429)
-      .json({ error: "Too many requests. Please wait before trying again." });
-  }
-
   try {
     // Generate demo ID
     const demoId = Math.random().toString(36).substring(2, 15);
 
-    // Extract business name from URL
-    const businessName = new URL(url).hostname
-      .replace("www.", "")
-      .split(".")[0];
+    // Analyze site
+    const analysis = await analyzeSite(url);
 
-    // Create demo record
+    // Create demo record with analysis
     const { data, error } = await supabase
       .from("demos")
       .insert({
         id: demoId,
-        client_id: demoId,
-        summary: "Quick analysis pending...",
+        client_id: analysis.businessName,
+        summary: analysis.summary,
         site_url: url,
-        key_items: [businessName],
+        key_items: analysis.coreServices,
       })
       .select()
       .single();
@@ -72,7 +50,7 @@ export default async function handler(
       });
     }
 
-    res.json({ demoId, businessName });
+    res.json({ demoId, businessName: analysis.businessName });
   } catch (error) {
     console.error("Quick analyze error:", error);
     res.status(500).json({ error: "Analysis failed" });

@@ -4,17 +4,18 @@ import {
   getCurrentEconomicContext,
   predictProfitWithEconomicFactors,
 } from "../../../lib/agents/EconomicIntelligenceAgent";
+import { ReActEconomicAgent } from "../../../lib/agents/react-economic-agent";
 import { supabaseAdmin } from "../../../server/supabaseAdmin";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") {
+  if (req.method !== "GET" && req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { demoId } = req.body;
+  const demoId = req.method === "POST" ? req.body.demoId : req.query.demoId;
 
   if (!demoId) {
     return res.status(400).json({ error: "demoId required" });
@@ -93,17 +94,22 @@ export default async function handler(
 
     console.log(`[Economic Intelligence] Detected industry: ${industry}`);
 
-    // Run economic analyses in parallel
-    const [economicContext, industryImpact, profitPrediction] =
-      await Promise.all([
-        getCurrentEconomicContext(),
-        analyzeEconomicEnvironment(industry, summary),
-        predictProfitWithEconomicFactors(
-          demo.client_id || demo.id,
-          industry,
-          summary
-        ),
-      ]);
+    // Use ReAct agent for comprehensive analysis
+    const reactAgent = new ReActEconomicAgent();
+    const reactResult = await reactAgent.analyzeEconomicEnvironment(industry, summary);
+    
+    // Fallback to traditional analysis if ReAct fails
+    const [economicContext, industryImpact, profitPrediction] = reactResult.success
+      ? [null, null, reactResult.finalAnswer]
+      : await Promise.all([
+          getCurrentEconomicContext(),
+          analyzeEconomicEnvironment(industry, summary),
+          predictProfitWithEconomicFactors(
+            demo.client_id || demo.id,
+            industry,
+            summary
+          ),
+        ]);
 
     const economicIntelligence = {
       demoId,
@@ -119,7 +125,6 @@ export default async function handler(
       .from("demos")
       .update({
         economic_intelligence: economicIntelligence,
-        updated_at: new Date().toISOString(),
       })
       .eq("id", demoId);
 

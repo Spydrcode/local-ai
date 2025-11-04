@@ -52,7 +52,7 @@ export default function PorterPage() {
   }, [demoId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/20 py-12">
+  <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950/20 py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-8">
         <h1 className="text-4xl font-bold text-white mb-2">Porter Intelligence Stack</h1>
         <p className="text-slate-400 mb-8 text-lg">Complete strategic analysis: Five Forces, SWOT, Business Model Canvas, GTM Strategy</p>

@@ -15,6 +15,11 @@ import {
 import { designHomepage } from "./agents/HomepageDesignAgent.js";
 import { generateProfitInsights } from "./agents/ProfitIQAgent.js";
 import { analyzeSite } from "./agents/SiteAnalysisAgent.js";
+import {
+  analyzeStrategy,
+  generateSWOT,
+  generateQuickWins,
+} from "./agents/StrategicAnalysisAgent.js";
 import { validateOpenAIConfig } from "./config/openai.js";
 
 /**
@@ -181,6 +186,63 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["businessInfo"],
         },
       },
+      {
+        name: "analyze_strategy",
+        description:
+          "Generates Porter's Five Forces and Blue Ocean Strategy analysis for small businesses. Automatically scrapes the website and provides competitive positioning, market opportunities, and actionable strategic plans.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            websiteUrl: {
+              type: "string",
+              description: "Business website URL to analyze",
+            },
+            businessName: {
+              type: "string",
+              description: "Business name (optional, will extract from website if not provided)",
+            },
+          },
+          required: ["websiteUrl"],
+        },
+      },
+      {
+        name: "generate_swot",
+        description:
+          "Generates a SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) by automatically scraping and analyzing the business website.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            websiteUrl: {
+              type: "string",
+              description: "Business website URL to analyze",
+            },
+            businessName: {
+              type: "string",
+              description: "Business name (optional, will extract from website if not provided)",
+            },
+          },
+          required: ["websiteUrl"],
+        },
+      },
+      {
+        name: "generate_quick_wins",
+        description:
+          "Identifies 5 actionable quick wins by automatically scraping and analyzing the business website. Provides impact and effort assessments for each recommendation.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            websiteUrl: {
+              type: "string",
+              description: "Business website URL to analyze",
+            },
+            businessName: {
+              type: "string",
+              description: "Business name (optional, will extract from website if not provided)",
+            },
+          },
+          required: ["websiteUrl"],
+        },
+      },
     ],
   };
 });
@@ -284,6 +346,54 @@ server.setRequestHandler(
             tone?: string;
           };
           const result = await buildChatbotConfig(businessInfo, tone);
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        }
+
+        case "analyze_strategy": {
+          const { websiteUrl, businessName } = args as {
+            websiteUrl: string;
+            businessName?: string;
+          };
+          const result = await analyzeStrategy(websiteUrl, businessName);
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        }
+
+        case "generate_swot": {
+          const { websiteUrl, businessName } = args as {
+            websiteUrl: string;
+            businessName?: string;
+          };
+          const result = await generateSWOT(websiteUrl, businessName);
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(result, null, 2),
+              },
+            ],
+          };
+        }
+
+        case "generate_quick_wins": {
+          const { websiteUrl, businessName } = args as {
+            websiteUrl: string;
+            businessName?: string;
+          };
+          const result = await generateQuickWins(websiteUrl, businessName);
           return {
             content: [
               {

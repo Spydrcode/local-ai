@@ -1,4 +1,3 @@
-import { similaritySearch } from "@/lib/vector";
 import { createClient } from "@supabase/supabase-js";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
@@ -261,23 +260,8 @@ export default async function handler(
     if (demoError) throw demoError;
     if (!demo) return res.status(404).json({ error: "Demo not found" });
 
-    // Get enriched context from vector database
-    const query =
-      "website design, visual identity, brand positioning, user experience";
-    const embedding = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: query,
-    });
-
-    const vectorResults = await similaritySearch({
-      demoId,
-      queryEmbedding: embedding.data[0].embedding,
-      topK: 8,
-    });
-
-    const businessContext = vectorResults
-      .map((result: any) => result.content)
-      .join("\n\n");
+    // Use demo data as business context
+    const businessContext = `${demo.summary}\n\nKey Items: ${JSON.stringify(demo.key_items)}\n\nInsights: ${JSON.stringify(demo.insights)}`;
 
     // Analyze business type to determine best-fit templates
     const businessAnalysis = await openai.chat.completions.create({
@@ -380,8 +364,12 @@ Return ONLY valid JSON matching the WebsiteDesign interface - no markdown, no ex
       throw new Error("Failed to generate any valid designs");
     }
 
-    // Sort by suitability score
-    designs.sort((a, b) => b.suitability.score - a.suitability.score);
+    // Sort by suitability score (with fallback for missing scores)
+    designs.sort((a, b) => {
+      const scoreA = a.suitability?.score || 0;
+      const scoreB = b.suitability?.score || 0;
+      return scoreB - scoreA;
+    });
 
     return res.status(200).json({
       success: true,

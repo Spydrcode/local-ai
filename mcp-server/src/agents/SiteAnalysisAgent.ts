@@ -3,6 +3,7 @@ import {
   DEFAULT_TEMPERATURE,
   openai,
 } from "../config/openai.js";
+import { scrapeWebsite } from "../tools/WebScraperTool.js";
 
 /**
  * SiteAnalysisAgent
@@ -92,9 +93,11 @@ export interface SiteAnalysisResult {
  */
 export async function analyzeSite(url: string): Promise<SiteAnalysisResult> {
   try {
-    // Note: In a production environment, you would fetch and parse the actual website content here
-    // For now, we'll use the URL as context and let the AI make reasonable assumptions
-    // or you could integrate with a web scraping service
+    // Scrape website content
+    const scraped = await scrapeWebsite(url);
+    if (scraped.error) {
+      throw new Error(`Failed to scrape website: ${scraped.error}`);
+    }
 
     const response = await openai.chat.completions.create({
       model: DEFAULT_MODEL,
@@ -107,9 +110,14 @@ export async function analyzeSite(url: string): Promise<SiteAnalysisResult> {
         },
         {
           role: "user",
-          content: `Analyze this website URL and extract detailed business information: ${url}
-          
-Note: Since I cannot actually fetch the website content, please make reasonable inferences based on the URL and domain name, but structure your response according to the detailed requirements. In a production system, actual website content would be provided here.`,
+          content: `Analyze this website and extract detailed business information.
+
+Website URL: ${url}
+Website Title: ${scraped.title}
+Meta Description: ${scraped.description || "N/A"}
+
+Website Content:
+${scraped.content.substring(0, 5000)}`,
         },
       ],
       response_format: { type: "json_object" },

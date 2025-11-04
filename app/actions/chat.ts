@@ -24,15 +24,22 @@ export async function sendChatMessage(formData: FormData) {
   // Search relevant context
   const context = await vectorRepo.searchCompetitor({
     demoId: data.demoId,
-    query: data.message
+    query: data.message,
+    topK: 5,
+    analysisType: "competitor" as const,
+    includeDirectCompetitors: true
   })
   
   // Generate AI response with context
-  const { generateAIResponse } = await import('@/lib/openai')
-  const reply = await generateAIResponse({
-    message: data.message,
-    context: context.map(r => r.content).join('\n'),
-    history: data.conversationHistory
+  const { createChatCompletion } = await import('@/lib/openai')
+  const reply = await createChatCompletion({
+    messages: [
+      { role: 'system', content: `Context: ${context.map(r => r.content).join('\n')}` },
+      ...data.conversationHistory,
+      { role: 'user', content: data.message }
+    ],
+    temperature: 0.7,
+    maxTokens: 500
   })
   
   return { success: true, reply }
