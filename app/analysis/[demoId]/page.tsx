@@ -333,10 +333,15 @@ export default function AnalysisPage() {
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/analyze-site-data/${demoId}?_t=${Date.now()}`);
+        const response = await fetch(`/api/analyze-site-data/${demoId}?_t=${Date.now()}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
         if (response.ok) {
           const data = await response.json();
           setAnalysisData(data);
+        } else {
+          console.error(`Failed to fetch initial data: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
         console.error('Failed to fetch initial data:', error);
