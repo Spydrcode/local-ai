@@ -374,13 +374,14 @@ export default function AnalysisPage() {
       });
       
       if (!response.ok) {
-        let errorMessage = 'Analysis failed';
+        let errorMessage = `Analysis failed for ${module.title}`;
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorData.details || errorMessage;
         } catch (e) {
-          errorMessage = `${errorMessage} (${response.status} ${response.statusText})`;
+          errorMessage = `${errorMessage} (${response.status} ${response.statusText}) - Endpoint: ${module.endpoint(demoId)} Method: ${method}`;
         }
+        console.error('API Error:', errorMessage);
         throw new Error(errorMessage);
       }
 
