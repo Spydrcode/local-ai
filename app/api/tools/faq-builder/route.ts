@@ -1,4 +1,4 @@
-import { AgentRegistry } from "@/lib/agents/unified-agent-system";
+import { generateContent } from "@/lib/generateContent";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -10,12 +10,6 @@ export async function POST(request: Request) {
         { error: "Missing required fields" },
         { status: 400 }
       );
-    }
-
-    const agent = AgentRegistry.get("content-generator");
-
-    if (!agent) {
-      throw new Error("Content generator agent not found");
     }
 
     const prompt = `Create an FAQ page for ${business_name}, a ${business_type} business.
@@ -41,34 +35,8 @@ Return JSON with:
 
 Make each answer 2-4 sentences and specific to the ${business_type} industry.`;
 
-    const response = await agent.execute(prompt, {
-      business_name,
-      business_type,
-    });
-
-    let faqData;
-    try {
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        faqData = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      return NextResponse.json(
-        {
-          error: "Unable to generate FAQ. Please try again.",
-          details:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(faqData);
+    const result = await generateContent(prompt);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("FAQ generation error:", error);
     return NextResponse.json(

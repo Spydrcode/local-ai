@@ -1,4 +1,4 @@
-import { AgentRegistry } from "@/lib/agents/unified-agent-system";
+import { generateContent } from "@/lib/generateContent";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -10,12 +10,6 @@ export async function POST(request: Request) {
         { error: "Missing required fields" },
         { status: 400 }
       );
-    }
-
-    const agent = AgentRegistry.get("content-generator");
-
-    if (!agent) {
-      throw new Error("Content generator agent not found");
     }
 
     const videoKind = video_type || "Behind-the-scenes";
@@ -31,49 +25,18 @@ export async function POST(request: Request) {
 - Show personality and authenticity
 - Clear value or entertainment
 - Call-to-action at end
-- Visual suggestions for each part
-- Music/sound suggestions
+- Include visual suggestions and timing cues
 
 Return JSON with:
 {
-  "hook": "First 3 seconds to grab attention",
-  "script": "Full script with timing and visual cues",
-  "cta": "Call-to-action",
-  "filming_tips": "How to film this for best results",
-  "hashtags": ["hashtag1", "hashtag2", "hashtag3"]
+  "script": "Full script with timing and visual cues formatted as a complete video script",
+  "platform_tips": "How to optimize this for TikTok, Reels, and YouTube Shorts"
 }
 
 Make it authentic and specific to ${business_type} businesses.`;
 
-    const response = await agent.execute(prompt, {
-      business_name,
-      business_type,
-      video_type: videoKind,
-    });
-
-    let videoScript;
-    try {
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        videoScript = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      return NextResponse.json(
-        {
-          error: "Unable to generate video script. Please try again.",
-          details:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(videoScript);
+    const result = await generateContent(prompt);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Video script generation error:", error);
     return NextResponse.json(

@@ -1,5 +1,9 @@
-import { agentSystem } from "@/lib/agents/core/AgentSystem";
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(request: Request) {
   try {
@@ -27,7 +31,7 @@ export async function POST(request: Request) {
 - Conversational but authoritative tone
 - Include call-to-action at end
 
-Return JSON with:
+Return ONLY valid JSON with:
 {
   "title": "SEO-optimized blog title",
   "content": "Full blog post with markdown headings",
@@ -35,50 +39,41 @@ Return JSON with:
   "keywords": ["keyword1", "keyword2", "keyword3"]
 }`;
 
-    // Use the new AgentSystem with caching, circuit breaker, and metrics
-    const response = await agentSystem.executeAgent(
-      "content-generator",
-      prompt,
-      {
-        business_name,
-        business_type,
-        topic: blogTopic,
-      }
-    );
-
-    let blogPost;
-    try {
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        blogPost = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      return NextResponse.json(
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
         {
-          error: "Unable to generate blog post. Please try again.",
-          details:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
+          role: "system",
+          content: "You are an expert content writer. Always return valid JSON only.",
         },
-        { status: 500 }
-      );
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.8,
+      response_format: { type: "json_object" },
+    });
+
+    const response = completion.choices[0]?.message?.content;
+    if (!response) {
+      throw new Error("No response from AI");
     }
+
+    const blogPost = JSON.parse(response);
 
     return NextResponse.json({
       ...blogPost,
       _metadata: {
-        executionTime: response.metadata.executionTime,
-        provider: response.metadata.provider,
+        model: "gpt-4o-mini",
+        business_name,
+        business_type,
       },
     });
   } catch (error) {
     console.error("Blog post generation error:", error);
     return NextResponse.json(
-      { error: "Failed to generate blog post" },
+      { 
+        error: "Failed to generate blog post",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }

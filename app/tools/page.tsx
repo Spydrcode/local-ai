@@ -336,6 +336,96 @@ export default function ToolsPage() {
                         </div>
                       )}
                     </div>
+                  ) : selectedTool === 'ad-copy' && result.headline ? (
+                    <div className="space-y-4">
+                      <div className="bg-slate-800/50 rounded-lg p-6 space-y-4">
+                        <div>
+                          <p className="text-xs text-slate-400 mb-2">Headline:</p>
+                          <h3 className="font-semibold text-white text-lg">{result.headline}</h3>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400 mb-2">Ad Body:</p>
+                          <p className="text-slate-300 whitespace-pre-wrap">{result.body}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400 mb-2">Call to Action:</p>
+                          <p className="text-white font-medium">{result.cta}</p>
+                        </div>
+                      </div>
+                      {result.targeting_tips && (
+                        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                          <p className="text-sm text-emerald-400">💡 {result.targeting_tips}</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : selectedTool === 'blog-writer' && result.title ? (
+                    <div className="space-y-4">
+                      <div className="bg-slate-800/50 rounded-lg p-6 space-y-4">
+                        <div>
+                          <p className="text-xs text-slate-400 mb-2">Blog Title:</p>
+                          <h3 className="font-semibold text-white text-xl mb-4">{result.title}</h3>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400 mb-2">Content:</p>
+                          <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">{result.content}</div>
+                        </div>
+                      </div>
+                      {result.seo_keywords && (
+                        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                          <p className="text-sm text-emerald-400">🔑 SEO Keywords: {result.seo_keywords}</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : selectedTool === 'video-script' && result.script ? (
+                    <div className="space-y-4">
+                      <div className="bg-slate-800/50 rounded-lg p-6">
+                        <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">{result.script}</p>
+                      </div>
+                      {result.platform_tips && (
+                        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                          <p className="text-sm text-emerald-400">💡 {result.platform_tips}</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : selectedTool === 'newsletter' && result.newsletter_content ? (
+                    <div className="space-y-4">
+                      <div className="bg-slate-800/50 rounded-lg p-6">
+                        {result.subject && (
+                          <div className="mb-4">
+                            <p className="text-xs text-slate-400 mb-2">Subject Line:</p>
+                            <h3 className="font-semibold text-white">{result.subject}</h3>
+                          </div>
+                        )}
+                        <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">{result.newsletter_content}</div>
+                      </div>
+                    </div>
+                  ) : selectedTool === 'job-description' && result.description ? (
+                    <div className="space-y-4">
+                      <div className="bg-slate-800/50 rounded-lg p-6">
+                        <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">{result.description}</div>
+                      </div>
+                      {result.posting_tips && (
+                        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                          <p className="text-sm text-emerald-400">💡 {result.posting_tips}</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : selectedTool === 'policy-generator' && result.policy_text ? (
+                    <div className="space-y-4">
+                      <div className="bg-slate-800/50 rounded-lg p-6">
+                        {result.policy_title && (
+                          <div className="mb-4">
+                            <h3 className="font-semibold text-white text-lg">{result.policy_title}</h3>
+                          </div>
+                        )}
+                        <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">{result.policy_text}</div>
+                      </div>
+                      {result.legal_disclaimer && (
+                        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                          <p className="text-sm text-amber-400">⚠️ {result.legal_disclaimer}</p>
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <div className="bg-slate-800/50 rounded-lg p-6">
                       <pre className="text-slate-200 whitespace-pre-wrap font-sans">
@@ -350,11 +440,33 @@ export default function ToolsPage() {
                   <div className="flex gap-3">
                     <Button
                       onClick={() => {
-                        const text = selectedTool === 'faq-builder' && result.faqs
-                          ? result.faqs.map((faq: any) => `Q: ${faq.question}\nA: ${faq.answer}`).join('\n\n')
-                          : typeof result === 'string' 
-                          ? result 
-                          : result.content || result.body || result.response || result.description || JSON.stringify(result, null, 2)
+                        let text = ''
+                        
+                        // Format based on tool type
+                        if (selectedTool === 'faq-builder' && result.faqs) {
+                          text = result.faqs.map((faq: any) => `Q: ${faq.question}\nA: ${faq.answer}`).join('\n\n')
+                        } else if (selectedTool === 'ad-copy' && result.headline) {
+                          text = `${result.headline}\n\n${result.body}\n\n${result.cta}`
+                        } else if (selectedTool === 'blog-writer' && result.title) {
+                          text = `${result.title}\n\n${result.content}`
+                        } else if (selectedTool === 'email-writer' && result.subject) {
+                          text = `Subject: ${result.subject}\n\n${result.body}`
+                        } else if (selectedTool === 'newsletter' && result.newsletter_content) {
+                          text = result.subject ? `Subject: ${result.subject}\n\n${result.newsletter_content}` : result.newsletter_content
+                        } else if (selectedTool === 'job-description' && result.description) {
+                          text = result.description
+                        } else if (selectedTool === 'policy-generator' && result.policy_text) {
+                          text = result.policy_title ? `${result.policy_title}\n\n${result.policy_text}` : result.policy_text
+                        } else if (selectedTool === 'video-script' && result.script) {
+                          text = result.script
+                        } else if (selectedTool === 'review-responder' && result.response) {
+                          text = result.response
+                        } else {
+                          text = typeof result === 'string' 
+                            ? result 
+                            : result.content || result.body || result.response || result.description || JSON.stringify(result, null, 2)
+                        }
+                        
                         navigator.clipboard.writeText(text)
                       }}
                       variant="outline"

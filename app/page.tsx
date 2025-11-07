@@ -58,6 +58,8 @@ const benefits = [
 export default function Home() {
   const [websiteUrl, setWebsiteUrl] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+  const [analysisStep, setAnalysisStep] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
 
@@ -70,8 +72,14 @@ export default function Home() {
 
     setIsAnalyzing(true)
     setError("")
+    setAnalysisProgress(0)
+    setAnalysisStep("Starting analysis...")
 
     try {
+      // Simulate progress updates
+      setAnalysisProgress(10)
+      setAnalysisStep("Analyzing website...")
+      
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -82,22 +90,39 @@ export default function Home() {
         }),
       })
 
+      setAnalysisProgress(60)
+      setAnalysisStep("Processing business data...")
+
       if (!response.ok) {
         throw new Error("Analysis failed")
       }
 
       const data = await response.json()
+      
+      setAnalysisProgress(90)
+      setAnalysisStep("Finalizing results...")
+      
       // Store analysis result with metadata and redirect to grow page
       sessionStorage.setItem('initialAnalysis', JSON.stringify({
         ...data,
         website: websiteUrl,
         analyzedAt: new Date().toISOString()
       }))
-      router.push("/grow")
+      
+      setAnalysisProgress(100)
+      setAnalysisStep("Complete!")
+      
+      setTimeout(() => {
+        router.push("/grow")
+      }, 500)
     } catch (err) {
       setError("Couldn't analyze the website. Please check the URL and try again.")
+      setAnalysisProgress(0)
+      setAnalysisStep("")
     } finally {
-      setIsAnalyzing(false)
+      if (!sessionStorage.getItem('initialAnalysis')) {
+        setIsAnalyzing(false)
+      }
     }
   }
 
@@ -142,11 +167,29 @@ export default function Home() {
                 placeholder="Enter your website (e.g., yourshop.com)"
                 className="flex-1 h-12 text-base"
                 required
+                disabled={isAnalyzing}
               />
               <Button type="submit" disabled={isAnalyzing} size="lg" className="px-8 h-12">
-                {isAnalyzing ? "Checking..." : "Check My Website"}
+                {isAnalyzing ? "Analyzing..." : "Check My Website"}
               </Button>
             </div>
+            
+            {/* Progress Bar */}
+            {isAnalyzing && (
+              <div className="mt-4 rounded-lg border border-emerald-500/30 bg-slate-900/50 p-4">
+                <div className="mb-2 flex items-center justify-between text-sm">
+                  <span className="text-slate-300">{analysisStep}</span>
+                  <span className="font-medium text-emerald-400">{analysisProgress}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-slate-700">
+                  <div 
+                    className="h-full bg-linear-to-r from-emerald-500 to-green-400 transition-all duration-500 ease-out"
+                    style={{ width: `${analysisProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+            
             {error && (
               <div className="mt-3 rounded-md border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</div>
             )}

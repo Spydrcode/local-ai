@@ -1,4 +1,4 @@
-import { AgentRegistry } from "@/lib/agents/unified-agent-system";
+import { generateContent } from "@/lib/generateContent";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -11,12 +11,6 @@ export async function POST(request: Request) {
         { error: "Missing required fields" },
         { status: 400 }
       );
-    }
-
-    const agent = AgentRegistry.get("content-generator");
-
-    if (!agent) {
-      throw new Error("Content generator agent not found");
     }
 
     const prompt = `Generate a professional response to this review for ${business_name}, a ${business_type} business.
@@ -38,36 +32,8 @@ Return JSON with:
   "tone_tips": "How to adjust this for your brand voice"
 }`;
 
-    const response = await agent.execute(prompt, {
-      business_name,
-      business_type,
-      review_text,
-      review_rating,
-    });
-
-    let reviewResponse;
-    try {
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        reviewResponse = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      return NextResponse.json(
-        {
-          error: "Unable to generate review response. Please try again.",
-          details:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(reviewResponse);
+    const result = await generateContent(prompt);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Review response generation error:", error);
     return NextResponse.json(

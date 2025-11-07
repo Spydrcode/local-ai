@@ -1,4 +1,4 @@
-import { AgentRegistry } from "@/lib/agents/unified-agent-system";
+import { generateContent } from "@/lib/generateContent";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -11,12 +11,6 @@ export async function POST(request: Request) {
         { error: "Missing required fields" },
         { status: 400 }
       );
-    }
-
-    const agent = AgentRegistry.get("marketing-content");
-
-    if (!agent) {
-      throw new Error("Marketing content agent not found");
     }
 
     const platform = ad_platform || "Facebook";
@@ -34,7 +28,7 @@ export async function POST(request: Request) {
 - ${platform === "Google" ? "Concise (90 characters max)" : "Engaging and conversational"}
 - Mention specific benefits relevant to their industry
 
-Return JSON with:
+Return ONLY valid JSON with:
 {
   "headline": "Main headline",
   "body": "Ad body text",
@@ -42,40 +36,16 @@ Return JSON with:
   "targeting_tips": "Audience targeting recommendations"
 }`;
 
-    const response = await agent.execute(prompt, {
-      business_name,
-      business_type,
-      ad_platform: platform,
-      ad_goal: goal,
-    });
-
-    let adCopy;
-    try {
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        adCopy = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      return NextResponse.json(
-        {
-          error: "Unable to generate ad copy. Please try again.",
-          details:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
-        },
-        { status: 500 }
-      );
-    }
+    const adCopy = await generateContent(prompt);
 
     return NextResponse.json(adCopy);
   } catch (error) {
     console.error("Ad copy generation error:", error);
     return NextResponse.json(
-      { error: "Failed to generate ad copy" },
+      { 
+        error: "Failed to generate ad copy",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }

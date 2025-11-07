@@ -1,4 +1,4 @@
-import { AgentRegistry } from "@/lib/agents/unified-agent-system";
+import { generateContent } from "@/lib/generateContent";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -10,12 +10,6 @@ export async function POST(request: Request) {
         { error: "Missing required fields" },
         { status: 400 }
       );
-    }
-
-    const agent = AgentRegistry.get("content-generator");
-
-    if (!agent) {
-      throw new Error("Content generator agent not found");
     }
 
     const prompt = `Create a monthly newsletter for ${business_name}, a ${business_type} business.
@@ -35,41 +29,13 @@ export async function POST(request: Request) {
 Return JSON with:
 {
   "subject": "Email subject line",
-  "preview_text": "Preview text (50 chars)",
-  "newsletter_content": "Full newsletter with sections",
-  "design_tips": "Layout and design recommendations"
+  "newsletter_content": "Full newsletter with sections, formatted with line breaks and headers"
 }
 
 Make it personal, valuable, and specific to ${business_type} industry.`;
 
-    const response = await agent.execute(prompt, {
-      business_name,
-      business_type,
-    });
-
-    let newsletter;
-    try {
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        newsletter = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      return NextResponse.json(
-        {
-          error: "Unable to generate newsletter. Please try again.",
-          details:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(newsletter);
+    const result = await generateContent(prompt);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Newsletter generation error:", error);
     return NextResponse.json(
