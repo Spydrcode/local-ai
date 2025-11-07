@@ -26,7 +26,9 @@ async function scrapeWebsite(url: string): Promise<ScrapedContent> {
     const html = await response.text();
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
     const title = titleMatch ? titleMatch[1].trim() : "";
-    const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
+    const descMatch = html.match(
+      /<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i
+    );
     const description = descMatch ? descMatch[1].trim() : undefined;
 
     let cleanHtml = html
@@ -34,7 +36,10 @@ async function scrapeWebsite(url: string): Promise<ScrapedContent> {
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
       .replace(/<!--[\s\S]*?-->/g, "");
 
-    const content = cleanHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const content = cleanHtml
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
     return { url, title, content: content.substring(0, 10000), description };
   } catch (error) {
@@ -55,19 +60,24 @@ export interface SiteAnalysisResult {
   summary: string;
 }
 
-export async function analyzeSite(url: string, demoId?: string): Promise<SiteAnalysisResult> {
+export async function analyzeSite(
+  url: string,
+  demoId?: string
+): Promise<SiteAnalysisResult> {
   const scraped = await scrapeWebsite(url);
 
-  let contextData = '';
+  let contextData = "";
   if (demoId) {
     const rag = new AgenticRAG();
-    const ragResult = await rag.query({
-      query: `business analysis for ${url}`,
-      demoId,
-    }).catch(() => null);
-    
+    const ragResult = await rag
+      .query({
+        query: `business analysis for ${url}`,
+        demoId,
+      })
+      .catch(() => null);
+
     if (ragResult?.sources.length) {
-      contextData = `\n\nPREVIOUS ANALYSIS:\n${ragResult.sources.map(s => s.content).join('\n')}`;
+      contextData = `\n\nPREVIOUS ANALYSIS:\n${ragResult.sources.map((s) => s.content).join("\n")}`;
     }
   }
 
@@ -78,18 +88,39 @@ export async function analyzeSite(url: string, demoId?: string): Promise<SiteAna
     messages: [
       {
         role: "system",
-        content: "You are a business analyst. Extract detailed business information and return valid JSON only.",
+        content: `You are analyzing a local business website to extract DETAILED, SPECIFIC information.
+
+**CRITICAL**: Be exhaustive and specific. Identify the exact sub-niche, not generic categories.
+
+Extract:
+1. **EXACT BUSINESS CLASSIFICATION**: Specific sub-niche (e.g., "Texas-style BBQ catering with competition-grade meats" NOT "restaurant")
+2. **UNIQUE DIFFERENTIATORS**: Specializations, credentials, service models, quality markers
+3. **ACTUAL PRODUCTS/SERVICES**: List by NAME with details, pricing if mentioned
+4. **TARGET CUSTOMER**: Specific WHO they serve (e.g., "families and corporate event clients" NOT "local customers")
+5. **BUSINESS INTELLIGENCE**: Location, hours, contact methods, years in business, credentials
+6. **TONE & VOICE**: How they speak - word choice, personality, repeated phrases
+
+Return valid JSON only.`,
       },
       {
         role: "user",
-        content: `Analyze this website and extract business details.
+        content: `Analyze this website and extract detailed business information.
 
 URL: ${url}
 Title: ${scraped.title}
 Description: ${scraped.description || "N/A"}
 Content: ${scraped.content.substring(0, 5000)}${contextData}
 
-Return JSON with: businessName, subNiche, location, coreServices (array), targetAudience, differentiators (array), brandVoice, expertise, summary (3-4 paragraphs)`,
+Return JSON with these exact fields:
+- businessName: string
+- subNiche: string (SPECIFIC sub-niche, not generic category)
+- location: string (city, state, service area)
+- coreServices: array of strings (actual named products/services with details)
+- targetAudience: string (specific customer segments)
+- differentiators: array of strings (what makes them unique)
+- brandVoice: string (tone and personality)
+- expertise: string (credentials, years, awards, certifications)
+- summary: string (3-4 detailed paragraphs covering all the above)`,
       },
     ],
     response_format: { type: "json_object" },

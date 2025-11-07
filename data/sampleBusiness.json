@@ -1,0 +1,66 @@
+{
+  "business_id": "sample-001",
+  "business_name": "Joe's Coffee Shop",
+  "summary": "A friendly local coffee shop serving the downtown area. You have great reviews and loyal customers, but could reach more people online. Your biggest opportunity is getting found by nearby coffee lovers searching on their phones.",
+  "top_quick_wins": [
+    {
+      "id": "qw-001",
+      "title": "Claim your Google Business Profile",
+      "why": "When people search 'coffee near me,' you're not showing up. A complete Google profile puts you on the map (literally) and shows your hours, photos, and reviews right in search results.",
+      "action": "Go to google.com/business, search for your shop name, and click 'Claim this business.' Add 5-10 photos and your current hours. Takes about 20 minutes.",
+      "estimated_impact": "Could bring 10-15 new customers per week",
+      "difficulty": "easy",
+      "category": "visibility"
+    },
+    {
+      "id": "qw-002",
+      "title": "Set up online ordering",
+      "why": "Your competitors let customers order ahead. You're missing breakfast rush orders from people who don't have time to wait in line.",
+      "action": "Sign up for Square Online or Toast. Start with pickup orders only. Add your 10 most popular items first.",
+      "estimated_impact": "Could add $500-800/month in revenue",
+      "difficulty": "medium",
+      "category": "growth"
+    },
+    {
+      "id": "qw-003",
+      "title": "Automate your social media posting",
+      "why": "You're spending 2+ hours per week manually posting to Instagram and Facebook. That's 8 hours a month you could spend with customers or improving your menu.",
+      "action": "Use Later.com or Buffer to schedule your week's posts every Sunday. Batch-create content once instead of posting daily.",
+      "estimated_impact": "Same social presence, less effort",
+      "est_hours_saved_per_week": 2,
+      "difficulty": "easy",
+      "category": "time-saver"
+    },
+    {
+      "id": "qw-004",
+      "title": "Ask happy customers for reviews",
+      "why": "You have 4.8 stars on Google but only 12 reviews. New customers trust businesses with 50+ reviews way more. You're losing customers to competitors with more reviews.",
+      "action": "Print QR codes linking to your Google review page. Put them on receipts and tables. Ask once per day: 'Would you mind leaving us a quick review?'",
+      "estimated_impact": "Could increase foot traffic by 15-20%",
+      "difficulty": "easy",
+      "category": "reputation"
+    },
+    {
+      "id": "qw-005",
+      "title": "Create a simple loyalty program",
+      "why": "Getting a customer to come back 2-3 times per month instead of once doubles their lifetime value. A punch card or app makes them think of you first.",
+      "action": "Start simple: Buy 9 coffees, get the 10th free. Use Square Loyalty or just paper punch cards. Costs almost nothing to set up.",
+      "estimated_impact": "Could increase repeat visits by 30%",
+      "difficulty": "easy",
+      "category": "growth"
+    }
+  ],
+  "visibility_score": 45,
+  "reputation_score": 78,
+  "growth_potential_score": 82,
+  "time_savers": {
+    "total_hours_per_week": 6,
+    "top_automation_opportunities": [
+      "Schedule social media posts in batches (saves 2h/week)",
+      "Automate inventory ordering for top 20 items (saves 3h/week)",
+      "Set up automatic review request emails (saves 1h/week)"
+    ]
+  },
+  "last_updated": "2025-11-07T10:30:00Z",
+  "created_at": "2025-11-07T10:30:00Z"
+}

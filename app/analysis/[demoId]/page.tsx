@@ -1,4 +1,4 @@
-"use client";
+    "use client";
 // Add missing AnalysisStatus type
 type AnalysisStatus = {
   [key: string]: 'not-run' | 'running' | 'completed' | 'error';

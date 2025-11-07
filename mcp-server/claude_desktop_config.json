@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "local-ai": {
+      "command": "node",
+      "args": ["C:\\Users\\dusti\\git\\local.ai\\mcp-server\\dist\\index.js"]
+    }
+  }
+}

@@ -146,11 +146,10 @@ $$ LANGUAGE plpgsql;
 
 COMMENT ON FUNCTION search_porter_vectors IS 'Fast vector similarity search with metadata filtering for Porter agents';
 
--- 14. Create view for porter analysis summaries
+-- 14. Create view for porter analysis summaries (safe column references)
 CREATE OR REPLACE VIEW porter_analysis_summary AS
 SELECT 
   d.id AS demo_id,
-  d.url,
   d.summary AS business_summary,
   jsonb_array_length(COALESCE(d.porter_analysis->'agents', '[]'::jsonb)) AS agent_count,
   d.porter_analysis->'synthesis'->>'competitivePosition' AS competitive_position,
@@ -160,7 +159,7 @@ SELECT
 FROM demos d
 LEFT JOIN site_chunks sc ON sc.demo_id = d.id AND sc.metadata->>'analysisType' = 'strategic'
 WHERE d.porter_analysis IS NOT NULL
-GROUP BY d.id, d.url, d.summary, d.porter_analysis;
+GROUP BY d.id, d.summary, d.porter_analysis;
 
 COMMENT ON VIEW porter_analysis_summary IS 'Summary view of Porter Intelligence Stack results';
 

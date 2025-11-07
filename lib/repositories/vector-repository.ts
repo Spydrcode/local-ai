@@ -3,66 +3,94 @@
  * Abstracts vector operations with provider-agnostic interface
  */
 
-import { z } from 'zod'
+import { z } from "zod";
 
 // Schemas for type safety
 const searchParamsSchema = z.object({
   demoId: z.string(),
   query: z.string(),
   topK: z.number().default(5),
-  filters: z.record(z.any()).optional()
-})
+  filters: z.record(z.any()).optional(),
+});
 
 const competitorSearchSchema = searchParamsSchema.extend({
-  analysisType: z.literal('competitor').default('competitor'),
-  includeDirectCompetitors: z.boolean().default(true)
-})
+  analysisType: z.literal("competitor").default("competitor"),
+  includeDirectCompetitors: z.boolean().default(true),
+});
 
 const roadmapSearchSchema = searchParamsSchema.extend({
-  analysisType: z.literal('roadmap').default('roadmap'),
-  timeframe: z.enum(['30_days', '90_days', '1_year']).default('90_days')
-})
+  analysisType: z.literal("roadmap").default("roadmap"),
+  timeframe: z.enum(["30_days", "90_days", "1_year"]).default("90_days"),
+});
 
-export type CompetitorSearchParams = z.infer<typeof competitorSearchSchema>
-export type RoadmapSearchParams = z.infer<typeof roadmapSearchSchema>
+export type CompetitorSearchParams = z.infer<typeof competitorSearchSchema>;
+export type RoadmapSearchParams = z.infer<typeof roadmapSearchSchema>;
 
 interface VectorProvider {
-  search(params: any): Promise<SearchResult[]>
-  upsert(vectors: VectorRecord[]): Promise<void>
+  search(params: any): Promise<SearchResult[]>;
+  upsert(vectors: VectorRecord[]): Promise<void>;
 }
 
 interface SearchResult {
-  id: string
-  score: number
-  metadata: Record<string, any>
-  content?: string
+  id: string;
+  score: number;
+  metadata: Record<string, any>;
+  content?: string;
 }
 
 interface VectorRecord {
-  id: string
-  values: number[]
-  metadata: Record<string, any>
+  id: string;
+  values: number[];
+  metadata: Record<string, any>;
 }
 
 class SupabaseVectorProvider implements VectorProvider {
+  private supabase: any;
+
+  constructor() {
+    const { createClient } = require("@supabase/supabase-js");
+    this.supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+
   async search(params: any): Promise<SearchResult[]> {
     // Implementation using existing Supabase logic
-    const { similaritySearch } = await import('../vector-utils')
-    return similaritySearch(params)
+    const { similaritySearch } = await import("../vector-utils");
+    return similaritySearch(params);
   }
 
   async upsert(vectors: VectorRecord[]): Promise<void> {
-    // Supabase vector upsert logic
+    // Batch insert vectors into site_chunks table
+    const records = vectors.map((v) => ({
+      id: v.id,
+      demo_id: v.metadata.demoId || v.metadata.demo_id,
+      content: JSON.stringify(v.metadata.content || {}),
+      metadata: v.metadata,
+      embedding: v.values,
+    }));
+
+    const { error } = await this.supabase.from("site_chunks").upsert(records, {
+      onConflict: "id",
+      ignoreDuplicates: false,
+    });
+
+    if (error) {
+      throw new Error(`Failed to upsert vectors: ${error.message}`);
+    }
   }
 }
 
 class PineconeVectorProvider implements VectorProvider {
-  private index: any
+  private index: any;
 
   constructor() {
-    const { Pinecone } = require('@pinecone-database/pinecone')
-    const pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! })
-    this.index = pinecone.index(process.env.PINECONE_INDEX_NAME || 'local-ai-demos')
+    const { Pinecone } = require("@pinecone-database/pinecone");
+    const pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
+    this.index = pinecone.index(
+      process.env.PINECONE_INDEX_NAME || "local-ai-demos"
+    );
   }
 
   async search(params: any): Promise<SearchResult[]> {
@@ -70,79 +98,88 @@ class PineconeVectorProvider implements VectorProvider {
       vector: params.queryEmbedding,
       topK: params.topK,
       filter: params.filters,
-      includeMetadata: true
-    })
-    
+      includeMetadata: true,
+    });
+
     return response.matches.map((match: any) => ({
       id: match.id,
       score: match.score,
       metadata: match.metadata,
-      content: match.metadata?.content
-    }))
+      content: match.metadata?.content,
+    }));
   }
 
   async upsert(vectors: VectorRecord[]): Promise<void> {
-    await this.index.upsert(vectors)
+    await this.index.upsert(vectors);
   }
 }
 
-function createProvider(type: 'supabase' | 'pinecone'): VectorProvider {
-  return type === 'pinecone' ? new PineconeVectorProvider() : new SupabaseVectorProvider()
+function createProvider(type: "supabase" | "pinecone"): VectorProvider {
+  return type === "pinecone"
+    ? new PineconeVectorProvider()
+    : new SupabaseVectorProvider();
 }
 
 export class VectorRepository {
-  public provider: VectorProvider
+  public provider: VectorProvider;
 
-  constructor(providerType: 'supabase' | 'pinecone' = 'supabase') {
-    this.provider = createProvider(providerType)
+  constructor(providerType: "supabase" | "pinecone" = "supabase") {
+    this.provider = createProvider(providerType);
   }
 
   async searchCompetitor(params: CompetitorSearchParams) {
-    const validated = competitorSearchSchema.parse(params)
-    
+    const validated = competitorSearchSchema.parse(params);
+
     return this.provider.search({
       ...validated,
-      filters: { 
-        analysisType: 'competitor',
-        agentType: 'business_intelligence',
-        ...validated.filters 
-      }
-    })
+      filters: {
+        analysisType: "competitor",
+        agentType: "business_intelligence",
+        ...validated.filters,
+      },
+    });
   }
 
   async searchRoadmap(params: RoadmapSearchParams) {
-    const validated = roadmapSearchSchema.parse(params)
-    
+    const validated = roadmapSearchSchema.parse(params);
+
     return this.provider.search({
       ...validated,
-      filters: { 
-        analysisType: 'roadmap',
-        agentType: 'optimization',
+      filters: {
+        analysisType: "roadmap",
+        agentType: "optimization",
         timeframe: validated.timeframe,
-        ...validated.filters 
-      }
-    })
+        ...validated.filters,
+      },
+    });
   }
 
-  async searchPorterForces(params: { demoId: string; query: string; force?: string }) {
+  async searchPorterForces(params: {
+    demoId: string;
+    query: string;
+    force?: string;
+  }) {
     return this.provider.search({
       ...params,
-      filters: { 
-        analysisType: 'porter_forces',
-        agentType: 'porter',
-        ...(params.force && { porterForce: params.force })
-      }
-    })
+      filters: {
+        analysisType: "porter_forces",
+        agentType: "porter",
+        ...(params.force && { porterForce: params.force }),
+      },
+    });
   }
 
-  async searchQuickWins(params: { demoId: string; effortLevel?: 'low' | 'medium' | 'high' }) {
+  async searchQuickWins(params: {
+    demoId: string;
+    effortLevel?: "low" | "medium" | "high";
+  }) {
     return this.provider.search({
       ...params,
-      filters: { 
-        analysisType: 'quick_wins',
-        agentType: 'optimization',
-        ...(params.effortLevel && { effortLevel: params.effortLevel })
-      }
-    })
+      filters: {
+        analysisType: "quick_wins",
+        agentType: "optimization",
+        ...(params.effortLevel && { effortLevel: params.effortLevel }),
+      },
+    });
   }
 }
