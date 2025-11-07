@@ -45,14 +45,17 @@ export default function GrowPage() {
         // Pre-fill the form with data from homepage
         setWebsiteUrl(initialData.website || "")
         setBusinessName(initialData.business_name || "")
+        setIndustry(initialData.industry || "")
         
-        // Automatically trigger full analysis with the data we have
-        if (initialData.business_name && initialData.website) {
-          handleAutoAnalyze(initialData.website, initialData.business_name, initialData.industry || "")
+        // Automatically trigger full analysis if we have website (business_name is extracted from site)
+        if (initialData.website) {
+          const name = initialData.business_name || "Your Business"
+          const ind = initialData.industry || "general"
+          handleAutoAnalyze(initialData.website, name, ind)
         }
         
-        // DON'T remove - keep it for other pages (Content Creator, AI Tools)
-        // sessionStorage.removeItem('initialAnalysis')
+        // Clear after using so refresh doesn't re-trigger
+        sessionStorage.removeItem('initialAnalysis')
       } catch (e) {
         console.error('Failed to parse stored analysis', e)
       }
@@ -145,8 +148,8 @@ export default function GrowPage() {
       </nav>
 
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        {!analysis ? (
-          /* Analysis Form */
+        {!analysis && !isAnalyzing ? (
+          /* Analysis Form - Only show if not analyzing */
           <div className="mx-auto max-w-2xl">
             <div className="text-center mb-10">
               <h1 className="text-4xl font-bold text-white mb-4">Grow Your Business</h1>
@@ -209,13 +212,28 @@ export default function GrowPage() {
                   disabled={isAnalyzing}
                   className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white text-base"
                 >
-                  {isAnalyzing ? "Analyzing Your Business..." : "Analyze My Business"}
+                  Analyze My Business
                 </Button>
 
                 <p className="text-sm text-slate-400 text-center">
                   Takes about 30 seconds • Free analysis
                 </p>
               </form>
+            </Card>
+          </div>
+        ) : !analysis && isAnalyzing ? (
+          /* Loading State - Show while analyzing */
+          <div className="mx-auto max-w-2xl text-center">
+            <Card className="p-12 bg-slate-900/50 border-slate-700">
+              <div className="flex flex-col items-center gap-6">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-500"></div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-2">Analyzing Your Business...</h2>
+                  <p className="text-slate-400">
+                    This usually takes about 30 seconds
+                  </p>
+                </div>
+              </div>
             </Card>
           </div>
         ) : (
