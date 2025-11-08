@@ -83,6 +83,14 @@ export default function GrowPage() {
 
       const data = await response.json()
       setAnalysis(data)
+
+      // Store in sessionStorage for use in Content Creator and AI Tools
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('initialAnalysis', JSON.stringify({
+          ...data,
+          industry: ind
+        }))
+      }
     } catch (err) {
       setError("Couldn't complete the analysis. Please try again.")
     } finally {
@@ -104,7 +112,7 @@ export default function GrowPage() {
       const response = await fetch("/api/grow-analysis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           website: websiteUrl,
           business_name: businessName,
           industry: industry || "general"
@@ -117,6 +125,14 @@ export default function GrowPage() {
 
       const data = await response.json()
       setAnalysis(data)
+
+      // Store in sessionStorage for use in Content Creator and AI Tools
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('initialAnalysis', JSON.stringify({
+          ...data,
+          industry: industry || "general"
+        }))
+      }
     } catch (err) {
       setError("Couldn't complete the analysis. Please try again.")
     } finally {

@@ -6,16 +6,8 @@
 export { VectorRepository } from './repositories/vector-repository'
 
 // Re-export for legacy compatibility
-export async function generateEmbedding(text: string): Promise<number[]> {
-  const OpenAI = require('openai')
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
-  
-  const response = await openai.embeddings.create({
-    model: "text-embedding-ada-002",
-    input: text,
-  })
-  return response.data[0].embedding
-}
+// ✅ FIXED: Now uses unified embedding service instead of inconsistent ada-002
+export { generateEmbedding } from './embeddings/embedding-service';
 
 export async function similaritySearch(params: any) {
   const { VectorRepository } = await import('./repositories/vector-repository')

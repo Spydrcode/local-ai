@@ -30,6 +30,7 @@ export default function ContentPage() {
   const [selectedPlatform, setSelectedPlatform] = useState<'facebook' | 'instagram' | '30-day'>('facebook')
   const [singlePost, setSinglePost] = useState<SocialPost | null>(null)
   const [calendar, setCalendar] = useState<ContentCalendar | null>(null)
+  const [websiteAnalysis, setWebsiteAnalysis] = useState<any>(null)
 
   // Auto-fill from initial analysis if available
   useEffect(() => {
@@ -39,23 +40,26 @@ export default function ContentPage() {
         try {
           const analysis = JSON.parse(storedAnalysis)
           console.log('Loading business info from analysis:', analysis)
-          
+
+          // Store the full analysis for use in content generation
+          setWebsiteAnalysis(analysis)
+
           // Fill business name
           if (analysis.business_name) {
             setBusinessName(analysis.business_name)
           }
-          
+
           // Fill business type (industry)
           if (analysis.industry) {
             setBusinessType(analysis.industry)
           }
-          
+
           // Fill target audience
           const targetAud = analysis.target_audience || analysis.targetAudience
           if (targetAud) {
             setTargetAudience(targetAud)
           }
-          
+
           console.log('Auto-filled:', {
             name: analysis.business_name,
             type: analysis.industry,
@@ -85,11 +89,12 @@ export default function ContentPage() {
       const response = await fetch("/api/generate-social-post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           business_name: businessName,
           business_type: businessType,
           target_audience: targetAudience || "local community",
-          platform: selectedPlatform
+          platform: selectedPlatform,
+          website_analysis: websiteAnalysis
         }),
       })
 
@@ -120,10 +125,11 @@ export default function ContentPage() {
       const response = await fetch("/api/generate-content-calendar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           business_name: businessName,
           business_type: businessType,
-          target_audience: targetAudience || "local community"
+          target_audience: targetAudience || "local community",
+          website_analysis: websiteAnalysis
         }),
       })
 

@@ -11,7 +11,7 @@
 import * as dotenv from "dotenv";
 import * as path from "path";
 import { VectorRepository } from "../lib/repositories/vector-repository";
-import { generateEmbedding } from "../lib/vector-utils";
+import { generateEmbedding } from "../lib/embeddings/embedding-service";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
 

@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export async function POST(request: Request) {
   try {
-    const { business_name, business_type, topic } = await request.json();
+    const { business_name, business_type, topic, website_analysis } = await request.json();
 
     if (!business_name || !business_type) {
       return NextResponse.json(
@@ -18,17 +18,36 @@ export async function POST(request: Request) {
 
     const blogTopic = topic || `Common questions about ${business_type}`;
 
-    const prompt = `Write an SEO-optimized blog post for ${business_name}, a ${business_type} business.
+    // Build context from website analysis
+    let businessContext = '';
+    if (website_analysis) {
+      const differentiators = website_analysis.what_makes_you_different?.slice(0, 3).join('\n- ') || '';
+      const strengths = website_analysis.your_strengths?.slice(0, 3).join('\n- ') || '';
+      const opportunities = website_analysis.opportunities?.slice(0, 2).join('\n- ') || '';
 
+      businessContext = `
+**BUSINESS EXPERTISE (Use this to demonstrate their unique knowledge):**
+${differentiators ? `\nWhat makes them different:\n- ${differentiators}` : ''}
+${strengths ? `\nTheir expertise areas:\n- ${strengths}` : ''}
+${opportunities ? `\nTopics they can speak authoritatively on:\n- ${opportunities}` : ''}
+${website_analysis.exact_sub_niche ? `\nTheir niche: ${website_analysis.exact_sub_niche}` : ''}
+
+**IMPORTANT**: Write from the perspective of THEIR specific expertise. Reference their differentiators naturally to establish authority. Make this blog uniquely theirs, not generic industry content.
+`;
+    }
+
+    const prompt = `Write an SEO-optimized blog post for ${business_name}, a ${business_type} business.
+${businessContext}
 **Topic**: ${blogTopic}
 
 **Requirements**:
 - 500-700 words
-- Specific to ${business_type} industry with expert insights
+- ${website_analysis ? 'Demonstrate their specific expertise and differentiators' : 'Specific to ' + business_type + ' industry with expert insights'}
 - H2 and H3 headings for structure
 - Actionable tips readers can use
 - Natural keyword integration
 - Conversational but authoritative tone
+- ${website_analysis ? 'Subtly reference their unique strengths or approach' : 'Show industry expertise'}
 - Include call-to-action at end
 
 Return ONLY valid JSON with:

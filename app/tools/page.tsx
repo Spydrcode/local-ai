@@ -8,9 +8,140 @@ import { useEffect, useState } from "react"
 
 const toolCategories = [
   {
+    id: "local-seo",
+    title: "Local SEO Tools",
+    icon: "📍",
+    description: "Get found by local customers searching for your services",
+    tools: [
+      {
+        id: "gmb-post",
+        title: "Google Business Post",
+        description: "Weekly GMB posts to boost local search rankings",
+        icon: "🏪"
+      },
+      {
+        id: "local-seo-meta",
+        title: "Local SEO Meta Tags",
+        description: "Page titles & descriptions that rank in local search",
+        icon: "🔍"
+      },
+      {
+        id: "location-page",
+        title: "Location Page Writer",
+        description: "SEO-optimized service area pages",
+        icon: "🗺️"
+      },
+    ]
+  },
+  {
+    id: "customer-retention",
+    title: "Customer Retention",
+    icon: "💝",
+    description: "Keep customers coming back and boost lifetime value",
+    tools: [
+      {
+        id: "win-back-email",
+        title: "Win-Back Email",
+        description: "Re-engage customers who haven't bought in 60+ days",
+        icon: "🔄"
+      },
+      {
+        id: "loyalty-program",
+        title: "Loyalty Program Designer",
+        description: "Simple reward programs that increase repeat business",
+        icon: "🎁"
+      },
+      {
+        id: "referral-request",
+        title: "Referral Request Email",
+        description: "Ask happy customers for referrals the right way",
+        icon: "🤝"
+      },
+    ]
+  },
+  {
+    id: "sales-conversion",
+    title: "Sales & Conversion",
+    icon: "💰",
+    description: "Turn more visitors into paying customers",
+    tools: [
+      {
+        id: "landing-page",
+        title: "Landing Page Copy",
+        description: "High-converting landing pages for your services",
+        icon: "🎯"
+      },
+      {
+        id: "sales-sequence",
+        title: "Sales Email Sequence",
+        description: "3-email series to convert leads into customers",
+        icon: "📧"
+      },
+      {
+        id: "objection-handler",
+        title: "Objection Handler",
+        description: "Responses to price, timing, and competitor objections",
+        icon: "💬"
+      },
+    ]
+  },
+  {
+    id: "competitive",
+    title: "Stand Out from Competitors",
+    icon: "🏆",
+    description: "Highlight what makes your business unique",
+    tools: [
+      {
+        id: "why-choose-us",
+        title: "Why Choose Us Page",
+        description: "Showcase your differentiators vs competitors",
+        icon: "⭐"
+      },
+      {
+        id: "positioning-statement",
+        title: "Positioning Statement",
+        description: "What to say when asked 'Why not [competitor]?'",
+        icon: "🎤"
+      },
+      {
+        id: "usp-generator",
+        title: "USP Generator",
+        description: "Distill your unique value into one powerful line",
+        icon: "💡"
+      },
+    ]
+  },
+  {
+    id: "social-proof",
+    title: "Social Proof",
+    icon: "⭐",
+    description: "Collect and showcase customer success stories",
+    tools: [
+      {
+        id: "testimonial-request",
+        title: "Testimonial Request Email",
+        description: "Ask customers for reviews at the perfect moment",
+        icon: "📝"
+      },
+      {
+        id: "case-study",
+        title: "Case Study Outline",
+        description: "Turn success stories into compelling case studies",
+        icon: "📊"
+      },
+      {
+        id: "social-testimonial",
+        title: "Social Testimonial Post",
+        description: "Turn customer reviews into shareable posts",
+        icon: "📱"
+      },
+    ]
+  },
+  {
     id: "marketing",
     title: "Marketing Tools",
     icon: "📢",
+    description: "Create professional marketing content quickly",
     tools: [
       {
         id: "email-writer",
@@ -33,10 +164,101 @@ const toolCategories = [
     ]
   },
   {
+    id: "crisis",
+    title: "Crisis Management",
+    icon: "🚨",
+    description: "Handle problems professionally and rebuild trust",
+    tools: [
+      {
+        id: "negative-review",
+        title: "Negative Review Response",
+        description: "Turn angry customers around with empathy",
+        icon: "😤"
+      },
+      {
+        id: "apology-email",
+        title: "Apology Email",
+        description: "Sincere apologies that rebuild trust",
+        icon: "🙏"
+      },
+      {
+        id: "crisis-communication",
+        title: "Crisis Communication",
+        description: "What to say when things go wrong",
+        icon: "📢"
+      },
+    ]
+  },
+  {
+    id: "pricing",
+    title: "Pricing & Packaging",
+    icon: "💵",
+    description: "Package and price your services profitably",
+    tools: [
+      {
+        id: "service-packages",
+        title: "Service Package Creator",
+        description: "Create Good/Better/Best service tiers",
+        icon: "📦"
+      },
+      {
+        id: "pricing-strategy",
+        title: "Pricing Strategy Guide",
+        description: "Pricing recommendations based on your market",
+        icon: "💲"
+      },
+    ]
+  },
+  {
+    id: "partnerships",
+    title: "Partnerships & Networking",
+    icon: "🤝",
+    description: "Build relationships that drive referrals",
+    tools: [
+      {
+        id: "partnership-pitch",
+        title: "Partnership Proposal",
+        description: "Pitch local businesses on cross-promotion",
+        icon: "📄"
+      },
+      {
+        id: "sponsorship-pitch",
+        title: "Sponsorship Pitch",
+        description: "Get local events/teams to promote you",
+        icon: "🎯"
+      },
+      {
+        id: "networking-followup",
+        title: "Networking Follow-Up",
+        description: "Follow up after meeting potential partners",
+        icon: "👋"
+      },
+    ]
+  },
+  {
     id: "operations",
     title: "Save Time Tools",
     icon: "⏰",
+    description: "Automate repetitive business tasks",
     tools: [
+      {
+        id: "auto-response",
+        title: "Auto-Response Templates",
+        description: "Out of office, holidays, after-hours messages",
+        icon: "🤖"
+      },
+      {
+        id: "booking-confirmation",
+        title: "Booking Confirmation",
+        description: "Professional confirmations that reduce no-shows",
+        icon: "📅"
+      },
+      {
+        id: "invoice-followup",
+        title: "Invoice Follow-Up",
+        description: "Polite reminders for overdue payments",
+        icon: "💳"
+      },
       {
         id: "job-description",
         title: "Job Description Writer",
@@ -61,6 +283,7 @@ const toolCategories = [
     id: "content",
     title: "Content Tools",
     icon: "✍️",
+    description: "Create engaging content for your audience",
     tools: [
       {
         id: "blog-writer",
@@ -91,6 +314,7 @@ export default function ToolsPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState("")
+  const [websiteAnalysis, setWebsiteAnalysis] = useState<any>(null)
 
   // Auto-fill from initial analysis if available
   useEffect(() => {
@@ -99,6 +323,10 @@ export default function ToolsPage() {
       if (storedAnalysis) {
         try {
           const analysis = JSON.parse(storedAnalysis)
+
+          // Store the full analysis for use in tool generation
+          setWebsiteAnalysis(analysis)
+
           if (analysis.business_name) {
             setBusinessName(analysis.business_name)
           }
@@ -129,6 +357,7 @@ export default function ToolsPage() {
         body: JSON.stringify({
           business_name: businessName,
           business_type: businessType,
+          website_analysis: websiteAnalysis,
         }),
       })
 
@@ -219,10 +448,13 @@ export default function ToolsPage() {
             <div className="grid gap-8 max-w-6xl mx-auto">
           {toolCategories.map((category) => (
             <div key={category.id}>
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4">
                 <span className="text-4xl">{category.icon}</span>
                 <div>
                   <h2 className="text-2xl font-bold text-white">{category.title}</h2>
+                  {category.description && (
+                    <p className="text-sm text-slate-400 mt-1">{category.description}</p>
+                  )}
                 </div>
               </div>
 
@@ -427,47 +659,136 @@ export default function ToolsPage() {
                       )}
                     </div>
                   ) : (
-                    <div className="bg-slate-800/50 rounded-lg p-6">
-                      <pre className="text-slate-200 whitespace-pre-wrap font-sans">
-                        {typeof result === 'string' 
-                          ? result 
-                          : result.content || result.description || result.policy_text || result.newsletter_content || result.script || JSON.stringify(result, null, 2)
-                        }
-                      </pre>
+                    // Universal renderer for all other tools
+                    <div className="space-y-4">
+                      {/* Main content area */}
+                      <div className="bg-slate-800/50 rounded-lg p-6 space-y-4">
+                        {/* Handle structured data with multiple fields */}
+                        {Object.entries(result).map(([key, value]) => {
+                          // Skip metadata and helper fields
+                          if (key.startsWith('_') || key === 'seo_keywords' || key === 'keywords' ||
+                              key.includes('tip') || key.includes('suggestion') || key.includes('strategy') ||
+                              key.includes('timing') || key.includes('schedule')) {
+                            return null;
+                          }
+
+                          // Handle arrays (like differentiator_sections, reward_tiers, etc.)
+                          if (Array.isArray(value)) {
+                            return (
+                              <div key={key}>
+                                <p className="text-xs text-slate-400 mb-2 uppercase">{key.replace(/_/g, ' ')}:</p>
+                                <div className="space-y-2">
+                                  {value.map((item: any, idx: number) => (
+                                    <div key={idx} className="bg-slate-700/30 rounded p-3">
+                                      {typeof item === 'object' ? (
+                                        Object.entries(item).map(([k, v]) => (
+                                          <div key={k} className="mb-1">
+                                            <span className="text-emerald-400 text-sm">{k.replace(/_/g, ' ')}: </span>
+                                            <span className="text-slate-200">{String(v)}</span>
+                                          </div>
+                                        ))
+                                      ) : (
+                                        <p className="text-slate-200">• {String(item)}</p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          // Handle objects (like email_1, good_package, etc.)
+                          if (typeof value === 'object' && value !== null) {
+                            return (
+                              <div key={key} className="border-l-2 border-emerald-500/50 pl-4">
+                                <p className="text-xs text-slate-400 mb-2 uppercase font-semibold">{key.replace(/_/g, ' ')}:</p>
+                                <div className="space-y-2">
+                                  {Object.entries(value as Record<string, any>).map(([k, v]) => (
+                                    <div key={k}>
+                                      <p className="text-xs text-emerald-400 mb-1">{k.replace(/_/g, ' ')}:</p>
+                                      <p className="text-slate-200 whitespace-pre-wrap">{String(v)}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          // Handle simple strings
+                          return (
+                            <div key={key}>
+                              <p className="text-xs text-slate-400 mb-2 uppercase">{key.replace(/_/g, ' ')}:</p>
+                              <p className="text-slate-200 whitespace-pre-wrap">{String(value)}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Tips and suggestions section */}
+                      {Object.entries(result).filter(([key]) =>
+                        key.includes('tip') || key.includes('suggestion') || key.includes('strategy') ||
+                        key.includes('timing') || key.includes('schedule') || key === 'seo_keywords' || key === 'keywords'
+                      ).map(([key, value]) => (
+                        <div key={key} className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                          <p className="text-xs text-emerald-400 mb-1 uppercase font-semibold">{key.replace(/_/g, ' ')}:</p>
+                          <p className="text-sm text-emerald-400">
+                            💡 {Array.isArray(value) ? value.join(', ') : String(value)}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   )}
                   
                   <div className="flex gap-3">
                     <Button
                       onClick={() => {
-                        let text = ''
-                        
-                        // Format based on tool type
+                        let text = '';
+
+                        // Format based on tool type - handles ALL tool formats
                         if (selectedTool === 'faq-builder' && result.faqs) {
-                          text = result.faqs.map((faq: any) => `Q: ${faq.question}\nA: ${faq.answer}`).join('\n\n')
+                          text = result.faqs.map((faq: any) => `Q: ${faq.question}\nA: ${faq.answer}`).join('\n\n');
                         } else if (selectedTool === 'ad-copy' && result.headline) {
-                          text = `${result.headline}\n\n${result.body}\n\n${result.cta}`
+                          text = `${result.headline}\n\n${result.body}\n\n${result.cta}`;
                         } else if (selectedTool === 'blog-writer' && result.title) {
-                          text = `${result.title}\n\n${result.content}`
+                          text = `${result.title}\n\n${result.content}`;
                         } else if (selectedTool === 'email-writer' && result.subject) {
-                          text = `Subject: ${result.subject}\n\n${result.body}`
+                          text = `Subject: ${result.subject}\n\n${result.body}`;
                         } else if (selectedTool === 'newsletter' && result.newsletter_content) {
-                          text = result.subject ? `Subject: ${result.subject}\n\n${result.newsletter_content}` : result.newsletter_content
+                          text = result.subject ? `Subject: ${result.subject}\n\n${result.newsletter_content}` : result.newsletter_content;
                         } else if (selectedTool === 'job-description' && result.description) {
-                          text = result.description
+                          text = result.description;
                         } else if (selectedTool === 'policy-generator' && result.policy_text) {
-                          text = result.policy_title ? `${result.policy_title}\n\n${result.policy_text}` : result.policy_text
+                          text = result.policy_title ? `${result.policy_title}\n\n${result.policy_text}` : result.policy_text;
                         } else if (selectedTool === 'video-script' && result.script) {
-                          text = result.script
+                          text = result.script;
                         } else if (selectedTool === 'review-responder' && result.response) {
-                          text = result.response
+                          text = result.response;
                         } else {
-                          text = typeof result === 'string' 
-                            ? result 
-                            : result.content || result.body || result.response || result.description || JSON.stringify(result, null, 2)
+                          // Universal formatter for all other tools
+                          const formatValue = (key: string, value: any, indent = ''): string => {
+                            if (Array.isArray(value)) {
+                              return value.map((item, idx) => {
+                                if (typeof item === 'object') {
+                                  return Object.entries(item).map(([k, v]) => `${indent}  ${k}: ${v}`).join('\n');
+                                }
+                                return `${indent}  • ${item}`;
+                              }).join('\n');
+                            } else if (typeof value === 'object' && value !== null) {
+                              return Object.entries(value).map(([k, v]) => `${indent}  ${k.replace(/_/g, ' ')}: ${v}`).join('\n');
+                            }
+                            return String(value);
+                          };
+
+                          text = Object.entries(result)
+                            .filter(([key]) => !key.startsWith('_')) // Skip metadata
+                            .map(([key, value]) => {
+                              const label = key.replace(/_/g, ' ').toUpperCase();
+                              return `${label}:\n${formatValue(key, value)}`;
+                            })
+                            .join('\n\n');
                         }
-                        
-                        navigator.clipboard.writeText(text)
+
+                        navigator.clipboard.writeText(text);
                       }}
                       variant="outline"
                     >

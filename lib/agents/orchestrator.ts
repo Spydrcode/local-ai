@@ -6,7 +6,7 @@
  */
 
 import { createChatCompletion } from "../openai";
-import { generateEmbedding } from "../vector-utils";
+import { generateEmbedding } from "../embeddings/embedding-service";
 import { VectorRepository } from "../repositories/vector-repository";
 import { AgenticRAG } from "../rag/agentic-rag";
 import { getAgentPrompt } from "./prompt-loader";

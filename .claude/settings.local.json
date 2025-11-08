@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(nul)",
+      "Bash(npm run build:*)",
+      "Bash(if exist nul del /F nul)",
+      "Bash(del /F \"c:\\Users\\dusti\\git\\local.ai\\nul\")",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

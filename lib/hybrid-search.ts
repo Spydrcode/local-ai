@@ -1,4 +1,5 @@
-import { generateEmbedding, similaritySearch } from "./vector-utils";
+import { generateEmbedding } from "./embeddings/embedding-service";
+import { similaritySearch } from "./vector-utils";
 
 interface SimilarityResult {
   id: string;
