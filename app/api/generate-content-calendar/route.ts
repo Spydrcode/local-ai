@@ -1,4 +1,4 @@
-import { AgentRegistry } from "@/lib/agents/unified-agent-system";
+import { generateContent } from "@/lib/generateContent";
 import { NextResponse } from "next/server";
 
 const buildCalendarPrompt = (params: {
@@ -81,13 +81,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get the content generator agent
-    const agent = AgentRegistry.get("content-generator");
-
-    if (!agent) {
-      throw new Error("Content generator agent not found");
-    }
-
     // Build the prompt with website analysis context
     const prompt = buildCalendarPrompt({
       business_name,
@@ -96,34 +89,7 @@ export async function POST(request: Request) {
       website_analysis,
     });
 
-    const response = await agent.execute(prompt);
-
-    // Parse the response
-    let calendar;
-    try {
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        calendar = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      console.error("AI Response content:", response.content);
-      // Return error instead of fallback template
-      return NextResponse.json(
-        {
-          error:
-            "Unable to generate content calendar. The AI response could not be parsed. Please try again.",
-          details:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
-        },
-        { status: 500 }
-      );
-    }
-
+    const calendar = await generateContent(prompt);
     return NextResponse.json(calendar);
   } catch (error) {
     console.error("Content calendar generation error:", error);

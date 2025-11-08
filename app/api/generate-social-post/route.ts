@@ -1,4 +1,4 @@
-import { AgentRegistry } from "@/lib/agents/unified-agent-system";
+import { generateContent } from "@/lib/generateContent";
 import { NextResponse } from "next/server";
 
 const buildPrompt = (platform: 'facebook' | 'instagram', params: {
@@ -81,13 +81,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get the content generator agent
-    const agent = AgentRegistry.get("content-generator");
-
-    if (!agent) {
-      throw new Error("Content generator agent not found");
-    }
-
     // Build the prompt with website analysis context
     const prompt = buildPrompt(platform, {
       business_name,
@@ -96,34 +89,7 @@ export async function POST(request: Request) {
       website_analysis,
     });
 
-    const response = await agent.execute(prompt);
-
-    // Parse the response
-    let post;
-    try {
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        post = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found in response");
-      }
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      console.error("AI Response content:", response.content);
-      // Return error instead of fallback template
-      return NextResponse.json(
-        {
-          error:
-            "Unable to generate social post. The AI response could not be parsed. Please try again.",
-          details:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
-        },
-        { status: 500 }
-      );
-    }
-
+    const post = await generateContent(prompt);
     return NextResponse.json(post);
   } catch (error) {
     console.error("Social post generation error:", error);
