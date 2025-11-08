@@ -42,9 +42,9 @@ Return ONLY valid JSON with:
   } catch (error) {
     console.error("Ad copy generation error:", error);
     return NextResponse.json(
-      { 
+      {
         error: "Failed to generate ad copy",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

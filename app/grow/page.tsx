@@ -241,8 +241,8 @@ export default function GrowPage() {
           <div className="space-y-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">{analysis.business_name}</h1>
-                <p className="text-slate-400">{analysis.website}</p>
+                <h1 className="text-3xl font-bold text-white mb-2">{analysis?.business_name}</h1>
+                <p className="text-slate-400">{analysis?.website}</p>
               </div>
               <Button
                 onClick={() => {
@@ -258,7 +258,7 @@ export default function GrowPage() {
             </div>
 
             {/* Empty state if no analysis data */}
-            {(!analysis.what_makes_you_different || analysis.what_makes_you_different.length === 0) &&
+            {analysis && (!analysis.what_makes_you_different || analysis.what_makes_you_different.length === 0) &&
              (!analysis.why_customers_choose_competitors || analysis.why_customers_choose_competitors.length === 0) &&
              (!analysis.your_strengths || analysis.your_strengths.length === 0) &&
              (!analysis.opportunities || analysis.opportunities.length === 0) &&
@@ -286,7 +286,7 @@ export default function GrowPage() {
             )}
 
             {/* What Makes You Different */}
-            {analysis.what_makes_you_different && analysis.what_makes_you_different.length > 0 && (
+            {analysis && analysis.what_makes_you_different && analysis.what_makes_you_different.length > 0 && (
               <Card className="p-8 bg-slate-900/50 border-emerald-500/20">
                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                   <span>💎</span>
@@ -304,7 +304,7 @@ export default function GrowPage() {
             )}
 
             {/* Why Customers Choose Competitors (Porter's 5 Forces in disguise) */}
-            {analysis.why_customers_choose_competitors && analysis.why_customers_choose_competitors.length > 0 && (
+            {analysis && analysis.why_customers_choose_competitors && analysis.why_customers_choose_competitors.length > 0 && (
               <Card className="p-8 bg-slate-900/50 border-slate-700">
                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                   <span>🔍</span>
@@ -327,10 +327,10 @@ export default function GrowPage() {
             )}
 
             {/* Your Strengths & Opportunities (SWOT in disguise) */}
-            {((analysis.your_strengths && analysis.your_strengths.length > 0) || 
+            {analysis && ((analysis.your_strengths && analysis.your_strengths.length > 0) || 
               (analysis.opportunities && analysis.opportunities.length > 0)) && (
               <div className="grid md:grid-cols-2 gap-6">
-                {analysis.your_strengths && analysis.your_strengths.length > 0 && (
+                {analysis && analysis.your_strengths && analysis.your_strengths.length > 0 && (
                   <Card className="p-6 bg-slate-900/50 border-slate-700">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                       <span>💪</span>
@@ -347,7 +347,7 @@ export default function GrowPage() {
                   </Card>
                 )}
 
-                {analysis.opportunities && analysis.opportunities.length > 0 && (
+                {analysis && analysis.opportunities && analysis.opportunities.length > 0 && (
                   <Card className="p-6 bg-slate-900/50 border-slate-700">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                       <span>🚀</span>
@@ -367,7 +367,7 @@ export default function GrowPage() {
             )}
 
             {/* Things to Watch Out For */}
-            {analysis.threats_to_watch && analysis.threats_to_watch.length > 0 && (
+            {analysis && analysis.threats_to_watch && analysis.threats_to_watch.length > 0 && (
               <Card className="p-6 bg-slate-900/50 border-slate-700">
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                   <span>⚠️</span>
@@ -385,7 +385,7 @@ export default function GrowPage() {
             )}
 
             {/* Quick Wins */}
-            {analysis.quick_wins && analysis.quick_wins.length > 0 && (
+            {analysis && analysis.quick_wins && analysis.quick_wins.length > 0 && (
               <Card className="p-8 bg-linear-to-br from-emerald-900/20 to-slate-900/50 border-emerald-500/30">
                 <h2 className="text-2xl font-bold text-white mb-2">Start Here: Your Top 3 Quick Wins</h2>
                 <p className="text-slate-400 mb-6">Simple actions that will make the biggest difference</p>

@@ -44,7 +44,8 @@ Return ONLY valid JSON with:
       messages: [
         {
           role: "system",
-          content: "You are an expert content writer. Always return valid JSON only.",
+          content:
+            "You are an expert content writer. Always return valid JSON only.",
         },
         { role: "user", content: prompt },
       ],
@@ -70,9 +71,9 @@ Return ONLY valid JSON with:
   } catch (error) {
     console.error("Blog post generation error:", error);
     return NextResponse.json(
-      { 
+      {
         error: "Failed to generate blog post",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

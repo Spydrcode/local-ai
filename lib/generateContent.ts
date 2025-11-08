@@ -21,7 +21,8 @@ export async function generateContent(
     messages: [
       {
         role: "system",
-        content: "You are an expert content creator. Always return valid JSON only.",
+        content:
+          "You are an expert content creator. Always return valid JSON only.",
       },
       { role: "user", content: prompt },
     ],
