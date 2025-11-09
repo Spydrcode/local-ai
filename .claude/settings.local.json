@@ -6,7 +6,15 @@
       "Bash(npm run build:*)",
       "Bash(if exist nul del /F nul)",
       "Bash(del /F \"c:\\Users\\dusti\\git\\local.ai\\nul\")",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(\"c:\\Users\\dusti\\git\\local.ai\\lib\\data-collectors\\seo-analyzer.ts\")",
+      "Bash(if exist .next rd /s /q .next)",
+      "Bash(cat:*)",
+      "Bash(if exist \"c:\\Users\\dusti\\git\\local.ai\\lib\\data-collectors\\seo-analyzer-enhanced.ts\" del /F \"c:\\Users\\dusti\\git\\local.ai\\lib\\data-collectors\\seo-analyzer-enhanced.ts\")",
+      "Bash(npm run dev:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(npm run seed:all:*)"
     ],
     "deny": [],
     "ask": []

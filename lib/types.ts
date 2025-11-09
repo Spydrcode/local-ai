@@ -11,7 +11,7 @@ export interface QuickWin {
   estimated_impact?: string; // e.g., "Could bring 5-10 new customers/month"
   est_hours_saved_per_week?: number; // For automation wins
   difficulty?: "easy" | "medium" | "advanced"; // How hard to implement
-  category?: "growth" | "visibility" | "time-saver" | "money-saver";
+  category?: "growth" | "visibility" | "time-saver" | "money-saver" | "reputation";
 }
 
 export interface AnalysisResult {
@@ -32,6 +32,29 @@ export interface AnalysisResult {
   time_savers?: {
     total_hours_per_week?: number;
     top_automation_opportunities?: string[];
+  };
+
+  // Real data from multi-source collection
+  real_data?: {
+    competitors?: number;
+    reviews?: number;
+    avgRating?: number;
+    seoScore?: {
+      desktop: number;
+      mobile: number;
+    };
+    domainAuthority?: number;
+    socialPlatforms?: number;
+    dataQuality?: string;
+  };
+
+  // Analysis metadata
+  metadata?: {
+    analysis_agents?: string[];
+    execution_time_ms?: number;
+    cache_hit?: boolean;
+    data_sources?: string[];
+    confidence_score?: number;
   };
 
   // Keep raw data for export/debug only

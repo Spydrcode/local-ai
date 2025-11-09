@@ -32,14 +32,14 @@ export default function ContentPage() {
   const [calendar, setCalendar] = useState<ContentCalendar | null>(null)
   const [websiteAnalysis, setWebsiteAnalysis] = useState<any>(null)
 
-  // Auto-fill from initial analysis if available
+  // Auto-fill from marketing analysis if available
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedAnalysis = sessionStorage.getItem('initialAnalysis')
+      const storedAnalysis = sessionStorage.getItem('marketingAnalysis')
       if (storedAnalysis) {
         try {
           const analysis = JSON.parse(storedAnalysis)
-          console.log('Loading business info from analysis:', analysis)
+          console.log('Loading business info from marketing analysis:', analysis)
 
           // Store the full analysis for use in content generation
           setWebsiteAnalysis(analysis)
@@ -47,22 +47,28 @@ export default function ContentPage() {
           // Fill business name
           if (analysis.business_name) {
             setBusinessName(analysis.business_name)
+          } else if (analysis.intelligence?.brandAnalysis?.businessName) {
+            setBusinessName(analysis.intelligence.brandAnalysis.businessName)
           }
 
           // Fill business type (industry)
           if (analysis.industry) {
             setBusinessType(analysis.industry)
+          } else if (analysis.intelligence?.industry) {
+            setBusinessType(analysis.intelligence.industry)
           }
 
           // Fill target audience
-          const targetAud = analysis.target_audience || analysis.targetAudience
+          const targetAud = analysis.target_audience || 
+                           analysis.targetAudience || 
+                           analysis.intelligence?.targetAudience
           if (targetAud) {
             setTargetAudience(targetAud)
           }
 
           console.log('Auto-filled:', {
-            name: analysis.business_name,
-            type: analysis.industry,
+            name: analysis.business_name || analysis.intelligence?.brandAnalysis?.businessName,
+            type: analysis.industry || analysis.intelligence?.industry,
             audience: targetAud
           })
         } catch (err) {
@@ -76,8 +82,8 @@ export default function ContentPage() {
 
   const handleGenerateSingle = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!businessName || !businessType) {
-      setError("Please fill in business name and type")
+    if (!businessType) {
+      setError("Please fill in your business type (e.g., coffee shop, plumber, dentist)")
       return
     }
 
@@ -90,7 +96,7 @@ export default function ContentPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          business_name: businessName,
+          business_name: businessName || "Your Business",
           business_type: businessType,
           target_audience: targetAudience || "local community",
           platform: selectedPlatform,
@@ -112,8 +118,8 @@ export default function ContentPage() {
   }
 
   const handleGenerate30Day = async () => {
-    if (!businessName || !businessType) {
-      setError("Please fill in business name and type")
+    if (!businessType) {
+      setError("Please fill in your business type (e.g., coffee shop, plumber, dentist)")
       return
     }
 
@@ -126,7 +132,7 @@ export default function ContentPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          business_name: businessName,
+          business_name: businessName || "Your Business",
           business_type: businessType,
           target_audience: targetAudience || "local community",
           website_analysis: websiteAnalysis

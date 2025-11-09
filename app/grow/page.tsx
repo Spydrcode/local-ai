@@ -6,102 +6,97 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
-interface CompetitiveInsight {
-  question: string
-  insight: string
-  action: string
+type WorkflowType =
+  | 'full-marketing-strategy'
+  | 'seo-strategy'
+  | 'content-strategy'
+  | 'social-media-strategy'
+  | 'brand-analysis'
+  | 'competitor-analysis'
+  | 'quick-analysis'
+
+interface MarketingResult {
+  workflow: WorkflowType
+  intelligence?: any
+  brandAnalysis?: any
+  marketingStrategy?: any
+  seoStrategy?: any
+  contentStrategy?: any
+  socialStrategy?: any
+  competitorAnalysis?: any
+  recommendations: string[]
+  nextSteps: string[]
+  estimatedImpact: string
+  timeline: string
+  executionTime: number
 }
 
-interface GrowthAnalysis {
-  business_name: string
-  website: string
-  what_makes_you_different: string[]
-  why_customers_choose_competitors: CompetitiveInsight[]
-  your_strengths: string[]
-  opportunities: string[]
-  threats_to_watch: string[]
-  quick_wins: Array<{
-    title: string
-    why: string
-    action: string
-    difficulty: string
-  }>
+interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: string
 }
 
-export default function GrowPage() {
+export default function MarketingHubPage() {
   const [websiteUrl, setWebsiteUrl] = useState("")
   const [businessName, setBusinessName] = useState("")
   const [industry, setIndustry] = useState("")
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowType>('full-marketing-strategy')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [error, setError] = useState("")
-  const [analysis, setAnalysis] = useState<GrowthAnalysis | null>(null)
+  const [result, setResult] = useState<MarketingResult | null>(null)
+
+  // Chat state
+  const [showChat, setShowChat] = useState(false)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [chatInput, setChatInput] = useState("")
+  const [isChatLoading, setIsChatLoading] = useState(false)
 
   useEffect(() => {
-    // Check if we have initial analysis from homepage
-    const stored = sessionStorage.getItem('initialAnalysis')
+    // Check for incoming request from homepage
+    const request = sessionStorage.getItem('marketingRequest')
+    if (request) {
+      try {
+        const data = JSON.parse(request)
+        setWebsiteUrl(data.website || "")
+        setSelectedWorkflow(data.workflow || 'full-marketing-strategy')
+        sessionStorage.removeItem('marketingRequest')
+
+        // Auto-trigger analysis
+        if (data.website) {
+          setTimeout(() => {
+            const form = document.querySelector('form')
+            if (form) {
+              form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+            }
+          }, 100)
+        }
+      } catch (e) {
+        console.error('Failed to parse marketing request', e)
+      }
+      return
+    }
+
+    // Check for previous analysis results
+    const stored = sessionStorage.getItem('marketingAnalysis')
     if (stored) {
       try {
-        const initialData = JSON.parse(stored)
-        // Pre-fill the form with data from homepage
-        setWebsiteUrl(initialData.website || "")
-        setBusinessName(initialData.business_name || "")
-        setIndustry(initialData.industry || "")
-        
-        // Automatically trigger full analysis if we have website (business_name is extracted from site)
-        if (initialData.website) {
-          const name = initialData.business_name || "Your Business"
-          const ind = initialData.industry || "general"
-          handleAutoAnalyze(initialData.website, name, ind)
-        }
-        
-        // Clear after using so refresh doesn't re-trigger
-        sessionStorage.removeItem('initialAnalysis')
+        const data = JSON.parse(stored)
+        setWebsiteUrl(data.context?.website || "")
+        setBusinessName(data.context?.businessName || "")
+        setIndustry(data.context?.industry || "")
+        setResult(data)
+        sessionStorage.removeItem('marketingAnalysis')
       } catch (e) {
         console.error('Failed to parse stored analysis', e)
       }
     }
   }, [])
 
-  const handleAutoAnalyze = async (website: string, name: string, ind: string) => {
-    setIsAnalyzing(true)
-    setError("")
-
-    try {
-      const response = await fetch("/api/grow-analysis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          website,
-          business_name: name,
-          industry: ind || "general"
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Analysis failed")
-      }
-
-      const data = await response.json()
-      setAnalysis(data)
-
-      // Store in sessionStorage for use in Content Creator and AI Tools
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('initialAnalysis', JSON.stringify({
-          ...data,
-          industry: ind
-        }))
-      }
-    } catch (err) {
-      setError("Couldn't complete the analysis. Please try again.")
-    } finally {
-      setIsAnalyzing(false)
-    }
-  }
-
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!websiteUrl || !businessName) {
-      setError("Please fill in all fields")
+    if (!websiteUrl) {
+      setError("Please enter a website URL")
       return
     }
 
@@ -109,13 +104,14 @@ export default function GrowPage() {
     setError("")
 
     try {
-      const response = await fetch("/api/grow-analysis", {
+      const response = await fetch("/api/marketing-strategy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           website: websiteUrl,
-          business_name: businessName,
-          industry: industry || "general"
+          businessName: businessName || undefined,
+          industry: industry || undefined,
+          workflow: selectedWorkflow
         }),
       })
 
@@ -124,13 +120,16 @@ export default function GrowPage() {
       }
 
       const data = await response.json()
-      setAnalysis(data)
+      setResult(data)
 
-      // Store in sessionStorage for use in Content Creator and AI Tools
+      // Store for content creator and AI tools pages  
       if (typeof window !== 'undefined') {
-        sessionStorage.setItem('initialAnalysis', JSON.stringify({
+        sessionStorage.setItem('marketingAnalysis', JSON.stringify({
           ...data,
-          industry: industry || "general"
+          website: websiteUrl,
+          business_name: businessName || data.intelligence?.brandAnalysis?.businessName || websiteUrl,
+          industry: industry || data.intelligence?.industry,
+          target_audience: data.intelligence?.targetAudience
         }))
       }
     } catch (err) {
@@ -139,6 +138,71 @@ export default function GrowPage() {
       setIsAnalyzing(false)
     }
   }
+
+  const handleChatSend = async () => {
+    if (!chatInput.trim()) return
+
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: chatInput,
+      timestamp: new Date().toISOString()
+    }
+
+    setChatMessages(prev => [...prev, userMessage])
+    setChatInput("")
+    setIsChatLoading(true)
+
+    try {
+      const response = await fetch("/api/marketing-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: chatInput,
+          conversationHistory: chatMessages,
+          businessContext: result ? {
+            website: websiteUrl,
+            businessName: businessName,
+            industry: industry,
+            previousAnalysis: result
+          } : null
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Chat failed")
+      }
+
+      const data = await response.json()
+
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.response,
+        timestamp: data.timestamp
+      }
+
+      setChatMessages(prev => [...prev, assistantMessage])
+    } catch (err) {
+      console.error('Chat error:', err)
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: "Sorry, I couldn't process that. Please try again.",
+        timestamp: new Date().toISOString()
+      }
+      setChatMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsChatLoading(false)
+    }
+  }
+
+  const workflows = [
+    { id: 'full-marketing-strategy', name: 'Full Marketing Strategy', icon: '🎯', time: '~2 min' },
+    { id: 'quick-analysis', name: 'Quick Analysis', icon: '⚡', time: '~30 sec' },
+    { id: 'seo-strategy', name: 'SEO Strategy', icon: '🔍', time: '~1 min' },
+    { id: 'content-strategy', name: 'Content Strategy', icon: '📝', time: '~1 min' },
+    { id: 'social-media-strategy', name: 'Social Media', icon: '📱', time: '~1 min' },
+    { id: 'brand-analysis', name: 'Brand Voice', icon: '🎨', time: '~45 sec' },
+    { id: 'competitor-analysis', name: 'Competitor Analysis', icon: '🏆', time: '~1 min' },
+  ]
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -155,7 +219,7 @@ export default function GrowPage() {
               <span className="text-xl font-semibold text-white">Local AI</span>
             </Link>
             <div className="flex items-center gap-6">
-              <Link href="/grow" className="text-sm font-medium text-emerald-400">Grow My Business</Link>
+              <Link href="/grow" className="text-sm font-medium text-emerald-400">AI Marketing Hub</Link>
               <Link href="/content" className="text-sm font-medium text-slate-300 hover:text-white">Content Creator</Link>
               <Link href="/tools" className="text-sm font-medium text-slate-300 hover:text-white">AI Tools</Link>
             </div>
@@ -164,57 +228,89 @@ export default function GrowPage() {
       </nav>
 
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        {!analysis && !isAnalyzing ? (
-          /* Analysis Form - Only show if not analyzing */
-          <div className="mx-auto max-w-2xl">
+        {!result && !isAnalyzing ? (
+          /* Analysis Form */
+          <div className="mx-auto max-w-4xl">
             <div className="text-center mb-10">
-              <h1 className="text-4xl font-bold text-white mb-4">Grow Your Business</h1>
-              <p className="text-lg text-slate-400">
-                Find out what's working, what's not, and exactly what to do next
+              <h1 className="text-5xl font-bold text-white mb-4">
+                AI Marketing Strategy Hub
+              </h1>
+              <p className="text-xl text-slate-400 mb-2">
+                Powerful AI-driven marketing intelligence for small businesses
+              </p>
+              <p className="text-sm text-slate-500">
+                Get SEO strategy, content calendars, brand analysis, and more in minutes
               </p>
             </div>
 
-            <Card className="p-8 bg-slate-900/50 border-slate-700">
+            <Card className="p-8 bg-slate-900/50 border-slate-700 mb-8">
               <form onSubmit={handleAnalyze} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Business Name
-                  </label>
-                  <Input
-                    type="text"
-                    value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)}
-                    placeholder="Joe's Coffee Shop"
-                    className="w-full"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Website
+                    Website URL *
                   </label>
                   <Input
                     type="url"
                     value={websiteUrl}
                     onChange={(e) => setWebsiteUrl(e.target.value)}
-                    placeholder="https://joescoffee.com"
+                    placeholder="https://yourbusiness.com"
                     className="w-full"
                     required
                   />
                 </div>
 
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Business Name (optional)
+                    </label>
+                    <Input
+                      type="text"
+                      value={businessName}
+                      onChange={(e) => setBusinessName(e.target.value)}
+                      placeholder="Your Business Name"
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Industry (optional)
+                    </label>
+                    <Input
+                      type="text"
+                      value={industry}
+                      onChange={(e) => setIndustry(e.target.value)}
+                      placeholder="e.g., Coffee shop, Plumbing, Consulting"
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Industry (optional)
+                  <label className="block text-sm font-medium text-slate-300 mb-3">
+                    Choose Analysis Type
                   </label>
-                  <Input
-                    type="text"
-                    value={industry}
-                    onChange={(e) => setIndustry(e.target.value)}
-                    placeholder="Coffee shop, retail, services, etc."
-                    className="w-full"
-                  />
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {workflows.map((workflow) => (
+                      <button
+                        key={workflow.id}
+                        type="button"
+                        onClick={() => setSelectedWorkflow(workflow.id as WorkflowType)}
+                        className={`p-4 rounded-lg border-2 transition-all text-left ${
+                          selectedWorkflow === workflow.id
+                            ? 'border-emerald-500 bg-emerald-500/10'
+                            : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-2xl">{workflow.icon}</span>
+                          <span className="text-xs text-slate-400">{workflow.time}</span>
+                        </div>
+                        <div className="text-sm font-medium text-white">{workflow.name}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {error && (
@@ -223,223 +319,315 @@ export default function GrowPage() {
                   </div>
                 )}
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isAnalyzing}
                   className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white text-base"
                 >
-                  Analyze My Business
+                  Generate Marketing Strategy
                 </Button>
 
                 <p className="text-sm text-slate-400 text-center">
-                  Takes about 30 seconds • Free analysis
+                  Powered by advanced AI agents • Free analysis
                 </p>
               </form>
             </Card>
+
+            {/* Feature highlights */}
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="p-6 bg-slate-900/30 border-slate-700">
+                <div className="text-3xl mb-3">🤖</div>
+                <h3 className="text-lg font-semibold text-white mb-2">AI-Powered Agents</h3>
+                <p className="text-sm text-slate-400">
+                  8 specialized marketing agents analyze your website and competitors
+                </p>
+              </Card>
+
+              <Card className="p-6 bg-slate-900/30 border-slate-700">
+                <div className="text-3xl mb-3">📊</div>
+                <h3 className="text-lg font-semibold text-white mb-2">Actionable Insights</h3>
+                <p className="text-sm text-slate-400">
+                  Get specific recommendations, not generic advice
+                </p>
+              </Card>
+
+              <Card className="p-6 bg-slate-900/30 border-slate-700">
+                <div className="text-3xl mb-3">💬</div>
+                <h3 className="text-lg font-semibold text-white mb-2">AI Chat Assistant</h3>
+                <p className="text-sm text-slate-400">
+                  Ask questions and get expert marketing guidance
+                </p>
+              </Card>
+            </div>
           </div>
-        ) : !analysis && isAnalyzing ? (
-          /* Loading State - Show while analyzing */
+        ) : !result && isAnalyzing ? (
+          /* Loading State */
           <div className="mx-auto max-w-2xl text-center">
             <Card className="p-12 bg-slate-900/50 border-slate-700">
               <div className="flex flex-col items-center gap-6">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-500"></div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Analyzing Your Business...</h2>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    AI Agents Working...
+                  </h2>
                   <p className="text-slate-400">
-                    This usually takes about 30 seconds
+                    Analyzing your website and generating marketing strategy
+                  </p>
+                  <p className="text-sm text-slate-500 mt-2">
+                    This usually takes 30 seconds to 2 minutes
                   </p>
                 </div>
               </div>
             </Card>
           </div>
         ) : (
-          /* Analysis Results */
+          /* Results */
           <div className="space-y-8">
+            {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">{analysis?.business_name}</h1>
-                <p className="text-slate-400">{analysis?.website}</p>
+                <h1 className="text-3xl font-bold text-white mb-2">
+                  Marketing Strategy Results
+                </h1>
+                <p className="text-slate-400">{websiteUrl}</p>
+                <p className="text-sm text-slate-500">
+                  Completed in {((result?.executionTime || 0) / 1000).toFixed(1)}s
+                </p>
               </div>
-              <Button
-                onClick={() => {
-                  setAnalysis(null)
-                  setWebsiteUrl("")
-                  setBusinessName("")
-                  setIndustry("")
-                }}
-                variant="outline"
-              >
-                Analyze Different Business
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowChat(!showChat)}
+                  variant={showChat ? "default" : "outline"}
+                  className={showChat ? "bg-emerald-500" : ""}
+                >
+                  💬 AI Chat
+                </Button>
+                <Button
+                  onClick={() => {
+                    setResult(null)
+                    setWebsiteUrl("")
+                    setBusinessName("")
+                    setIndustry("")
+                    setChatMessages([])
+                  }}
+                  variant="outline"
+                >
+                  New Analysis
+                </Button>
+              </div>
             </div>
 
-            {/* Empty state if no analysis data */}
-            {analysis && (!analysis.what_makes_you_different || analysis.what_makes_you_different.length === 0) &&
-             (!analysis.why_customers_choose_competitors || analysis.why_customers_choose_competitors.length === 0) &&
-             (!analysis.your_strengths || analysis.your_strengths.length === 0) &&
-             (!analysis.opportunities || analysis.opportunities.length === 0) &&
-             (!analysis.quick_wins || analysis.quick_wins.length === 0) && (
-              <Card className="p-12 bg-slate-900/30 border-slate-700 text-center">
-                <div className="max-w-md mx-auto">
-                  <div className="text-6xl mb-4">🔄</div>
-                  <h3 className="text-xl font-bold text-white mb-2">Analysis in Progress</h3>
-                  <p className="text-slate-400 mb-6">
-                    We're analyzing your business. This should only take a moment...
-                  </p>
+            {/* Chat Panel */}
+            {showChat && (
+              <Card className="p-6 bg-slate-900/50 border-emerald-500/30">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <span>💬</span>
+                  Marketing AI Assistant
+                </h3>
+                <p className="text-sm text-slate-400 mb-4">
+                  Ask me anything about your marketing strategy, how to use the tools, or get specific advice.
+                </p>
+
+                {/* Messages */}
+                <div className="bg-slate-950/50 rounded-lg p-4 mb-4 h-96 overflow-y-auto">
+                  {chatMessages.length === 0 ? (
+                    <div className="text-center text-slate-500 py-12">
+                      <div className="text-4xl mb-2">👋</div>
+                      <p>Start a conversation! Try asking:</p>
+                      <div className="mt-4 space-y-2 text-sm">
+                        <p>"How do I improve my SEO?"</p>
+                        <p>"What should I post on Instagram?"</p>
+                        <p>"Explain my brand analysis"</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {chatMessages.map((msg, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`max-w-[80%] rounded-lg p-3 ${
+                              msg.role === 'user'
+                                ? 'bg-emerald-500 text-white'
+                                : 'bg-slate-800 text-slate-200'
+                            }`}
+                          >
+                            <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                      {isChatLoading && (
+                        <div className="flex justify-start">
+                          <div className="bg-slate-800 text-slate-400 rounded-lg p-3 text-sm">
+                            Thinking...
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Input */}
+                <div className="flex gap-2">
+                  <Input
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && !isChatLoading && handleChatSend()}
+                    placeholder="Ask a marketing question..."
+                    disabled={isChatLoading}
+                    className="flex-1"
+                  />
                   <Button
-                    onClick={() => {
-                      setAnalysis(null)
-                      setWebsiteUrl("")
-                      setBusinessName("")
-                      setIndustry("")
-                    }}
-                    variant="outline"
+                    onClick={handleChatSend}
+                    disabled={isChatLoading || !chatInput.trim()}
+                    className="bg-emerald-500 hover:bg-emerald-600"
                   >
-                    Start Over
+                    Send
                   </Button>
                 </div>
               </Card>
             )}
 
-            {/* What Makes You Different */}
-            {analysis && analysis.what_makes_you_different && analysis.what_makes_you_different.length > 0 && (
-              <Card className="p-8 bg-slate-900/50 border-emerald-500/20">
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                  <span>💎</span>
-                  What Makes You Different
-                </h2>
-                <div className="space-y-3">
-                  {analysis.what_makes_you_different.map((item, idx) => (
-                    <div key={idx} className="flex gap-3">
-                      <span className="text-emerald-400 mt-1">✓</span>
-                      <p className="text-slate-300">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Why Customers Choose Competitors (Porter's 5 Forces in disguise) */}
-            {analysis && analysis.why_customers_choose_competitors && analysis.why_customers_choose_competitors.length > 0 && (
-              <Card className="p-8 bg-slate-900/50 border-slate-700">
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                  <span>🔍</span>
-                  Why Customers Choose Competitors
-                </h2>
-                <p className="text-slate-400 mb-6">Understanding this helps you stand out</p>
-                <div className="space-y-6">
-                  {analysis.why_customers_choose_competitors.map((insight, idx) => (
-                    <div key={idx} className="border-l-2 border-orange-500/50 pl-6 py-2">
-                      <h3 className="text-lg font-semibold text-white mb-2">{insight.question}</h3>
-                      <p className="text-slate-300 mb-3">{insight.insight}</p>
-                      <div className="bg-slate-800/50 rounded-lg p-4">
-                        <p className="text-sm font-medium text-emerald-400 mb-1">What to do:</p>
-                        <p className="text-sm text-slate-300">{insight.action}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Your Strengths & Opportunities (SWOT in disguise) */}
-            {analysis && ((analysis.your_strengths && analysis.your_strengths.length > 0) || 
-              (analysis.opportunities && analysis.opportunities.length > 0)) && (
-              <div className="grid md:grid-cols-2 gap-6">
-                {analysis && analysis.your_strengths && analysis.your_strengths.length > 0 && (
+            {/* Key Metrics */}
+            {result && (
+              <>
+                <div className="grid md:grid-cols-3 gap-6">
                   <Card className="p-6 bg-slate-900/50 border-slate-700">
-                    <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                      <span>💪</span>
-                      Your Strengths
-                    </h3>
-                    <div className="space-y-2">
-                      {analysis.your_strengths.map((strength, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <span className="text-emerald-400">•</span>
-                          <p className="text-slate-300 text-sm">{strength}</p>
+                    <div className="text-sm text-slate-400 mb-1">Estimated Impact</div>
+                    <div className="text-lg font-semibold text-white">{result.estimatedImpact}</div>
+                  </Card>
+
+                  <Card className="p-6 bg-slate-900/50 border-slate-700">
+                    <div className="text-sm text-slate-400 mb-1">Timeline</div>
+                    <div className="text-lg font-semibold text-white">{result.timeline}</div>
+                  </Card>
+
+                  <Card className="p-6 bg-slate-900/50 border-slate-700">
+                    <div className="text-sm text-slate-400 mb-1">Analysis Type</div>
+                    <div className="text-lg font-semibold text-white capitalize">
+                      {result.workflow.replace(/-/g, ' ')}
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Recommendations */}
+                <Card className="p-8 bg-linear-to-br from-emerald-900/20 to-slate-900/50 border-emerald-500/30">
+                  <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                    <span>✨</span>
+                    Top Recommendations
+                  </h2>
+                  <div className="space-y-3">
+                    {result.recommendations.map((rec, idx) => (
+                      <div key={idx} className="flex gap-3 items-start">
+                        <span className="text-emerald-400 font-bold mt-1">{idx + 1}.</span>
+                        <p className="text-slate-200">{rec}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Next Steps */}
+                <Card className="p-8 bg-slate-900/50 border-slate-700">
+                  <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                    <span>🎯</span>
+                    Next Steps
+                  </h2>
+                  <div className="space-y-3">
+                    {result.nextSteps.map((step, idx) => (
+                      <div key={idx} className="flex gap-3 items-start">
+                        <div className="shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                          <span className="text-xs text-emerald-400">{idx + 1}</span>
                         </div>
-                      ))}
+                        <p className="text-slate-300">{step}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Detailed Results (collapsible sections) */}
+                {result.intelligence && (
+                  <Card className="p-8 bg-slate-900/50 border-slate-700">
+                    <h2 className="text-2xl font-bold text-white mb-4">Website Intelligence</h2>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Brand */}
+                      {result.intelligence.brandAnalysis && (
+                        <div>
+                          <h3 className="text-lg font-semibold text-white mb-2">Brand</h3>
+                          <p className="text-sm text-slate-400 mb-2">
+                            Tone: {result.intelligence.brandAnalysis.tone}
+                          </p>
+                          {result.intelligence.brandAnalysis.tagline && (
+                            <p className="text-sm text-slate-300 italic">
+                              "{result.intelligence.brandAnalysis.tagline}"
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* SEO */}
+                      {result.intelligence.seoData && (
+                        <div>
+                          <h3 className="text-lg font-semibold text-white mb-2">SEO Status</h3>
+                          <div className="text-sm text-slate-400 space-y-1">
+                            <p>Images: {result.intelligence.seoData.imageCount} ({result.intelligence.seoData.imagesWithAlt} with alt text)</p>
+                            <p>Internal Links: {result.intelligence.seoData.internalLinks}</p>
+                            <p>Schema: {result.intelligence.seoData.hasSchema ? '✓ Yes' : '✗ No'}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Social */}
+                      {result.intelligence.socialLinks && (
+                        <div>
+                          <h3 className="text-lg font-semibold text-white mb-2">Social Presence</h3>
+                          <div className="flex gap-2 flex-wrap">
+                            {Object.entries(result.intelligence.socialLinks)
+                              .filter(([_, url]) => url)
+                              .map(([platform]) => (
+                                <span key={platform} className="text-xs px-2 py-1 bg-slate-800 rounded text-slate-300">
+                                  {platform}
+                                </span>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Content */}
+                      {result.intelligence.contentAnalysis && (
+                        <div>
+                          <h3 className="text-lg font-semibold text-white mb-2">Content</h3>
+                          <p className="text-sm text-slate-400">
+                            Blog: {result.intelligence.contentAnalysis.hasBlog ? '✓ Yes' : '✗ No'}
+                          </p>
+                          <p className="text-sm text-slate-400">
+                            Media Richness: {result.intelligence.contentAnalysis.mediaRichness}/10
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </Card>
                 )}
-
-                {analysis && analysis.opportunities && analysis.opportunities.length > 0 && (
-                  <Card className="p-6 bg-slate-900/50 border-slate-700">
-                    <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                      <span>🚀</span>
-                      Opportunities to Grow
-                    </h3>
-                    <div className="space-y-2">
-                      {analysis.opportunities.map((opportunity, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <span className="text-blue-400">•</span>
-                          <p className="text-slate-300 text-sm">{opportunity}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                )}
-              </div>
-            )}
-
-            {/* Things to Watch Out For */}
-            {analysis && analysis.threats_to_watch && analysis.threats_to_watch.length > 0 && (
-              <Card className="p-6 bg-slate-900/50 border-slate-700">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <span>⚠️</span>
-                  Things to Watch Out For
-                </h3>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {analysis.threats_to_watch.map((threat, idx) => (
-                    <div key={idx} className="flex gap-2">
-                      <span className="text-yellow-400">⚡</span>
-                      <p className="text-slate-300 text-sm">{threat}</p>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Quick Wins */}
-            {analysis && analysis.quick_wins && analysis.quick_wins.length > 0 && (
-              <Card className="p-8 bg-linear-to-br from-emerald-900/20 to-slate-900/50 border-emerald-500/30">
-                <h2 className="text-2xl font-bold text-white mb-2">Start Here: Your Top 3 Quick Wins</h2>
-                <p className="text-slate-400 mb-6">Simple actions that will make the biggest difference</p>
-                <div className="space-y-4">
-                  {analysis.quick_wins.slice(0, 3).map((win, idx) => (
-                    <Card key={idx} className="p-6 bg-slate-900/70 border-slate-700 hover:border-emerald-500/50 transition-all">
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-white">{win.title}</h3>
-                        <span className={`text-xs px-3 py-1 rounded-full ${
-                          win.difficulty === 'easy' 
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                            : win.difficulty === 'medium'
-                            ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                            : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                        }`}>
-                          {win.difficulty}
-                        </span>
-                      </div>
-                      <p className="text-slate-400 text-sm mb-4">{win.why}</p>
-                      <div className="bg-slate-800/50 rounded-lg p-4">
-                        <p className="text-sm font-medium text-emerald-400 mb-1">Action:</p>
-                        <p className="text-sm text-slate-300">{win.action}</p>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </Card>
+              </>
             )}
 
             {/* CTA */}
             <div className="text-center py-8">
-              <h3 className="text-2xl font-bold text-white mb-4">Need Help with Content?</h3>
-              <p className="text-slate-400 mb-6">Get 30 days of social media posts created in minutes</p>
-              <Link href="/content">
-                <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 px-8">
-                  Create Content Now
-                </Button>
-              </Link>
+              <h3 className="text-2xl font-bold text-white mb-4">Ready to Execute?</h3>
+              <p className="text-slate-400 mb-6">Use our AI tools to create content and implement your strategy</p>
+              <div className="flex gap-4 justify-center">
+                <Link href="/content">
+                  <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 px-8">
+                    Generate Content
+                  </Button>
+                </Link>
+                <Link href="/tools">
+                  <Button size="lg" variant="outline" className="px-8">
+                    Browse AI Tools
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         )}

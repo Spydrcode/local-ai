@@ -10,10 +10,12 @@
 
 import * as dotenv from "dotenv";
 import * as path from "path";
-import { VectorRepository } from "../lib/repositories/vector-repository";
-import { generateEmbedding } from "../lib/embeddings/embedding-service";
 
+// Load environment variables FIRST before any other imports
 dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
+
+import { generateEmbedding } from "../lib/embeddings/embedding-service";
+import { VectorRepository } from "../lib/repositories/vector-repository";
 
 // Porter's Core Knowledge Base (will be converted to vectors)
 const PORTER_KNOWLEDGE_CHUNKS = [
@@ -333,6 +335,194 @@ THE FIT TEST:
 - Do your activities reinforce each other?`,
     source: "What is Strategy? (1996)",
     category: "strategy_fundamentals",
+  },
+  {
+    id: "blue-ocean-four-actions-framework",
+    framework: "blue_ocean",
+    title: "Blue Ocean Strategy - Four Actions Framework",
+    content: `Blue Ocean Strategy focuses on creating uncontested market space (blue oceans) rather than competing in existing markets (red oceans).
+
+THE FOUR ACTIONS FRAMEWORK:
+
+1. ELIMINATE
+   - What factors that the industry takes for granted should be eliminated?
+   - Remove factors that no longer create value but add cost
+   - Challenge industry conventions that customers don't value
+   - Example: Cirque du Soleil eliminated animals, star performers, multiple show arenas
+   - Ask: "What can we stop competing on that adds cost but customers don't care about?"
+
+2. REDUCE
+   - What factors should be reduced well below the industry standard?
+   - Over-delivering on factors customers don't value much
+   - Reduce to "good enough" level while cutting costs
+   - Example: Southwest Airlines reduced seating comfort, meal service
+   - Ask: "What are we over-engineering that customers would accept at lower level?"
+
+3. RAISE
+   - What factors should be raised well above the industry standard?
+   - Create exceptional value on factors customers truly care about
+   - Differentiate on what matters most
+   - Example: Cirque du Soleil raised artistic production, theater ambiance
+   - Ask: "What can we amplify that customers will pay premium for?"
+
+4. CREATE
+   - What factors should be created that the industry has never offered?
+   - Discover entirely new sources of value
+   - Often by looking at non-customers and why they avoid the industry
+   - Example: Cirque du Soleil created unique venue experiences, multiple productions per show
+   - Ask: "What new value can we offer that competitors haven't thought of?"
+
+VALUE INNOVATION:
+- Pursue differentiation AND low cost simultaneously (breaks Porter's generic strategies)
+- Shift from competing to creating new demand
+- Align innovation with utility, price, and cost
+- Not about technology innovation - about value innovation
+
+RED OCEAN vs BLUE OCEAN:
+RED OCEAN (Compete in existing market)
+- Industry boundaries are defined and accepted
+- Beat the competition
+- Exploit existing demand
+- Make value-cost trade-off
+- Align activities with strategic choice (cost OR differentiation)
+
+BLUE OCEAN (Create uncontested market)
+- Redefine industry boundaries
+- Make competition irrelevant
+- Create and capture new demand
+- Break value-cost trade-off
+- Align activities in pursuit of differentiation AND low cost`,
+    source: "Blue Ocean Strategy (2005) - Kim & Mauborgne",
+    category: "market_creation",
+  },
+  {
+    id: "blue-ocean-value-curve",
+    framework: "blue_ocean",
+    title: "Blue Ocean Strategy Canvas and Value Curve",
+    content: `The Strategy Canvas visualizes your value curve versus competitors:
+
+STRATEGY CANVAS COMPONENTS:
+
+1. HORIZONTAL AXIS: Competing Factors
+   - List all factors the industry competes on
+   - Include product, service, delivery factors
+   - Typical 6-12 key factors per industry
+
+2. VERTICAL AXIS: Offering Level
+   - How much you offer on each factor (low to high)
+   - Compare to competitors
+   - Your value curve vs industry average
+
+VALUE CURVE PATTERNS:
+
+WEAK STRATEGY (Red Ocean):
+- Your curve overlaps competitors
+- Trying to beat competition at their game
+- Competing on same factors
+- Result: Price competition, margin erosion
+
+STRONG STRATEGY (Blue Ocean):
+- Your curve diverges from industry
+- Focus: Different factors than competitors
+- Some factors eliminated or reduced
+- New factors created
+- Result: Uncontested market space
+
+APPLYING TO SMALL BUSINESS:
+
+1. MAP CURRENT STATE
+   - List factors your industry competes on
+   - Rate yourself and top 3 competitors on each (1-5 scale)
+   - Plot the curves
+   - See where you overlap (red ocean)
+
+2. DISCOVER BLUE OCEAN
+   - Which factors can you eliminate? (Industry takes for granted)
+   - Which to reduce? (Over-delivering, customers don't care)
+   - Which to raise? (Create standout differentiation)
+   - Which to create? (New value, industry never offered)
+
+3. TEST NEW VALUE CURVE
+   - Does it diverge from competition?
+   - Does it have clear focus? (not trying to win everywhere)
+   - Does it have a compelling tagline? ("X for Y without Z")
+   - Is it sustainable? (hard to copy as a system)
+
+EXAMPLES:
+- Curves du Soleil: Eliminated animals/stars, reduced venue variety, raised artistic value, created multiple shows
+- Southwest Airlines: Eliminated meals/seating classes, reduced comfort, raised frequency/speed, created point-to-point routing
+- Yellow Tail Wine: Eliminated aging complexity/vineyard prestige, reduced wine terminology, raised ease of selection/fun, created retail-friendly positioning`,
+    source: "Blue Ocean Strategy (2005) - Kim & Mauborgne",
+    category: "market_creation",
+  },
+  {
+    id: "blue-ocean-non-customers",
+    framework: "blue_ocean",
+    title: "Blue Ocean Strategy - Three Tiers of Non-Customers",
+    content: `Blue oceans are often found by converting non-customers into customers:
+
+TIER 1: "SOON-TO-BE" NON-CUSTOMERS
+- On the edge of your market
+- Use industry offerings minimally
+- Ready to jump ship if better alternative appears
+- They settle for current solutions but aren't happy
+- Ask: "What makes them barely tolerate our industry?"
+- Example: People who rarely go to movies (too expensive, bad experience)
+
+TIER 2: "REFUSING" NON-CUSTOMERS
+- Consciously choose against your industry
+- See it as an option but reject it
+- Either use substitutes or go without
+- They've evaluated and said "no"
+- Ask: "Why do they refuse our industry despite having the need?"
+- Example: People who rejected traditional circus (animal concerns, high cost)
+
+TIER 3: "UNEXPLORED" NON-CUSTOMERS
+- Never considered your industry as option
+- Their needs addressed by other industries or not at all
+- Furthest from your market
+- Largest opportunity but hardest to convert
+- Ask: "Who has this need but looks to completely different industries?"
+- Example: Corporate clients who use other entertainment (never considered circus)
+
+DISCOVERING INSIGHTS FROM NON-CUSTOMERS:
+
+1. IDENTIFY COMMONALITIES
+   - What do all three tiers have in common?
+   - What shared frustrations keep them away?
+   - What common desires are unmet?
+
+2. LOOK FOR DECISIVE REASONS
+   - Not just preferences, but deal-breakers
+   - What single factor would convert them?
+   - Often simpler than you think
+
+3. CHALLENGE INDUSTRY LOGIC
+   - Industries focus on better serving existing customers
+   - Blue oceans focus on converting non-customers
+   - Requires questioning industry assumptions
+   - "What if we eliminated what keeps non-customers away?"
+
+SMALL BUSINESS APPLICATION:
+
+For each tier, ask:
+- TIER 1: "What makes our occasional customers use us so rarely?"
+  → Reduce friction, lower barriers
+  
+- TIER 2: "What makes people choose alternatives to our industry?"
+  → Create new factors they value, eliminate what they hate
+  
+- TIER 3: "Who has our problem but uses completely different solutions?"
+  → Expand industry boundaries, make offering accessible
+
+STRATEGIC QUESTIONS:
+1. Who are the non-customers of your industry (all three tiers)?
+2. What is keeping them from using your industry?
+3. What do they have in common across all tiers?
+4. How can you convert the largest number with one strategic move?
+5. What would you need to eliminate, reduce, raise, or create?`,
+    source: "Blue Ocean Strategy (2005) - Kim & Mauborgne",
+    category: "market_creation",
   },
 ];
 

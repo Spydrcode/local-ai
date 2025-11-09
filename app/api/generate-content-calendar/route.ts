@@ -1,3 +1,11 @@
+import {
+  augmentWithMarketingContext,
+  retrieveMarketingContext,
+} from "@/lib/agents/marketing-rag";
+import {
+  enrichWithContext,
+  getContextForPrompt,
+} from "@/lib/context/context-helper";
 import { generateContent } from "@/lib/generateContent";
 import { NextResponse } from "next/server";
 
@@ -7,24 +15,31 @@ const buildCalendarPrompt = (params: {
   target_audience: string;
   website_analysis?: any;
 }) => {
-  const { business_name, business_type, target_audience, website_analysis } = params;
+  const { business_name, business_type, target_audience, website_analysis } =
+    params;
 
   // Build context from website analysis if available
-  let businessContext = '';
+  let businessContext = "";
   if (website_analysis) {
-    const differentiators = website_analysis.what_makes_you_different?.join('\n- ') || '';
-    const strengths = website_analysis.your_strengths?.join('\n- ') || '';
-    const opportunities = website_analysis.opportunities?.slice(0, 3).join('\n- ') || '';
-    const quickWins = website_analysis.quick_wins?.slice(0, 3).map((w: any) => `${w.title}: ${w.why}`).join('\n- ') || '';
+    const differentiators =
+      website_analysis.what_makes_you_different?.join("\n- ") || "";
+    const strengths = website_analysis.your_strengths?.join("\n- ") || "";
+    const opportunities =
+      website_analysis.opportunities?.slice(0, 3).join("\n- ") || "";
+    const quickWins =
+      website_analysis.quick_wins
+        ?.slice(0, 3)
+        .map((w: any) => `${w.title}: ${w.why}`)
+        .join("\n- ") || "";
 
     businessContext = `
 BUSINESS INTELLIGENCE (Use this to create authentic, specific content):
-${differentiators ? `\nWhat makes them different:\n- ${differentiators}` : ''}
-${strengths ? `\nKey strengths:\n- ${strengths}` : ''}
-${opportunities ? `\nGrowth opportunities to highlight:\n- ${opportunities}` : ''}
-${quickWins ? `\nQuick wins to promote:\n- ${quickWins}` : ''}
-${website_analysis.exact_sub_niche ? `\nExact niche: ${website_analysis.exact_sub_niche}` : ''}
-${website_analysis.location_context ? `\nLocation: ${website_analysis.location_context}` : ''}
+${differentiators ? `\nWhat makes them different:\n- ${differentiators}` : ""}
+${strengths ? `\nKey strengths:\n- ${strengths}` : ""}
+${opportunities ? `\nGrowth opportunities to highlight:\n- ${opportunities}` : ""}
+${quickWins ? `\nQuick wins to promote:\n- ${quickWins}` : ""}
+${website_analysis.exact_sub_niche ? `\nExact niche: ${website_analysis.exact_sub_niche}` : ""}
+${website_analysis.location_context ? `\nLocation: ${website_analysis.location_context}` : ""}
 
 CONTENT STRATEGY:
 - Feature their specific differentiators and competitive advantages in promotional posts
@@ -38,10 +53,10 @@ CONTENT STRATEGY:
   return `You are a professional social media strategist creating a 30-day content calendar for ${business_name}, a ${business_type} business targeting ${target_audience}.
 ${businessContext}
 Create a balanced mix of content types:
-- Educational posts (tips, how-tos) ${website_analysis ? '- use their quick wins and opportunities' : ''}
-- Promotional posts (special offers, products/services) ${website_analysis ? '- highlight their differentiators' : ''}
+- Educational posts (tips, how-tos) ${website_analysis ? "- use their quick wins and opportunities" : ""}
+- Promotional posts (special offers, products/services) ${website_analysis ? "- highlight their differentiators" : ""}
 - Engaging posts (questions, polls, fun facts)
-- Behind-the-scenes posts (team, process) ${website_analysis ? '- showcase their strengths' : ''}
+- Behind-the-scenes posts (team, process) ${website_analysis ? "- showcase their strengths" : ""}
 - Customer-focused posts (testimonials, spotlight)
 
 For each week, create:
@@ -66,30 +81,64 @@ Return ONLY valid JSON in this exact format:
   "week_4": [...]
 }
 
-${website_analysis ? 'CRITICAL: Reference their actual differentiators, strengths, and opportunities in the posts. Make content specific to THEIR business.' : 'Make each post unique, valuable, and specific to their business type.'}`;
+${website_analysis ? "CRITICAL: Reference their actual differentiators, strengths, and opportunities in the posts. Make content specific to THEIR business." : "Make each post unique, valuable, and specific to their business type."}`;
 };
 
 export async function POST(request: Request) {
   try {
-    const { business_name, business_type, target_audience, website_analysis } =
-      await request.json();
+    const body = await request.json();
 
-    if (!business_name || !business_type) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    // Enrich request with stored business context
+    const enriched = enrichWithContext({
+      website: body.website,
+      businessName: body.business_name,
+      industry: body.business_type,
+      ...body,
+    });
+
+    // Use enriched data with fallbacks
+    const business_name = enriched.businessName;
+    const business_type = enriched.industry || body.business_type || "business";
+    const target_audience =
+      enriched.targetAudience || body.target_audience || "local community";
+
+    // Get stored context summary for AI
+    const storedContext = getContextForPrompt(enriched.website);
+
+    // Build enhanced website_analysis from stored context + provided data
+    const website_analysis =
+      body.website_analysis ||
+      (storedContext
+        ? {
+            what_makes_you_different: enriched.keyMessages,
+            brand_voice: enriched.brandVoice,
+            brand_tone: enriched.brandTone,
+            context_summary: storedContext,
+          }
+        : null);
+
+    // Retrieve marketing framework knowledge from vectors
+    const marketingContext = `${business_name} in ${business_type} creating content calendar for ${target_audience}`;
+    const marketingKnowledge = await retrieveMarketingContext(
+      marketingContext,
+      "content"
+    );
 
     // Build the prompt with website analysis context
     const prompt = buildCalendarPrompt({
       business_name,
       business_type,
-      target_audience: target_audience || "local community",
+      target_audience,
       website_analysis,
     });
 
-    const calendar = await generateContent(prompt);
+    // Augment prompt with marketing framework knowledge
+    const augmentedPrompt = augmentWithMarketingContext(
+      prompt,
+      marketingKnowledge
+    );
+
+    const calendar = await generateContent(augmentedPrompt);
     return NextResponse.json(calendar);
   } catch (error) {
     console.error("Content calendar generation error:", error);

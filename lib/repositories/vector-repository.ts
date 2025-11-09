@@ -158,13 +158,43 @@ export class VectorRepository {
     demoId: string;
     query: string;
     force?: string;
+    topK?: number;
   }) {
+    const { generateEmbedding } = await import(
+      "../embeddings/embedding-service"
+    );
+    const queryEmbedding = await generateEmbedding(params.query);
+
     return this.provider.search({
-      ...params,
+      queryEmbedding,
+      topK: params.topK || 3,
       filters: {
-        analysisType: "porter_forces",
+        analysisType: "porter_framework", // Match what we seeded
         agentType: "porter",
         ...(params.force && { porterForce: params.force }),
+      },
+    });
+  }
+
+  async searchMarketingKnowledge(params: {
+    demoId: string;
+    query: string;
+    contentType?: "social" | "content" | "email" | "seo" | "all";
+    topK?: number;
+  }) {
+    const { generateEmbedding } = await import(
+      "../embeddings/embedding-service"
+    );
+    const queryEmbedding = await generateEmbedding(params.query);
+
+    return this.provider.search({
+      queryEmbedding,
+      topK: params.topK || 3,
+      filters: {
+        analysisType: "marketing_framework",
+        agentType: "marketing",
+        ...(params.contentType &&
+          params.contentType !== "all" && { contentType: params.contentType }),
       },
     });
   }

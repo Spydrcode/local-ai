@@ -16,7 +16,9 @@
     "setup:pinecone-optimized": "npx tsx scripts/setup-pinecone-optimized.ts",
     "test:vectors": "npx tsx scripts/test-vector-search.ts",
     "migrate:vectors": "npx tsx --env-file=.env.local scripts/migrate-vectors.ts",
-    "seed:porter": "npx tsx scripts/seed-porter-vectors.ts"
+    "seed:porter": "npx tsx scripts/seed-porter-vectors.ts",
+    "seed:marketing": "npx tsx scripts/seed-marketing-vectors.ts",
+    "seed:all": "npx tsx scripts/seed-all-vectors.ts"
   },
   "dependencies": {
     "@huggingface/inference": "^2.6.4",

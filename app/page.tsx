@@ -8,58 +8,105 @@ import { useRouter } from "next/navigation"
 import type React from "react"
 import { useState } from "react"
 
-const painPoints = [
+const marketingChallenges = [
+  {
+    icon: "🎯",
+    challenge: "Don't know where to start with marketing?",
+    solution: "Get AI-powered strategy tailored to your business in 2 minutes",
+  },
   {
     icon: "🔍",
-    problem: "Not showing up on Google?",
-    solution: "Find out why customers can't find you online",
+    challenge: "Struggling with SEO and online visibility?",
+    solution: "Get a 90-day SEO roadmap with specific actions to rank higher",
   },
   {
-    icon: "💔",
-    problem: "Losing customers to competitors?",
-    solution: "Discover what makes them choose others over you",
+    icon: "📱",
+    challenge: "Running out of content ideas?",
+    solution: "Generate 30 days of platform-specific content instantly",
   },
   {
-    icon: "⏰",
-    problem: "Spending hours on social media?",
-    solution: "Get 30 days of content created in 5 minutes",
-  },
-  {
-    icon: "❓",
-    problem: "Not sure what to fix first?",
-    solution: "Get a simple action plan that actually works",
+    icon: "🏆",
+    challenge: "Competitors beating you online?",
+    solution: "Discover what they're doing and how to differentiate",
   },
 ]
 
-const benefits = [
-  {
-    icon: "📈",
-    title: "Grow Your Business",
-    description: "See exactly why customers choose competitors and what to do about it",
-    action: "Get Your Growth Plan",
-    link: "/grow",
-  },
-  {
-    icon: "✍️",
-    title: "Never Run Out of Content",
-    description: "Professional Facebook and Instagram posts, plus a 30-day content calendar",
-    action: "Create Content Now",
-    link: "/content",
-  },
+const aiCapabilities = [
   {
     icon: "🤖",
-    title: "Save 10+ Hours Weekly",
-    description: "AI tools that handle the busy work so you can focus on customers",
-    action: "Find Time-Savers",
-    link: "/tools",
+    title: "17 AI Marketing Agents",
+    description: "Specialized agents for SEO, content, social media, brand voice, competitors, and more",
+    features: ["Marketing Intelligence", "SEO Strategy", "Content Calendar", "Brand Voice Analysis"],
+  },
+  {
+    icon: "🎓",
+    title: "Harvard Frameworks",
+    description: "World-class strategies from HBS professors applied to your business",
+    features: ["Jobs-to-be-Done", "Blue Ocean Strategy", "Competitive Positioning", "Consumer Journey"],
+  },
+  {
+    icon: "📊",
+    title: "Modern ML Practices",
+    description: "Cutting-edge machine learning for personalization and optimization",
+    features: ["AI Personalization", "Attribution Modeling", "Marketing Mix Optimization", "Predictive Analytics"],
+  },
+]
+
+const workflows = [
+  {
+    id: "full-marketing-strategy",
+    icon: "🎯",
+    name: "Full Marketing Strategy",
+    description: "Comprehensive analysis with SEO, content, social, brand, and competitor insights",
+    time: "~2 min",
+    bestFor: "Complete marketing overhaul",
+  },
+  {
+    id: "quick-analysis",
+    icon: "⚡",
+    name: "Quick Wins",
+    description: "Fast audit with immediate actionable improvements you can implement today",
+    time: "~30 sec",
+    bestFor: "Quick improvements",
+  },
+  {
+    id: "seo-strategy",
+    icon: "🔍",
+    name: "SEO Strategy",
+    description: "90-day SEO roadmap with keyword research, technical fixes, and content plan",
+    time: "~1 min",
+    bestFor: "Improving Google rankings",
+  },
+  {
+    id: "content-strategy",
+    icon: "📝",
+    name: "Content Strategy",
+    description: "30-day multi-channel content calendar with platform-specific posts",
+    time: "~1 min",
+    bestFor: "Content planning",
+  },
+  {
+    id: "social-media-strategy",
+    icon: "📱",
+    name: "Social Media Strategy",
+    description: "Platform-specific strategies for Instagram, Facebook, LinkedIn, TikTok, and more",
+    time: "~1 min",
+    bestFor: "Growing social presence",
+  },
+  {
+    id: "brand-analysis",
+    icon: "🎨",
+    name: "Brand Voice",
+    description: "Define your brand voice, archetype, and messaging framework",
+    time: "~45 sec",
+    bestFor: "Brand consistency",
   },
 ]
 
 export default function Home() {
   const [websiteUrl, setWebsiteUrl] = useState("")
+  const [selectedWorkflow, setSelectedWorkflow] = useState("full-marketing-strategy")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisProgress, setAnalysisProgress] = useState(0)
-  const [analysisStep, setAnalysisStep] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
 
@@ -72,57 +119,19 @@ export default function Home() {
 
     setIsAnalyzing(true)
     setError("")
-    setAnalysisProgress(0)
-    setAnalysisStep("Starting analysis...")
 
     try {
-      // Simulate progress updates
-      setAnalysisProgress(10)
-      setAnalysisStep("Analyzing website...")
-      
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          website: websiteUrl,
-          business_name: "",
-          industry: ""
-        }),
-      })
-
-      setAnalysisProgress(60)
-      setAnalysisStep("Processing business data...")
-
-      if (!response.ok) {
-        throw new Error("Analysis failed")
-      }
-
-      const data = await response.json()
-      
-      setAnalysisProgress(90)
-      setAnalysisStep("Finalizing results...")
-      
-      // Store analysis result with metadata and redirect to grow page
-      sessionStorage.setItem('initialAnalysis', JSON.stringify({
-        ...data,
+      // Store selection and redirect to marketing hub
+      sessionStorage.setItem('marketingRequest', JSON.stringify({
         website: websiteUrl,
-        analyzedAt: new Date().toISOString()
+        workflow: selectedWorkflow,
+        timestamp: new Date().toISOString()
       }))
-      
-      setAnalysisProgress(100)
-      setAnalysisStep("Complete!")
-      
-      setTimeout(() => {
-        router.push("/grow")
-      }, 500)
+
+      router.push("/grow")
     } catch (err) {
-      setError("Couldn't analyze the website. Please check the URL and try again.")
-      setAnalysisProgress(0)
-      setAnalysisStep("")
-    } finally {
-      if (!sessionStorage.getItem('initialAnalysis')) {
-        setIsAnalyzing(false)
-      }
+      setError("Something went wrong. Please try again.")
+      setIsAnalyzing(false)
     }
   }
 
@@ -140,7 +149,7 @@ export default function Home() {
               <span className="text-xl font-semibold text-white">Local AI</span>
             </Link>
             <div className="flex items-center gap-6">
-              <Link href="/grow" className="text-sm font-medium text-slate-300 hover:text-white">Grow My Business</Link>
+              <Link href="/grow" className="text-sm font-medium text-slate-300 hover:text-white">AI Marketing Hub</Link>
               <Link href="/content" className="text-sm font-medium text-slate-300 hover:text-white">Content Creator</Link>
               <Link href="/tools" className="text-sm font-medium text-slate-300 hover:text-white">AI Tools</Link>
             </div>
@@ -149,71 +158,116 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-        <div className="mx-auto max-w-4xl text-center">
-          <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Is Your Business Easy to Find Online?
-          </h1>
-          <p className="mb-10 text-xl leading-relaxed text-slate-300">
-            Most customers search online before buying. Let's make sure they find YOU, not your competitors.
-          </p>
-
-          <form onSubmit={handleAnalyze} className="mx-auto mb-6 max-w-2xl">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Input
-                type="url"
-                value={websiteUrl}
-                onChange={(e) => { setWebsiteUrl(e.target.value); setError("") }}
-                placeholder="Enter your website (e.g., yourshop.com)"
-                className="flex-1 h-12 text-base"
-                required
-                disabled={isAnalyzing}
-              />
-              <Button type="submit" disabled={isAnalyzing} size="lg" className="px-8 h-12">
-                {isAnalyzing ? "Analyzing..." : "Check My Website"}
-              </Button>
+      <section className="relative overflow-hidden py-20 sm:py-32">
+        <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 via-slate-950 to-slate-950" />
+        <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+              Powered by 17 AI Agents + Harvard Frameworks
             </div>
-            
-            {/* Progress Bar */}
-            {isAnalyzing && (
-              <div className="mt-4 rounded-lg border border-emerald-500/30 bg-slate-900/50 p-4">
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-slate-300">{analysisStep}</span>
-                  <span className="font-medium text-emerald-400">{analysisProgress}%</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-700">
-                  <div 
-                    className="h-full bg-linear-to-r from-emerald-500 to-green-400 transition-all duration-500 ease-out"
-                    style={{ width: `${analysisProgress}%` }}
-                  />
-                </div>
+
+            <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
+              AI Marketing Strategy
+              <span className="bg-linear-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent"> Platform</span>
+            </h1>
+
+            <p className="mb-10 text-xl leading-relaxed text-slate-300 sm:text-2xl">
+              Get world-class marketing intelligence in minutes. Powered by Harvard Business School frameworks and modern AI.
+            </p>
+
+            <form onSubmit={handleAnalyze} className="mx-auto mb-8 max-w-2xl">
+              <div className="mb-4">
+                <Input
+                  type="url"
+                  value={websiteUrl}
+                  onChange={(e) => { setWebsiteUrl(e.target.value); setError("") }}
+                  placeholder="Enter your website URL (e.g., yourbusiness.com)"
+                  className="h-14 text-base text-center"
+                  required
+                  disabled={isAnalyzing}
+                />
               </div>
-            )}
-            
-            {error && (
-              <div className="mt-3 rounded-md border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</div>
-            )}
-          </form>
-          <p className="text-sm text-slate-400">Free analysis • Takes 30 seconds • No signup required</p>
+
+              {/* Workflow Selection */}
+              <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {workflows.slice(0, 6).map((workflow) => (
+                  <button
+                    key={workflow.id}
+                    type="button"
+                    onClick={() => setSelectedWorkflow(workflow.id)}
+                    className={`rounded-lg border-2 p-4 text-left transition-all ${
+                      selectedWorkflow === workflow.id
+                        ? 'border-emerald-500 bg-emerald-500/10'
+                        : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="text-2xl">{workflow.icon}</span>
+                      <span className="text-xs text-slate-400">{workflow.time}</span>
+                    </div>
+                    <div className="text-sm font-medium text-white">{workflow.name}</div>
+                  </button>
+                ))}
+              </div>
+
+              {error && (
+                <div className="mb-4 rounded-md border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isAnalyzing}
+                size="lg"
+                className="h-14 w-full text-lg bg-emerald-500 hover:bg-emerald-600 sm:w-auto sm:px-16"
+              >
+                {isAnalyzing ? "Processing..." : "Generate Marketing Strategy"}
+              </Button>
+            </form>
+
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Free analysis
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Results in 30s - 2min
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                No signup required
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Pain Points Section */}
+      {/* Marketing Challenges Section */}
       <section className="border-t border-white/10 bg-slate-900/30 py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold text-white">Sound Familiar?</h2>
-            <p className="text-slate-400">We help fix these common problems</p>
+            <h2 className="mb-3 text-3xl font-bold text-white">Marketing Challenges We Solve</h2>
+            <p className="text-slate-400">AI-powered solutions for small business marketing</p>
           </div>
 
           <div className="mx-auto max-w-4xl grid gap-6 sm:grid-cols-2">
-            {painPoints.map((point, idx) => (
+            {marketingChallenges.map((item, idx) => (
               <Card key={idx} className="p-6 bg-slate-900/50 border-slate-700 hover:border-emerald-500/50 transition-all">
                 <div className="flex gap-4">
-                  <div className="text-3xl">{point.icon}</div>
+                  <div className="text-3xl">{item.icon}</div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{point.problem}</h3>
-                    <p className="text-slate-400">{point.solution}</p>
+                    <h3 className="text-lg font-semibold text-white mb-2">{item.challenge}</h3>
+                    <p className="text-slate-400">{item.solution}</p>
                   </div>
                 </div>
               </Card>
@@ -222,39 +276,169 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-16">
+      {/* AI Capabilities Section */}
+      <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold text-white">What You Get</h2>
-            <p className="text-slate-400">Simple tools that help you get more customers</p>
+            <h2 className="mb-3 text-4xl font-bold text-white">Powered by Advanced AI</h2>
+            <p className="text-xl text-slate-400">The most sophisticated marketing intelligence platform for small businesses</p>
           </div>
 
-          <div className="mx-auto max-w-5xl grid gap-8 md:grid-cols-3">
-            {benefits.map((benefit, idx) => (
-              <Card key={idx} className="p-8 bg-slate-900/50 border-slate-700 hover:border-emerald-500/50 transition-all flex flex-col">
-                <div className="text-5xl mb-4">{benefit.icon}</div>
-                <h3 className="text-xl font-bold text-white mb-3">{benefit.title}</h3>
-                <p className="text-slate-400 mb-6 flex-1">{benefit.description}</p>
-                <Link href={benefit.link}>
-                  <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white">
-                    {benefit.action}
-                  </Button>
-                </Link>
+          <div className="mx-auto max-w-6xl grid gap-8 lg:grid-cols-3">
+            {aiCapabilities.map((capability, idx) => (
+              <Card key={idx} className="p-8 bg-slate-900/50 border-slate-700 hover:border-emerald-500/50 transition-all">
+                <div className="text-5xl mb-4">{capability.icon}</div>
+                <h3 className="text-2xl font-bold text-white mb-3">{capability.title}</h3>
+                <p className="text-slate-400 mb-6">{capability.description}</p>
+                <div className="space-y-2">
+                  {capability.features.map((feature, fIdx) => (
+                    <div key={fIdx} className="flex items-center gap-2 text-sm text-slate-300">
+                      <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {feature}
+                    </div>
+                  ))}
+                </div>
               </Card>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Workflow Details Section */}
+      <section className="border-t border-white/10 bg-slate-900/30 py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="mb-3 text-4xl font-bold text-white">Choose Your Analysis Type</h2>
+            <p className="text-xl text-slate-400">From quick wins to comprehensive strategies</p>
+          </div>
+
+          <div className="mx-auto max-w-6xl grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {workflows.map((workflow) => (
+              <Card key={workflow.id} className="p-6 bg-slate-900/50 border-slate-700 hover:border-emerald-500/50 transition-all">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="text-4xl">{workflow.icon}</span>
+                  <span className="text-xs rounded-full bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 text-emerald-400">
+                    {workflow.time}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">{workflow.name}</h3>
+                <p className="text-sm text-slate-400 mb-3">{workflow.description}</p>
+                <div className="text-xs text-slate-500">
+                  <span className="font-medium text-emerald-400">Best for:</span> {workflow.bestFor}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-5xl">
+            <div className="text-center mb-12">
+              <h2 className="mb-3 text-4xl font-bold text-white">What You Get</h2>
+              <p className="text-xl text-slate-400">Comprehensive marketing intelligence</p>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-2">
+              <Card className="p-8 bg-linear-to-br from-emerald-900/20 to-slate-900/50 border-emerald-500/30">
+                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                  <span>📊</span>
+                  Marketing Intelligence
+                </h3>
+                <ul className="space-y-3 text-slate-300">
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Brand voice analysis and messaging framework</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>SEO audit with technical fixes and keyword opportunities</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Content strategy with platform-specific recommendations</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Social media presence analysis and growth tactics</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Competitor marketing analysis and differentiation opportunities</span>
+                  </li>
+                </ul>
+              </Card>
+
+              <Card className="p-8 bg-linear-to-br from-blue-900/20 to-slate-900/50 border-blue-500/30">
+                <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                  <span>🎯</span>
+                  Actionable Strategy
+                </h3>
+                <ul className="space-y-3 text-slate-300">
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Specific recommendations (not generic advice)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Step-by-step next actions to implement</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>90-day roadmap with prioritized tasks</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Expected impact and timeline for each action</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>AI chat assistant for follow-up questions</span>
+                  </li>
+                </ul>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
-      <section className="border-t border-white/10 bg-linear-to-b from-slate-900 to-slate-950 py-16">
+      <section className="border-t border-white/10 bg-linear-to-b from-emerald-900/20 via-slate-900 to-slate-950 py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-white">Ready to Grow?</h2>
-          <p className="mb-8 text-lg text-slate-300">Start with a free website check. Takes 30 seconds.</p>
-          <Button size="lg" className="px-12 h-14 text-lg bg-emerald-500 hover:bg-emerald-600" onClick={() => document.querySelector('input')?.focus()}>
-            Check My Website Now
+          <h2 className="mb-4 text-4xl font-bold text-white">Ready to Transform Your Marketing?</h2>
+          <p className="mb-8 text-xl text-slate-300">Get world-class strategy in minutes, not months.</p>
+          <Button
+            size="lg"
+            className="h-16 px-16 text-lg bg-emerald-500 hover:bg-emerald-600"
+            onClick={() => document.querySelector('input')?.focus()}
+          >
+            Start Free Analysis Now
           </Button>
+          <p className="mt-4 text-sm text-slate-400">No credit card required • Instant results</p>
         </div>
       </section>
 
@@ -269,7 +453,7 @@ export default function Home() {
               </div>
               <span className="font-semibold text-white">Local AI</span>
             </div>
-            <p className="text-sm text-slate-500">© 2025 Local AI. Grow your business with simple AI tools.</p>
+            <p className="text-sm text-slate-500">© 2025 Local AI. AI-Powered Marketing Strategy Platform.</p>
           </div>
         </div>
       </footer>
