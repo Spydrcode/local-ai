@@ -551,7 +551,7 @@ async function seedPorterVectors() {
         id: chunk.id,
         values: embedding,
         metadata: {
-          demoId: "porter-knowledge-base", // Special demo_id for framework knowledge
+          demoId: "knowledge-base", // Unified knowledge base for all framework knowledge
           framework: chunk.framework,
           title: chunk.title,
           content: chunk.content,

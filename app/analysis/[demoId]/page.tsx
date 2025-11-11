@@ -252,12 +252,106 @@ const analysisModules = [
     category: 'optimization',
     endpoint: (demoId: string) => `/api/growth-plan/${demoId}`,
     color: 'amber'
+  },
+  // Strategic Frameworks (MBA-Level Analysis)
+  {
+    id: 'blue-ocean-strategy',
+    title: 'Blue Ocean Strategy',
+    description: 'Escape competition and find uncontested market space',
+    icon: '🌊',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/blue-ocean-analysis/${demoId}`,
+    color: 'blue',
+    tier: 'free'
+  },
+  {
+    id: 'ansoff-matrix',
+    title: 'Ansoff Growth Matrix',
+    description: '4 proven growth strategies with ROI estimates',
+    icon: '📊',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/ansoff-matrix/${demoId}`,
+    color: 'emerald',
+    tier: 'free'
+  },
+  {
+    id: 'bcg-matrix',
+    title: 'BCG Portfolio Matrix',
+    description: 'Which products to invest in vs divest (Stars, Cash Cows, Dogs)',
+    icon: '💼',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/bcg-matrix/${demoId}`,
+    color: 'purple'
+  },
+  {
+    id: 'positioning-map',
+    title: 'Competitive Positioning Map',
+    description: 'Visual 2x2 map showing market gaps and opportunities',
+    icon: '🗺️',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/positioning-map/${demoId}`,
+    color: 'violet'
+  },
+  {
+    id: 'customer-journey',
+    title: 'Customer Journey Map',
+    description: 'Optimize every touchpoint from awareness to advocacy',
+    icon: '🛤️',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/customer-journey/${demoId}`,
+    color: 'cyan'
+  },
+  {
+    id: 'okr-framework',
+    title: 'OKR Framework',
+    description: 'Quarterly objectives with measurable key results',
+    icon: '🎯',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/okr-framework/${demoId}`,
+    color: 'amber'
+  },
+  {
+    id: 'digital-maturity',
+    title: 'Digital Maturity Assessment',
+    description: 'Assess your digital capabilities across 8 dimensions',
+    icon: '💻',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/digital-maturity/${demoId}`,
+    color: 'indigo'
+  },
+  {
+    id: 'pestel-analysis',
+    title: 'PESTEL Analysis',
+    description: 'External macro-environmental factors impacting your business',
+    icon: '🌍',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/pestel-analysis/${demoId}`,
+    color: 'teal'
+  },
+  {
+    id: 'business-model-canvas',
+    title: 'Business Model Canvas',
+    description: 'Complete business model mapped across 9 building blocks',
+    icon: '🏗️',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/business-model-canvas/${demoId}`,
+    color: 'rose'
+  },
+  {
+    id: 'lean-canvas',
+    title: 'Lean Canvas',
+    description: '1-page business plan focused on problems, solutions & metrics',
+    icon: '📋',
+    category: 'frameworks',
+    endpoint: (demoId: string) => `/api/strategic-frameworks/lean-canvas/${demoId}`,
+    color: 'orange'
   }
 ];
 
 const categories = [
   { id: 'foundation', label: '🧭 Business Intelligence', description: 'What makes you the go-to choice locally' },
   { id: 'strategic', label: '🎯 Strategic Advantage', description: 'Proven strategic frameworks simplified for small business' },
+  { id: 'frameworks', label: '🎓 Strategic Frameworks', description: 'MBA-level analysis tools for growth and positioning' },
   { id: 'content', label: '📱 Marketing Engine', description: 'Content that converts visitors to customers' },
   { id: 'optimization', label: '📈 Growth Accelerator', description: 'Track & improve what matters most' }
 ];
@@ -285,9 +379,19 @@ function getActionButtonText(moduleId: string): string {
     'business-dna-analysis': 'Discover My DNA',
     'local-market-intelligence': 'Map My Market',
     'customer-sentiment-tracker': 'Track Customer Voice',
-    'economic-intelligence': 'Check Market Reality'
+    'economic-intelligence': 'Check Market Reality',
+    'blue-ocean-strategy': 'Find Blue Ocean',
+    'ansoff-matrix': 'Map Growth Strategy',
+    'bcg-matrix': 'Analyze Portfolio',
+    'positioning-map': 'Map Competition',
+    'customer-journey': 'Map Customer Journey',
+    'okr-framework': 'Set OKRs',
+    'digital-maturity': 'Assess Digital Maturity',
+    'pestel-analysis': 'Analyze External Factors',
+    'business-model-canvas': 'Map Business Model',
+    'lean-canvas': 'Create Lean Canvas'
   };
-  
+
   return buttonTexts[moduleId] || 'Run Analysis';
 }
 
@@ -314,9 +418,15 @@ function getModuleActionSteps(moduleId: string): string {
     'business-dna-analysis': 'Update your elevator pitch to focus on customer outcomes, not what you do.',
     'local-market-intelligence': 'Visit or call your top 3 competitors to understand their pricing and offerings.',
     'customer-sentiment-tracker': 'Set up Google Alerts for your business name and respond to mentions.',
-    'economic-intelligence': 'Adjust your marketing message to address current economic concerns customers have.'
+    'economic-intelligence': 'Adjust your marketing message to address current economic concerns customers have.',
+    'blue-ocean-strategy': 'Implement the top 2 "Create" recommendations to differentiate from competitors.',
+    'ansoff-matrix': 'Focus on the highest-ROI quadrant and start the first recommended action this week.',
+    'bcg-matrix': 'Allocate 70% of investment to Stars, harvest Cash Cows, decide on Question Marks.',
+    'positioning-map': 'Update your homepage and marketing to emphasize your unique positioning.',
+    'customer-journey': 'Fix the top 3 drop-off points identified in the conversion funnel.',
+    'okr-framework': 'Schedule weekly OKR check-ins with your team starting next Monday.'
   };
-  
+
   return actionSteps[moduleId] || 'Review the analysis results and implement the top 3 recommendations this week.';
 }
 

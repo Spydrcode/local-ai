@@ -1,3 +1,5 @@
+
+
 "use client"
 
 import { Button } from "@/components/ui/Button"
@@ -14,6 +16,21 @@ type WorkflowType =
   | 'brand-analysis'
   | 'competitor-analysis'
   | 'quick-analysis'
+  // Strategic Frameworks
+  | 'blue-ocean-strategy'
+  | 'ansoff-matrix'
+  | 'bcg-matrix'
+  | 'positioning-map'
+  | 'customer-journey-map'
+  | 'okr-framework'
+  | 'comprehensive-strategic-analysis'
+  // HBS Frameworks
+  | 'jobs-to-be-done-analysis'
+  | 'customer-journey-mapping'
+  | 'positioning-strategy'
+  | 'innovation-strategy'
+  | 'ml-optimization-strategy'
+  | 'comprehensive-hbs-analysis'
 
 interface MarketingResult {
   workflow: WorkflowType
@@ -195,13 +212,31 @@ export default function MarketingHubPage() {
   }
 
   const workflows = [
-    { id: 'full-marketing-strategy', name: 'Full Marketing Strategy', icon: '🎯', time: '~2 min' },
-    { id: 'quick-analysis', name: 'Quick Analysis', icon: '⚡', time: '~30 sec' },
-    { id: 'seo-strategy', name: 'SEO Strategy', icon: '🔍', time: '~1 min' },
-    { id: 'content-strategy', name: 'Content Strategy', icon: '📝', time: '~1 min' },
-    { id: 'social-media-strategy', name: 'Social Media', icon: '📱', time: '~1 min' },
-    { id: 'brand-analysis', name: 'Brand Voice', icon: '🎨', time: '~45 sec' },
-    { id: 'competitor-analysis', name: 'Competitor Analysis', icon: '🏆', time: '~1 min' },
+    // Marketing Intelligence Workflows
+    { id: 'full-marketing-strategy', name: 'Full Marketing Strategy', icon: '🎯', time: '~2 min', category: 'Marketing' },
+    { id: 'quick-analysis', name: 'Quick Analysis', icon: '⚡', time: '~30 sec', category: 'Marketing' },
+    { id: 'seo-strategy', name: 'SEO Strategy', icon: '🔍', time: '~1 min', category: 'Marketing' },
+    { id: 'content-strategy', name: 'Content Strategy', icon: '📝', time: '~1 min', category: 'Marketing' },
+    { id: 'social-media-strategy', name: 'Social Media', icon: '📱', time: '~1 min', category: 'Marketing' },
+    { id: 'brand-analysis', name: 'Brand Voice', icon: '🎨', time: '~45 sec', category: 'Marketing' },
+    { id: 'competitor-analysis', name: 'Competitor Analysis', icon: '🏆', time: '~1 min', category: 'Marketing' },
+    
+    // Strategic Framework Workflows
+    { id: 'blue-ocean-strategy', name: 'Blue Ocean Strategy', icon: '🌊', time: '~1 min', category: 'Strategic' },
+    { id: 'ansoff-matrix', name: 'Ansoff Growth Matrix', icon: '📈', time: '~1 min', category: 'Strategic' },
+    { id: 'bcg-matrix', name: 'BCG Portfolio Matrix', icon: '⭐', time: '~1 min', category: 'Strategic' },
+    { id: 'positioning-map', name: 'Competitive Positioning', icon: '🎯', time: '~1 min', category: 'Strategic' },
+    { id: 'customer-journey-map', name: 'Customer Journey Map', icon: '🗺️', time: '~1 min', category: 'Strategic' },
+    { id: 'okr-framework', name: 'OKR Framework', icon: '🎯', time: '~1 min', category: 'Strategic' },
+    { id: 'comprehensive-strategic-analysis', name: 'All Strategic Frameworks', icon: '🚀', time: '~3 min', category: 'Strategic' },
+    
+    // HBS Framework Workflows
+    { id: 'jobs-to-be-done-analysis', name: 'Jobs-to-be-Done', icon: '💼', time: '~1 min', category: 'HBS' },
+    { id: 'customer-journey-mapping', name: 'HBS Customer Journey', icon: '🛤️', time: '~1 min', category: 'HBS' },
+    { id: 'positioning-strategy', name: 'HBS Positioning', icon: '🎪', time: '~1 min', category: 'HBS' },
+    { id: 'innovation-strategy', name: 'Disruptive Innovation', icon: '💡', time: '~1 min', category: 'HBS' },
+    { id: 'ml-optimization-strategy', name: 'ML Marketing Mix', icon: '🤖', time: '~1 min', category: 'HBS' },
+    { id: 'comprehensive-hbs-analysis', name: 'All HBS Frameworks', icon: '🎓', time: '~3 min', category: 'HBS' },
   ]
 
   return (
@@ -219,9 +254,10 @@ export default function MarketingHubPage() {
               <span className="text-xl font-semibold text-white">Local AI</span>
             </Link>
             <div className="flex items-center gap-6">
-              <Link href="/grow" className="text-sm font-medium text-emerald-400">AI Marketing Hub</Link>
-              <Link href="/content" className="text-sm font-medium text-slate-300 hover:text-white">Content Creator</Link>
-              <Link href="/tools" className="text-sm font-medium text-slate-300 hover:text-white">AI Tools</Link>
+              <Link href="/grow" className="text-sm font-medium text-emerald-400">Marketing Hub</Link>
+              <Link href="/demo" className="text-sm font-medium text-slate-300 hover:text-white">Strategic Frameworks</Link>
+              <Link href="/pricing" className="text-sm font-medium text-slate-300 hover:text-white">Pricing</Link>
+              <Link href="/agency/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Agency Portal</Link>
             </div>
           </div>
         </div>
@@ -291,26 +327,88 @@ export default function MarketingHubPage() {
                   <label className="block text-sm font-medium text-slate-300 mb-3">
                     Choose Analysis Type
                   </label>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {workflows.map((workflow) => (
-                      <button
-                        key={workflow.id}
-                        type="button"
-                        onClick={() => setSelectedWorkflow(workflow.id as WorkflowType)}
-                        className={`p-4 rounded-lg border-2 transition-all text-left ${
-                          selectedWorkflow === workflow.id
-                            ? 'border-emerald-500 bg-emerald-500/10'
-                            : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-2xl">{workflow.icon}</span>
-                          <span className="text-xs text-slate-400">{workflow.time}</span>
-                        </div>
-                        <div className="text-sm font-medium text-white">{workflow.name}</div>
-                      </button>
-                    ))}
+                  
+                  {/* Marketing Intelligence Category */}
+                  <div className="mb-6">
+                    <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-3">
+                      📊 Marketing Intelligence
+                    </h3>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {workflows.filter(w => w.category === 'Marketing').map((workflow) => (
+                        <button
+                          key={workflow.id}
+                          type="button"
+                          onClick={() => setSelectedWorkflow(workflow.id as WorkflowType)}
+                          className={`p-4 rounded-lg border-2 transition-all text-left ${
+                            selectedWorkflow === workflow.id
+                              ? 'border-emerald-500 bg-emerald-500/10'
+                              : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xl">{workflow.icon}</span>
+                            <span className="text-xs text-slate-400">{workflow.time}</span>
+                          </div>
+                          <div className="text-sm font-medium text-white">{workflow.name}</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Strategic Frameworks Category */}
+                  <div className="mb-6">
+                    <h3 className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-3">
+                      🎯 Strategic Frameworks
+                    </h3>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {workflows.filter(w => w.category === 'Strategic').map((workflow) => (
+                        <button
+                          key={workflow.id}
+                          type="button"
+                          onClick={() => setSelectedWorkflow(workflow.id as WorkflowType)}
+                          className={`p-4 rounded-lg border-2 transition-all text-left ${
+                            selectedWorkflow === workflow.id
+                              ? 'border-blue-500 bg-blue-500/10'
+                              : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xl">{workflow.icon}</span>
+                            <span className="text-xs text-slate-400">{workflow.time}</span>
+                          </div>
+                          <div className="text-sm font-medium text-white">{workflow.name}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* HBS Frameworks Category */}
+                  <div className="mb-6">
+                    <h3 className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-3">
+                      🎓 Harvard Business School Frameworks
+                    </h3>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {workflows.filter(w => w.category === 'HBS').map((workflow) => (
+                        <button
+                          key={workflow.id}
+                          type="button"
+                          onClick={() => setSelectedWorkflow(workflow.id as WorkflowType)}
+                          className={`p-4 rounded-lg border-2 transition-all text-left ${
+                            selectedWorkflow === workflow.id
+                              ? 'border-purple-500 bg-purple-500/10'
+                              : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xl">{workflow.icon}</span>
+                            <span className="text-xs text-slate-400">{workflow.time}</span>
+                          </div>
+                          <div className="text-sm font-medium text-white">{workflow.name}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
 
                 {error && (
@@ -337,9 +435,9 @@ export default function MarketingHubPage() {
             <div className="grid md:grid-cols-3 gap-6">
               <Card className="p-6 bg-slate-900/30 border-slate-700">
                 <div className="text-3xl mb-3">🤖</div>
-                <h3 className="text-lg font-semibold text-white mb-2">AI-Powered Agents</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">19 AI Workflows</h3>
                 <p className="text-sm text-slate-400">
-                  8 specialized marketing agents analyze your website and competitors
+                  Marketing intelligence, strategic frameworks, and HBS methodologies
                 </p>
               </Card>
 
@@ -347,7 +445,7 @@ export default function MarketingHubPage() {
                 <div className="text-3xl mb-3">📊</div>
                 <h3 className="text-lg font-semibold text-white mb-2">Actionable Insights</h3>
                 <p className="text-sm text-slate-400">
-                  Get specific recommendations, not generic advice
+                  Get specific recommendations tailored to your business, not generic advice
                 </p>
               </Card>
 
@@ -355,7 +453,7 @@ export default function MarketingHubPage() {
                 <div className="text-3xl mb-3">💬</div>
                 <h3 className="text-lg font-semibold text-white mb-2">AI Chat Assistant</h3>
                 <p className="text-sm text-slate-400">
-                  Ask questions and get expert marketing guidance
+                  Ask follow-up questions and get expert marketing guidance instantly
                 </p>
               </Card>
             </div>

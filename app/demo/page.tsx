@@ -310,7 +310,34 @@ export default function DemoBuilderPage() {
       ) : null}
 
       {demoResult ? (
-        <div className="mt-10">
+        <div className="mt-10 space-y-8">
+          {/* Strategic Frameworks CTA */}
+          <div className="rounded-2xl border-2 border-emerald-500/50 bg-linear-to-br from-emerald-900/30 to-blue-900/30 p-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-3">
+                🎓 Ready for MBA-Level Strategic Analysis?
+              </h2>
+              <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
+                Access all 10 Strategic Frameworks including Blue Ocean Strategy, BCG Matrix, Ansoff Growth Matrix,
+                OKR Framework, and 6 more professional frameworks to get Fortune 500-level insights.
+              </p>
+              <Link
+                href={`/analysis/${demoResult.demoId}`}
+                className="inline-flex items-center gap-3 rounded-full bg-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-emerald-600 hover:scale-105"
+              >
+                <span>📊</span>
+                <span>View All 10 Strategic Frameworks</span>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+              <p className="text-sm text-slate-400 mt-4">
+                Includes: Blue Ocean • Ansoff Matrix • BCG Matrix • Positioning Map • Customer Journey • OKR • Digital Maturity • PESTEL • Business Model Canvas • Lean Canvas
+              </p>
+            </div>
+          </div>
+
+          {/* Marketing Content Demo */}
           <DemoOverview
             demoId={demoResult.demoId}
             chatbotConfig={demoResult.chatbotConfig}

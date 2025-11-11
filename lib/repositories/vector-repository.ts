@@ -65,7 +65,7 @@ class SupabaseVectorProvider implements VectorProvider {
     // Batch insert vectors into site_chunks table
     const records = vectors.map((v) => ({
       id: v.id,
-      demo_id: v.metadata.demoId || v.metadata.demo_id,
+      demo_id: v.metadata.demoId || v.metadata.demo_id || null, // Allow null for knowledge chunks
       content: JSON.stringify(v.metadata.content || {}),
       metadata: v.metadata,
       embedding: v.values,
@@ -199,6 +199,33 @@ export class VectorRepository {
     });
   }
 
+  async searchStrategicFrameworks(params: {
+    demoId: string;
+    query: string;
+    framework?:
+      | "ansoff_matrix"
+      | "bcg_matrix"
+      | "positioning_map"
+      | "customer_journey_map"
+      | "okr";
+    topK?: number;
+  }) {
+    const { generateEmbedding } = await import(
+      "../embeddings/embedding-service"
+    );
+    const queryEmbedding = await generateEmbedding(params.query);
+
+    return this.provider.search({
+      queryEmbedding,
+      topK: params.topK || 3,
+      filters: {
+        analysisType: "strategic_framework",
+        agentType: "strategic",
+        ...(params.framework && { framework: params.framework }),
+      },
+    });
+  }
+
   async searchQuickWins(params: {
     demoId: string;
     effortLevel?: "low" | "medium" | "high";
@@ -210,6 +237,27 @@ export class VectorRepository {
         agentType: "optimization",
         ...(params.effortLevel && { effortLevel: params.effortLevel }),
       },
+    });
+  }
+
+  /**
+   * Generic search method for custom queries
+   * Use specific search methods when available for better type safety
+   */
+  async search(params: {
+    query: string;
+    topK?: number;
+    filters?: Record<string, any>;
+  }): Promise<SearchResult[]> {
+    const { generateEmbedding } = await import(
+      "../embeddings/embedding-service"
+    );
+    const queryEmbedding = await generateEmbedding(params.query);
+
+    return this.provider.search({
+      queryEmbedding,
+      topK: params.topK || 5,
+      filters: params.filters || {},
     });
   }
 }

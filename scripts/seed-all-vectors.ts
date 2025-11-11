@@ -17,8 +17,9 @@ import * as path from "path";
 // Load environment variables FIRST
 dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
 
-import { seedPorterVectors } from "./seed-porter-vectors";
 import { seedMarketingVectors } from "./seed-marketing-vectors";
+import { seedPorterVectors } from "./seed-porter-vectors";
+import { seedStrategicVectors } from "./seed-strategic-vectors";
 
 async function seedAllVectors() {
   console.log("\n" + "=".repeat(70));
@@ -29,14 +30,21 @@ async function seedAllVectors() {
 
   try {
     // Step 1: Seed Porter frameworks
-    console.log("📊 STEP 1/2: Seeding Porter's Strategic Frameworks");
+    console.log("📊 STEP 1/3: Seeding Porter's Strategic Frameworks");
     console.log("-".repeat(70) + "\n");
     await seedPorterVectors();
 
     console.log("\n");
 
-    // Step 2: Seed marketing knowledge
-    console.log("📊 STEP 2/2: Seeding Marketing Knowledge Base");
+    // Step 2: Seed strategic frameworks
+    console.log("📊 STEP 2/3: Seeding Strategic Growth Frameworks");
+    console.log("-".repeat(70) + "\n");
+    await seedStrategicVectors();
+
+    console.log("\n");
+
+    // Step 3: Seed marketing knowledge
+    console.log("📊 STEP 3/3: Seeding Marketing Knowledge Base");
     console.log("-".repeat(70) + "\n");
     await seedMarketingVectors();
 
@@ -52,6 +60,11 @@ async function seedAllVectors() {
     console.log("   ✓ Porter's Generic Strategies");
     console.log("   ✓ Porter's Value Chain");
     console.log("   ✓ Blue Ocean Strategy");
+    console.log("   ✓ Ansoff Matrix (Growth Strategies)");
+    console.log("   ✓ BCG Matrix (Portfolio Management)");
+    console.log("   ✓ Positioning Map (Competitive Positioning)");
+    console.log("   ✓ Customer Journey Map (8 stages)");
+    console.log("   ✓ OKR Framework (Objectives & Key Results)");
     console.log("   ✓ Jobs-to-be-Done (Christensen)");
     console.log("   ✓ Marketing Myopia (Levitt)");
     console.log("   ✓ Competitive Positioning");
@@ -67,9 +80,10 @@ async function seedAllVectors() {
     console.log("   ✓ Email Marketing Tactics");
     console.log("   ✓ Conversion Optimization");
 
-    console.log("\n💡 AI agents can now retrieve relevant frameworks during analysis!");
+    console.log(
+      "\n💡 AI agents can now retrieve relevant frameworks during analysis!"
+    );
     console.log("   RAG-powered recommendations are active.\n");
-
   } catch (error) {
     console.error("\n❌ ERROR during seeding:", error);
     throw error;

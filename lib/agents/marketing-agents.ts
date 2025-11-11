@@ -565,7 +565,7 @@ Return JSON with list building strategy, email sequences, templates, and automat
 })
 
 // ============================================================================
-// REGISTER ALL MARKETING AGENTS
+// REGISTER ALL MARKETING AGENTS (DEPRECATED - use direct imports instead)
 // ============================================================================
 
 export function registerMarketingAgents() {

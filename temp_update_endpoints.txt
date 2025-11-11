@@ -1,0 +1,4 @@
+bcg-matrix,bcgMatrixAgent,BCGMatrixAgent,analyzed_bcg_matrix,BCG Matrix
+positioning-map,positioningMapAgent,PositioningMapAgent,analyzed_positioning_map,Positioning Map
+customer-journey,customerJourneyAgent,CustomerJourneyAgent,analyzed_customer_journey,Customer Journey
+okr-framework,okrAgent,OKRAgent,analyzed_okr,OKR

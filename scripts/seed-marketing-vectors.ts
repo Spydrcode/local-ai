@@ -48,7 +48,7 @@ async function seedMarketingVectors() {
         id: knowledge.id,
         values: embedding,
         metadata: {
-          demoId: "marketing-knowledge-base", // Special demo_id for marketing knowledge
+          demoId: "knowledge-base", // Unified knowledge base for all framework knowledge
           framework: knowledge.metadata.framework,
           category: knowledge.metadata.category,
           industry: knowledge.metadata.industry || "general",

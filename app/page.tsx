@@ -34,15 +34,15 @@ const marketingChallenges = [
 const aiCapabilities = [
   {
     icon: "🤖",
-    title: "17 AI Marketing Agents",
-    description: "Specialized agents for SEO, content, social media, brand voice, competitors, and more",
+    title: "19 AI Marketing Workflows",
+    description: "Specialized workflows for SEO, content, social media, brand voice, competitors, and more",
     features: ["Marketing Intelligence", "SEO Strategy", "Content Calendar", "Brand Voice Analysis"],
   },
   {
     icon: "🎓",
-    title: "Harvard Frameworks",
-    description: "World-class strategies from HBS professors applied to your business",
-    features: ["Jobs-to-be-Done", "Blue Ocean Strategy", "Competitive Positioning", "Consumer Journey"],
+    title: "Harvard & Strategic Frameworks",
+    description: "World-class strategies from HBS professors and proven business frameworks",
+    features: ["Jobs-to-be-Done", "Blue Ocean Strategy", "BCG Matrix", "Ansoff Growth Matrix", "OKR Framework"],
   },
   {
     icon: "📊",
@@ -149,9 +149,10 @@ export default function Home() {
               <span className="text-xl font-semibold text-white">Local AI</span>
             </Link>
             <div className="flex items-center gap-6">
-              <Link href="/grow" className="text-sm font-medium text-slate-300 hover:text-white">AI Marketing Hub</Link>
-              <Link href="/content" className="text-sm font-medium text-slate-300 hover:text-white">Content Creator</Link>
-              <Link href="/tools" className="text-sm font-medium text-slate-300 hover:text-white">AI Tools</Link>
+              <Link href="/grow" className="text-sm font-medium text-slate-300 hover:text-white">Marketing Hub</Link>
+              <Link href="/demo" className="text-sm font-medium text-slate-300 hover:text-white">Strategic Frameworks</Link>
+              <Link href="/pricing" className="text-sm font-medium text-slate-300 hover:text-white">Pricing</Link>
+              <Link href="/agency/dashboard" className="text-sm font-medium text-emerald-400 hover:text-emerald-300">Agency Portal</Link>
             </div>
           </div>
         </div>
@@ -167,7 +168,7 @@ export default function Home() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
               </span>
-              Powered by 17 AI Agents + Harvard Frameworks
+              Powered by 19 AI Workflows + Harvard & Strategic Frameworks
             </div>
 
             <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
