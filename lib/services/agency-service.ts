@@ -1,5 +1,5 @@
-import { supabaseAdmin } from '@/server/supabaseAdmin';
-import { Agency, AgencyBranding } from '@/types/agency';
+import { supabaseAdmin } from "@/server/supabaseAdmin";
+import { Agency, AgencyBranding } from "@/types/agency";
 
 export class AgencyService {
   /**
@@ -7,7 +7,9 @@ export class AgencyService {
    */
   private static ensureSupabase() {
     if (!supabaseAdmin) {
-      throw new Error('Supabase admin client not initialized. Check environment variables.');
+      throw new Error(
+        "Supabase admin client not initialized. Check environment variables."
+      );
     }
     return supabaseAdmin;
   }
@@ -19,13 +21,13 @@ export class AgencyService {
     const supabase = this.ensureSupabase();
 
     const { data, error } = await supabase
-      .from('agencies')
-      .select('*')
-      .eq('id', agencyId)
+      .from("agencies")
+      .select("*")
+      .eq("id", agencyId)
       .single();
 
     if (error || !data) {
-      console.error('Error fetching agency:', error);
+      console.error("Error fetching agency:", error);
       return null;
     }
 
@@ -53,13 +55,15 @@ export class AgencyService {
    */
   static async getBranding(agencyId: string): Promise<AgencyBranding | null> {
     const { data, error } = await this.ensureSupabase()
-      .from('agencies')
-      .select('id, name, logo_url, primary_color, secondary_color, footer_text, website_url')
-      .eq('id', agencyId)
+      .from("agencies")
+      .select(
+        "id, name, logo_url, primary_color, secondary_color, footer_text, website_url"
+      )
+      .eq("id", agencyId)
       .single();
 
     if (error || !data) {
-      console.error('Error fetching agency branding:', error);
+      console.error("Error fetching agency branding:", error);
       return null;
     }
 
@@ -77,21 +81,23 @@ export class AgencyService {
   /**
    * Get branding for a demo (via agency_id)
    */
-  static async getBrandingForDemo(demoId: string): Promise<AgencyBranding | null> {
+  static async getBrandingForDemo(
+    demoId: string
+  ): Promise<AgencyBranding | null> {
     const { data, error } = await this.ensureSupabase()
-      .from('demos')
-      .select('agency_id')
-      .eq('id', demoId)
+      .from("demos")
+      .select("agency_id")
+      .eq("id", demoId)
       .single();
 
     if (error || !data || !data.agency_id) {
       // Return default branding if no agency
       return {
-        id: 'default',
-        name: 'Business Intelligence Platform',
-        primaryColor: '#10b981',
-        secondaryColor: '#6366f1',
-        footerText: 'Strategic Analysis Report',
+        id: "default",
+        name: "Business Intelligence Platform",
+        primaryColor: "#10b981",
+        secondaryColor: "#6366f1",
+        footerText: "Strategic Analysis Report",
       };
     }
 
@@ -104,38 +110,39 @@ export class AgencyService {
   static async createAgency(
     name: string,
     ownerEmail: string,
-    plan: 'solo' | 'starter' | 'pro' | 'enterprise' = 'solo'
+    plan: "solo" | "starter" | "pro" | "enterprise" = "solo"
   ): Promise<string | null> {
     const { data, error } = await this.ensureSupabase()
-      .from('agencies')
+      .from("agencies")
       .insert({
         name,
         plan,
-        monthly_report_limit: plan === 'solo' ? 10 : plan === 'starter' ? 50 : -1,
-        billing_cycle_start: new Date().toISOString().split('T')[0],
+        monthly_report_limit:
+          plan === "solo" ? 10 : plan === "starter" ? 50 : -1,
+        billing_cycle_start: new Date().toISOString().split("T")[0],
       })
-      .select('id')
+      .select("id")
       .single();
 
     if (error || !data) {
-      console.error('Error creating agency:', error);
+      console.error("Error creating agency:", error);
       return null;
     }
 
     // Add owner as team member
     const { error: teamError } = await this.ensureSupabase()
-      .from('team_members')
+      .from("team_members")
       .insert({
         agency_id: data.id,
         email: ownerEmail.toLowerCase(),
-        role: 'owner',
+        role: "owner",
         accepted_at: new Date().toISOString(),
         can_export: true,
         can_invite: true,
       });
 
     if (teamError) {
-      console.error('Error adding owner to team:', teamError);
+      console.error("Error adding owner to team:", teamError);
     }
 
     return data.id;
@@ -149,7 +156,7 @@ export class AgencyService {
     updates: Partial<AgencyBranding>
   ): Promise<boolean> {
     const { error } = await this.ensureSupabase()
-      .from('agencies')
+      .from("agencies")
       .update({
         name: updates.name,
         logo_url: updates.logoUrl,
@@ -159,10 +166,10 @@ export class AgencyService {
         website_url: updates.websiteUrl,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', agencyId);
+      .eq("id", agencyId);
 
     if (error) {
-      console.error('Error updating agency branding:', error);
+      console.error("Error updating agency branding:", error);
       return false;
     }
 
@@ -187,12 +194,15 @@ export class AgencyService {
    * Increment report usage
    */
   static async incrementReportUsage(agencyId: string): Promise<boolean> {
-    const { data, error } = await this.ensureSupabase().rpc('increment_report_usage', {
-      p_agency_id: agencyId,
-    });
+    const { data, error } = await this.ensureSupabase().rpc(
+      "increment_report_usage",
+      {
+        p_agency_id: agencyId,
+      }
+    );
 
     if (error) {
-      console.error('Error incrementing report usage:', error);
+      console.error("Error incrementing report usage:", error);
       return false;
     }
 
@@ -209,7 +219,7 @@ export class AgencyService {
     demoId?: string,
     metadata?: Record<string, any>
   ): Promise<void> {
-    await this.ensureSupabase().from('activity_log').insert({
+    await this.ensureSupabase().from("activity_log").insert({
       agency_id: agencyId,
       demo_id: demoId,
       user_email: userEmail,
@@ -232,17 +242,20 @@ export class AgencyService {
 
     // Get most used analyses from activity log
     const { data: activityData } = await this.ensureSupabase()
-      .from('activity_log')
-      .select('action, metadata')
-      .eq('agency_id', agencyId)
-      .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
-      .order('created_at', { ascending: false })
+      .from("activity_log")
+      .select("action, metadata")
+      .eq("agency_id", agencyId)
+      .gte(
+        "created_at",
+        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+      )
+      .order("created_at", { ascending: false })
       .limit(1000);
 
     const analysisCounts: Record<string, number> = {};
     activityData?.forEach((entry) => {
-      if (entry.action.startsWith('analyzed_')) {
-        const analysisType = entry.action.replace('analyzed_', '');
+      if (entry.action.startsWith("analyzed_")) {
+        const analysisType = entry.action.replace("analyzed_", "");
         analysisCounts[analysisType] = (analysisCounts[analysisType] || 0) + 1;
       }
     });
@@ -272,16 +285,16 @@ export class AgencyService {
     stripeSubscriptionId: string
   ): Promise<boolean> {
     const { error } = await this.ensureSupabase()
-      .from('agencies')
+      .from("agencies")
       .update({
         stripe_customer_id: stripeCustomerId,
         stripe_subscription_id: stripeSubscriptionId,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', agencyId);
+      .eq("id", agencyId);
 
     if (error) {
-      console.error('Error updating Stripe subscription:', error);
+      console.error("Error updating Stripe subscription:", error);
       return false;
     }
 
@@ -293,21 +306,21 @@ export class AgencyService {
    */
   static async updatePlan(
     agencyId: string,
-    plan: 'solo' | 'starter' | 'pro' | 'enterprise'
+    plan: "solo" | "starter" | "pro" | "enterprise"
   ): Promise<boolean> {
-    const reportLimit = plan === 'solo' ? 10 : plan === 'starter' ? 50 : -1;
+    const reportLimit = plan === "solo" ? 10 : plan === "starter" ? 50 : -1;
 
     const { error } = await this.ensureSupabase()
-      .from('agencies')
+      .from("agencies")
       .update({
         plan,
         monthly_report_limit: reportLimit,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', agencyId);
+      .eq("id", agencyId);
 
     if (error) {
-      console.error('Error updating plan:', error);
+      console.error("Error updating plan:", error);
       return false;
     }
 

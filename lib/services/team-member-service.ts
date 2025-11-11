@@ -1,5 +1,5 @@
-import { supabaseAdmin } from '@/server/supabaseAdmin';
-import { TeamMember } from '@/types/agency';
+import { supabaseAdmin } from "@/server/supabaseAdmin";
+import { TeamMember } from "@/types/agency";
 
 export class TeamMemberService {
   /**
@@ -7,7 +7,9 @@ export class TeamMemberService {
    */
   private static ensureSupabase() {
     if (!supabaseAdmin) {
-      throw new Error('Supabase admin client not initialized. Check environment variables.');
+      throw new Error(
+        "Supabase admin client not initialized. Check environment variables."
+      );
     }
     return supabaseAdmin;
   }
@@ -17,12 +19,12 @@ export class TeamMemberService {
    */
   static async getByEmail(email: string): Promise<TeamMember[]> {
     const { data, error } = await this.ensureSupabase()
-      .from('team_members')
-      .select('*')
-      .eq('email', email.toLowerCase());
+      .from("team_members")
+      .select("*")
+      .eq("email", email.toLowerCase());
 
     if (error) {
-      console.error('Error fetching team members:', error);
+      console.error("Error fetching team members:", error);
       return [];
     }
 
@@ -54,13 +56,13 @@ export class TeamMemberService {
    */
   static async getTeamMembers(agencyId: string): Promise<TeamMember[]> {
     const { data, error } = await this.ensureSupabase()
-      .from('team_members')
-      .select('*')
-      .eq('agency_id', agencyId)
-      .order('created_at', { ascending: true });
+      .from("team_members")
+      .select("*")
+      .eq("agency_id", agencyId)
+      .order("created_at", { ascending: true });
 
     if (error) {
-      console.error('Error fetching team members:', error);
+      console.error("Error fetching team members:", error);
       return [];
     }
 
@@ -86,18 +88,20 @@ export class TeamMemberService {
     agencyId: string,
     email: string,
     invitedBy: string,
-    role: 'admin' | 'member' = 'member'
+    role: "admin" | "member" = "member"
   ): Promise<boolean> {
-    const { error } = await this.ensureSupabase().from('team_members').insert({
-      agency_id: agencyId,
-      email: email.toLowerCase(),
-      role,
-      invited_by_email: invitedBy,
-      can_invite: role === 'admin',
-    });
+    const { error } = await this.ensureSupabase()
+      .from("team_members")
+      .insert({
+        agency_id: agencyId,
+        email: email.toLowerCase(),
+        role,
+        invited_by_email: invitedBy,
+        can_invite: role === "admin",
+      });
 
     if (error) {
-      console.error('Error inviting team member:', error);
+      console.error("Error inviting team member:", error);
       return false;
     }
 
@@ -108,16 +112,19 @@ export class TeamMemberService {
   /**
    * Accept invitation
    */
-  static async acceptInvitation(email: string, agencyId: string): Promise<boolean> {
+  static async acceptInvitation(
+    email: string,
+    agencyId: string
+  ): Promise<boolean> {
     const { error } = await this.ensureSupabase()
-      .from('team_members')
+      .from("team_members")
       .update({ accepted_at: new Date().toISOString() })
-      .eq('email', email.toLowerCase())
-      .eq('agency_id', agencyId)
-      .is('accepted_at', null);
+      .eq("email", email.toLowerCase())
+      .eq("agency_id", agencyId)
+      .is("accepted_at", null);
 
     if (error) {
-      console.error('Error accepting invitation:', error);
+      console.error("Error accepting invitation:", error);
       return false;
     }
 
@@ -130,25 +137,25 @@ export class TeamMemberService {
   static async removeMember(agencyId: string, email: string): Promise<boolean> {
     // Don't allow removing the owner
     const { data: member } = await this.ensureSupabase()
-      .from('team_members')
-      .select('role')
-      .eq('agency_id', agencyId)
-      .eq('email', email.toLowerCase())
+      .from("team_members")
+      .select("role")
+      .eq("agency_id", agencyId)
+      .eq("email", email.toLowerCase())
       .single();
 
-    if (member?.role === 'owner') {
-      console.error('Cannot remove agency owner');
+    if (member?.role === "owner") {
+      console.error("Cannot remove agency owner");
       return false;
     }
 
     const { error } = await this.ensureSupabase()
-      .from('team_members')
+      .from("team_members")
       .delete()
-      .eq('agency_id', agencyId)
-      .eq('email', email.toLowerCase());
+      .eq("agency_id", agencyId)
+      .eq("email", email.toLowerCase());
 
     if (error) {
-      console.error('Error removing team member:', error);
+      console.error("Error removing team member:", error);
       return false;
     }
 
@@ -161,19 +168,19 @@ export class TeamMemberService {
   static async updateRole(
     agencyId: string,
     email: string,
-    role: 'admin' | 'member'
+    role: "admin" | "member"
   ): Promise<boolean> {
     const { error } = await this.ensureSupabase()
-      .from('team_members')
+      .from("team_members")
       .update({
         role,
-        can_invite: role === 'admin',
+        can_invite: role === "admin",
       })
-      .eq('agency_id', agencyId)
-      .eq('email', email.toLowerCase());
+      .eq("agency_id", agencyId)
+      .eq("email", email.toLowerCase());
 
     if (error) {
-      console.error('Error updating team member role:', error);
+      console.error("Error updating team member role:", error);
       return false;
     }
 
@@ -186,24 +193,26 @@ export class TeamMemberService {
   static async hasPermission(
     email: string,
     agencyId: string,
-    permission: 'export' | 'invite' | 'admin'
+    permission: "export" | "invite" | "admin"
   ): Promise<boolean> {
     const { data, error } = await this.ensureSupabase()
-      .from('team_members')
-      .select('role, can_export, can_invite')
-      .eq('email', email.toLowerCase())
-      .eq('agency_id', agencyId)
+      .from("team_members")
+      .select("role, can_export, can_invite")
+      .eq("email", email.toLowerCase())
+      .eq("agency_id", agencyId)
       .single();
 
     if (error || !data) return false;
 
     switch (permission) {
-      case 'export':
+      case "export":
         return data.can_export;
-      case 'invite':
-        return data.can_invite || data.role === 'owner' || data.role === 'admin';
-      case 'admin':
-        return data.role === 'owner' || data.role === 'admin';
+      case "invite":
+        return (
+          data.can_invite || data.role === "owner" || data.role === "admin"
+        );
+      case "admin":
+        return data.role === "owner" || data.role === "admin";
       default:
         return false;
     }
