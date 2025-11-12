@@ -1,11 +1,11 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { searchCompetitorAds } from "@/lib/data-collectors";
+import { NextApiRequest, NextApiResponse } from "next";
 
 /**
  * Test Meta Ads Library Integration
- * 
+ *
  * GET /api/test/meta-ads
- * 
+ *
  * Quick endpoint to verify Meta Ads Library token is configured and working
  */
 
@@ -24,7 +24,8 @@ export default async function handler(
       success: false,
       error: "Meta Ads Library token not configured",
       message: "Please set META_ADS_LIBRARY_TOKEN in your .env.local file",
-      instructions: "Get your token from: https://www.facebook.com/ads/library/api",
+      instructions:
+        "Get your token from: https://www.facebook.com/ads/library/api",
     });
   }
 

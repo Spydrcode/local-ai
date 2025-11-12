@@ -11,11 +11,13 @@ The Meta Ads Library API token has been added to your `.env.local` file and is r
 ### Option 1: Test API Endpoint (Recommended)
 
 1. Make sure your dev server is running:
+
    ```bash
    npm run dev
    ```
 
 2. Visit the test endpoint in your browser:
+
    ```
    http://localhost:3000/api/test/meta-ads
    ```
@@ -50,11 +52,13 @@ The Meta Ads Library API token has been added to your `.env.local` file and is r
 ## What's Now Available
 
 ### 1. Competitive Ad Intelligence
+
 - See what ads your competitors are running on Facebook/Instagram
 - Analyze their messaging, CTAs, and targeting
 - Identify gaps in their advertising strategy
 
 ### 2. Enhanced Data Collection
+
 ```typescript
 POST /api/data-collection/enhanced
 {
@@ -68,11 +72,13 @@ POST /api/data-collection/enhanced
 ```
 
 ### 3. Ad Search by Keyword
+
 ```
 GET /api/meta-ads/competitive-intel?keyword=coffee&countries=US
 ```
 
 ### 4. Industry Insights
+
 - Common advertising platforms in your industry
 - Popular CTAs and messaging themes
 - Average number of active ads
@@ -87,6 +93,7 @@ GET /api/meta-ads/competitive-intel?keyword=coffee&countries=US
 **Variable:** `META_ADS_LIBRARY_TOKEN`
 
 **Token Details:**
+
 - Starts with: `EAAD1ZCRoFk7w...`
 - Length: 192 characters
 - Configured: November 12, 2025
@@ -96,6 +103,7 @@ GET /api/meta-ads/competitive-intel?keyword=coffee&countries=US
 ## Important Notes
 
 ### Token Expiration
+
 Meta access tokens typically expire after 60 days. If you start getting authentication errors:
 
 1. Visit: https://developers.facebook.com/tools/accesstoken/
@@ -104,11 +112,14 @@ Meta access tokens typically expire after 60 days. If you start getting authenti
 4. Restart your dev server
 
 ### Rate Limits
+
 The Meta Ads Library API has rate limits:
+
 - The collector automatically adds 1-second delays between competitor requests
 - Recommended: Limit to 3-5 competitors per request for optimal performance
 
 ### Privacy & Compliance
+
 - Meta Ads Library data is public information
 - Only active/recently active ads are available
 - Ad creative and targeting info is aggregated, not user-specific
@@ -125,19 +136,20 @@ The Meta Ads Library API has rate limits:
    - Add your main competitors
 
 3. 🔍 **Try competitive analysis**
+
    ```typescript
    // In your code
-   import { useBusinessContext } from '@/lib/hooks/useBusinessContext';
-   
+   import { useBusinessContext } from "@/lib/hooks/useBusinessContext";
+
    const { context } = useBusinessContext();
-   
+
    // Get competitor ad insights
-   const response = await fetch('/api/meta-ads/competitive-intel', {
-     method: 'POST',
+   const response = await fetch("/api/meta-ads/competitive-intel", {
+     method: "POST",
      body: JSON.stringify({
        competitors: context.competitors,
-       industry: context.industry
-     })
+       industry: context.industry,
+     }),
    });
    ```
 
@@ -151,19 +163,23 @@ The Meta Ads Library API has rate limits:
 ## Troubleshooting
 
 **Error: "Meta Ads Library token not configured"**
+
 - Make sure you've restarted your dev server after adding the token
 - Check the token is in `.env.local` (not `.env.example`)
 
 **Error: "Invalid OAuth access token"**
+
 - Token may have expired - generate a new one
 - Ensure token has Ads Library API permissions
 
 **No ads found for competitor**
+
 - Verify the competitor has a Facebook page
 - Check they're running active ads
 - Try searching by their exact Facebook page name
 
 **Data collection is slow**
+
 - Normal - Meta Ads adds 1-2 seconds per competitor
 - Reduce number of competitors to 3-5 for faster results
 
