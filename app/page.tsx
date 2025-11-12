@@ -121,14 +121,14 @@ export default function Home() {
     setError("")
 
     try {
-      // Store selection and redirect to marketing hub
+      // Store selection and redirect to unified dashboard
       sessionStorage.setItem('marketingRequest', JSON.stringify({
         website: websiteUrl,
         workflow: selectedWorkflow,
         timestamp: new Date().toISOString()
       }))
 
-      router.push("/grow")
+      router.push("/dashboard")
     } catch (err) {
       setError("Something went wrong. Please try again.")
       setIsAnalyzing(false)
@@ -149,8 +149,7 @@ export default function Home() {
               <span className="text-xl font-semibold text-white">Local AI</span>
             </Link>
             <div className="flex items-center gap-6">
-              <Link href="/grow" className="text-sm font-medium text-slate-300 hover:text-white">Marketing Hub</Link>
-              <Link href="/demo" className="text-sm font-medium text-slate-300 hover:text-white">Strategic Frameworks</Link>
+              <Link href="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Dashboard</Link>
               <Link href="/pricing" className="text-sm font-medium text-slate-300 hover:text-white">Pricing</Link>
               <Link href="/agency/dashboard" className="text-sm font-medium text-emerald-400 hover:text-emerald-300">Agency Portal</Link>
             </div>

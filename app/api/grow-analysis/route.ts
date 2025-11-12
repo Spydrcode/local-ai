@@ -3,6 +3,7 @@ import {
   retrievePorterContext,
 } from "@/lib/agents/porter-rag";
 import { AgentRegistry } from "@/lib/agents/unified-agent-system";
+import { MarketingIntelligenceCollector } from "@/lib/data-collectors/marketing-intelligence-collector";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -23,6 +24,21 @@ export async function POST(request: Request) {
       throw new Error("Strategic analysis agent not found");
     }
 
+    // CRITICAL: First collect ACTUAL website data before analysis
+    console.log(`Collecting real website data from ${website}...`);
+    const dataCollector = new MarketingIntelligenceCollector();
+    let websiteData;
+    try {
+      websiteData = await dataCollector.collect(website);
+      console.log(`✓ Collected data from ${website}`);
+    } catch (error) {
+      console.error(`Failed to collect website data:`, error);
+      return NextResponse.json(
+        { error: "Failed to fetch website data. Please check the URL and try again." },
+        { status: 400 }
+      );
+    }
+
     // Retrieve Porter framework knowledge from vectors
     const businessContext = `${business_name} (${website}) in the ${industry} industry`;
     const porterContext = await retrievePorterContext(businessContext, "all");
@@ -30,23 +46,40 @@ export async function POST(request: Request) {
     // Porter's 5 Forces analysis disguised as relatable questions
     const porterPrompt = `You are analyzing ${business_name} (${website}) in the ${industry} industry.
 
+**ACTUAL WEBSITE DATA COLLECTED**:
+Business Name: ${websiteData.brandAnalysis.businessName}
+Tagline: ${websiteData.brandAnalysis.tagline || 'None'}
+Headlines: ${websiteData.brandAnalysis.headlines.join(', ')}
+Brand Tone: ${websiteData.brandAnalysis.tone}
+Service Area: ${websiteData.competitiveSignals.serviceArea || 'Not specified'}
+Years in Business: ${websiteData.competitiveSignals.yearsInBusiness || 'Not specified'}
+Social Presence: ${Object.entries(websiteData.socialLinks).filter(([_, url]) => url).map(([platform]) => platform).join(', ') || 'None'}
+Phone: ${websiteData.conversionAnalysis.phoneNumbers.join(', ') || 'Not found'}
+CTAs: ${websiteData.conversionAnalysis.ctaButtons.join(', ')}
+Content: ${websiteData.contentAnalysis.hasBlog ? `Has blog with ${websiteData.contentAnalysis.blogPostCount || 'unknown'} posts` : 'No blog'}
+SEO: ${websiteData.seoData.metaTitle || 'No meta title'}
+
+FULL WEBSITE INTELLIGENCE DATA:
+${JSON.stringify(websiteData, null, 2)}
+
 **CRITICAL INSTRUCTIONS - READ CAREFULLY**:
-1. First, identify the EXACT business sub-niche (e.g., "Texas BBQ catering with competition-grade meats" NOT just "restaurant")
-2. Analyze what makes THIS specific business DIFFERENT from typical competitors
-3. Reference their ACTUAL location, services, and competitive position BY NAME
-4. **ABSOLUTELY FORBIDDEN**: Generic phrases like "similar services", "typical industry", "as with most businesses"
-5. **REQUIRED**: Every single answer MUST include specific details from their website (e.g., "their 24/7 emergency service", "their 4 tank exchange locations", "their BBQ championship wins")
+1. Use ONLY the actual data provided above from ${website}
+2. The business name is "${websiteData.brandAnalysis.businessName}" NOT "${business_name}" (if different)
+3. Reference their ACTUAL headlines, CTAs, and services from the data
+4. **ABSOLUTELY FORBIDDEN**: Making up locations, services, or details not in the data
+5. **REQUIRED**: Every answer MUST reference specific details from the WEBSITE DATA above
+6. If a detail is "Not specified" or empty, say "not mentioned on website" - DO NOT invent it
 
 **MANDATORY ANALYSIS**:
 
-STEP 1 - Visit ${website} and extract:
-- Exact business classification and sub-niche
-- Specific products/services they offer (by name and details)
-- Their exact location and service area (city, region)
-- What makes them unique (credentials, methods, specializations, response times, service hours)
-- Their target customer segments (residential, commercial, specific industries)
-- Their actual competitors BY NAME if visible
-- Any specific metrics they mention (hours, response times, years in business, coverage area)
+STEP 1 - Extract from the ACTUAL website data provided:
+- Exact business classification based on their headlines: "${websiteData.brandAnalysis.headlines.join(', ')}"
+- Specific products/services from their CTAs: "${websiteData.conversionAnalysis.ctaButtons.join(', ')}"
+- Their location: ${websiteData.competitiveSignals.serviceArea || 'Must infer from content or say "not specified on website"'}
+- What makes them unique from the brand analysis above
+- Target customer segments based on their messaging tone: ${websiteData.brandAnalysis.tone}
+- Years in business: ${websiteData.competitiveSignals.yearsInBusiness || 'not mentioned'}
+- Any certifications: ${websiteData.competitiveSignals.awardsAndCertifications.join(', ') || 'none mentioned'}
 
 STEP 2 - Competitive Analysis (Porter's 5 Forces in plain English):
 For EACH force, you MUST:

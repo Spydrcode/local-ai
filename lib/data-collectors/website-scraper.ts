@@ -93,17 +93,17 @@ IMPORTANT:
 
 Return JSON with this exact structure:
 {
-  "name": "Business Name",
-  "description": "Actual description from website",
-  "industry": "Industry from content",
-  "location": "City, State",
-  "phone": "555-555-5555",
-  "email": "email@example.com",
-  "hours": "Mon-Fri 9-5",
-  "services": ["Specific Service 1", "Specific Service 2"],
-  "pricing": null,
-  "credentials": ["Credential 1", "Credential 2"],
-  "yearsInBusiness": 10
+  "name": "[Extract actual business name]",
+  "description": "[Actual description from website meta or content]",
+  "industry": "[Infer from services and content]",
+  "location": "[Extract from address/contact section]",
+  "phone": "[Extract from contact info]",
+  "email": "[Extract from contact info]",
+  "hours": "[Extract from hours section if available]",
+  "services": ["[List actual services from menu/services page]"],
+  "pricing": "[Extract if displayed, otherwise null]",
+  "credentials": ["[Extract certifications, awards, memberships]"],
+  "yearsInBusiness": "[Calculate from 'since YYYY' or 'XX years' mentions]"
 }`,
       },
     ],

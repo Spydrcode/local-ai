@@ -109,8 +109,10 @@ export default function ContentPage() {
       }
 
       const data = await response.json()
+      console.log('Received social post data:', data)
       setSinglePost(data)
     } catch (err) {
+      console.error('Error generating post:', err)
       setError("Couldn't generate the post. Please try again.")
     } finally {
       setIsGenerating(false)
@@ -144,8 +146,10 @@ export default function ContentPage() {
       }
 
       const data = await response.json()
+      console.log('Received calendar data:', data)
       setCalendar(data)
     } catch (err) {
+      console.error('Error generating calendar:', err)
       setError("Couldn't generate the calendar. Please try again.")
     } finally {
       setIsGenerating(false)

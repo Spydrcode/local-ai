@@ -452,18 +452,18 @@ ${this.context.siteSummary || "Limited information available"}
 ❌ DO NOT copy example content - examples show format only
 
 **COMPETITOR IDENTIFICATION GUIDE**:
-- Extract industry from business intelligence (e.g., "propane delivery" → analyze propane market)
-- Extract location from business intelligence (e.g., "Phoenix East Valley" → focus on Phoenix area competitors)
-- Research standard competitors for that industry+location combination
-- Example: "propane delivery in Phoenix" → Suburban Propane, AmeriGas, Ferrellgas, local independent providers
-- Example: "emergency HVAC in Denver" → One Hour Heating & Air Conditioning, Plumbline Services, Brothers Plumbing Heating and Electric
+- Extract industry from business intelligence
+- Extract location/service area from business intelligence
+- Identify standard competitors for that industry+location combination
+- Include both national chains and local competitors
+- Provide realistic competitor names based on the actual market
 
 **MARKET TRENDS - BE SPECIFIC TO THEIR INDUSTRY**:
-GOOD: "Residential propane demand in Southwest grew 12% in 2024 due to natural gas pipeline constraints and new construction in exurban areas"
+GOOD: Include specific statistics, timelines, and market dynamics
 BAD: "Growing demand in the market"
 
-GOOD: "Emergency propane delivery becoming critical differentiator as extreme weather events increase - 2024 Phoenix freeze event created 3-day backlog at major suppliers"
-BAD: "Service quality is important"
+GOOD: Connect trends to specific business model implications with data
+BAD: Generic statements like "Service quality is important"
 
 Return JSON:
 {
@@ -539,7 +539,13 @@ ${this.context.siteSummary || "Limited information available"}
 **POSITIONING FORMULA (USE THEIR ACTUAL DETAILS)**:
 "For [THEIR specific target from business intel] who [THEIR specific need based on services] [Business Name] is the [THEIR specific category] that [THEIR unique benefit from differentiators] unlike [realistic alternative in THEIR industry] because [THEIR proof from credentials/years/methods]."
 
-GOOD example structure: "For homeowners with propane appliances who need reliable fuel supply, Phoenix Propane is the 24/7 emergency delivery service that guarantees 4-hour response unlike big corporate suppliers (Suburban Propane, AmeriGas) because we're family-owned with 27 years serving only East Valley, allowing faster localized service."
+GOOD positioning structure includes:
+- Specific target audience extracted from their intelligence
+- Clear need that their services address
+- Specific category/business type
+- Unique benefit based on their actual differentiators
+- Realistic alternatives in their industry
+- Concrete proof points from their credentials
 
 BAD (generic): "For customers who value quality, we are the company that provides excellent service unlike competitors because we care."
 

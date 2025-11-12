@@ -160,25 +160,71 @@ export class HBSFrameworksOrchestrator {
       }
     );
 
+    // Extract recommendations from AI agent response
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof jobsAnalysis.content === 'string'
+        ? JSON.parse(jobsAnalysis.content)
+        : jobsAnalysis.content;
+
+      // Extract functional, emotional, and social jobs
+      if (content.functional_jobs && Array.isArray(content.functional_jobs)) {
+        content.functional_jobs.slice(0, 2).forEach((job: any) => {
+          recommendations.push(`Functional Job: ${job.job || job}`);
+        });
+      }
+
+      if (content.emotional_jobs && Array.isArray(content.emotional_jobs)) {
+        content.emotional_jobs.slice(0, 2).forEach((job: any) => {
+          recommendations.push(`Emotional Job: ${job.job || job}`);
+        });
+      }
+
+      if (content.social_jobs && Array.isArray(content.social_jobs)) {
+        content.social_jobs.slice(0, 1).forEach((job: any) => {
+          recommendations.push(`Social Job: ${job.job || job}`);
+        });
+      }
+
+      // Extract underserved jobs as opportunities
+      if (content.underserved_jobs && Array.isArray(content.underserved_jobs)) {
+        content.underserved_jobs.slice(0, 2).forEach((job: any) => {
+          recommendations.push(`Opportunity: ${job.opportunity || job}`);
+        });
+      }
+
+      // Extract action plan as next steps
+      if (content.action_plan && Array.isArray(content.action_plan)) {
+        content.action_plan.slice(0, 5).forEach((step: any) => {
+          nextSteps.push(step.step || step.action || step);
+        });
+      } else if (content.implementation_steps && Array.isArray(content.implementation_steps)) {
+        content.implementation_steps.slice(0, 5).forEach((step: any) => {
+          nextSteps.push(step.step || step);
+        });
+      }
+    } catch (error) {
+      console.error('Error parsing Jobs-to-be-Done analysis:', error);
+      throw new Error('Failed to parse Jobs-to-be-Done analysis from AI agent.');
+    }
+
+    if (recommendations.length === 0) {
+      throw new Error('Jobs-to-be-Done agent did not return any job recommendations.');
+    }
+
+    if (nextSteps.length === 0) {
+      throw new Error('Jobs-to-be-Done agent did not return action steps.');
+    }
+
     return {
       workflow: "jobs-to-be-done-analysis",
       context,
       intelligence,
       jobsAnalysis,
-      recommendations: [
-        "Identify the core 'job' customers hire your product/service to do",
-        "Map functional, emotional, and social jobs customers need done",
-        "Find underserved jobs competitors are missing",
-        "Design solutions around jobs, not just product features",
-        "Measure success by how well you help customers get jobs done",
-      ],
-      nextSteps: [
-        "Interview customers about their underlying jobs and goals",
-        "Map out current solutions customers use (including workarounds)",
-        "Identify pain points in how jobs currently get done",
-        "Redesign offerings to better complete critical jobs",
-        "Test job-focused messaging with target customers",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact: "High - Better product-market fit and messaging",
       timeline: "30-60 days for initial insights and messaging",
       executedAt: new Date().toISOString(),
@@ -206,23 +252,72 @@ export class HBSFrameworksOrchestrator {
       }
     );
 
+    // Extract recommendations from AI agent response
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof customerJourney.content === 'string'
+        ? JSON.parse(customerJourney.content)
+        : customerJourney.content;
+
+      // Extract touchpoints across stages
+      const stages = ['awareness', 'consideration', 'purchase', 'retention', 'advocacy'];
+
+      stages.forEach(stage => {
+        if (content[stage] && content[stage].touchpoints) {
+          const touchpoint = Array.isArray(content[stage].touchpoints)
+            ? content[stage].touchpoints[0]
+            : content[stage].touchpoints;
+          if (touchpoint) {
+            recommendations.push(`${stage.charAt(0).toUpperCase() + stage.slice(1)}: ${touchpoint.channel || touchpoint}`);
+          }
+        }
+      });
+
+      // Extract pain points and opportunities
+      if (content.pain_points && Array.isArray(content.pain_points)) {
+        content.pain_points.slice(0, 2).forEach((pain: any) => {
+          recommendations.push(`Address: ${pain.pain || pain.issue || pain}`);
+        });
+      }
+
+      if (content.opportunities && Array.isArray(content.opportunities)) {
+        content.opportunities.slice(0, 2).forEach((opp: any) => {
+          recommendations.push(`Opportunity: ${opp.opportunity || opp}`);
+        });
+      }
+
+      // Extract action plan
+      if (content.action_plan && Array.isArray(content.action_plan)) {
+        content.action_plan.slice(0, 5).forEach((step: any) => {
+          nextSteps.push(step.step || step.action || step);
+        });
+      } else if (content.implementation_roadmap && Array.isArray(content.implementation_roadmap)) {
+        content.implementation_roadmap.slice(0, 5).forEach((step: any) => {
+          nextSteps.push(step.step || step);
+        });
+      }
+    } catch (error) {
+      console.error('Error parsing Customer Journey analysis:', error);
+      throw new Error('Failed to parse Customer Journey analysis from AI agent.');
+    }
+
+    if (recommendations.length === 0) {
+      throw new Error('Customer Journey agent did not return any recommendations.');
+    }
+
+    if (nextSteps.length === 0) {
+      throw new Error('Customer Journey agent did not return action steps.');
+    }
+
     return {
       workflow: "customer-journey-mapping",
       context,
       intelligence,
       customerJourney,
-      recommendations: [
-        "Map all touchpoints across awareness, consideration, purchase, and advocacy",
-        "Identify friction points in the journey",
-        "Create journey-specific content for each stage",
-        "Implement cross-channel tracking and attribution",
-      ],
-      nextSteps: [
-        "Document current customer journey with all touchpoints",
-        "Survey customers about their journey experience",
-        "Create stage-specific content and offers",
-        "Set up analytics to track journey progression",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact:
         "Journey optimization can reduce customer acquisition cost by 15-30%",
       timeline: "45 days for mapping and implementation",
@@ -250,25 +345,76 @@ export class HBSFrameworksOrchestrator {
       }
     );
 
+    // Extract recommendations from AI agent response
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof positioningStrategy.content === 'string'
+        ? JSON.parse(positioningStrategy.content)
+        : positioningStrategy.content;
+
+      // Extract target segment
+      if (content.target_segment) {
+        const segment = typeof content.target_segment === 'string'
+          ? content.target_segment
+          : content.target_segment.description || JSON.stringify(content.target_segment);
+        recommendations.push(`Target Segment: ${segment}`);
+      }
+
+      // Extract frame of reference (category)
+      if (content.frame_of_reference || content.category) {
+        recommendations.push(`Category: ${content.frame_of_reference || content.category}`);
+      }
+
+      // Extract points of difference
+      if (content.points_of_difference && Array.isArray(content.points_of_difference)) {
+        content.points_of_difference.slice(0, 2).forEach((pod: any) => {
+          recommendations.push(`Point of Difference: ${pod.point || pod}`);
+        });
+      }
+
+      // Extract points of parity
+      if (content.points_of_parity && Array.isArray(content.points_of_parity)) {
+        const pop = content.points_of_parity[0];
+        recommendations.push(`Point of Parity: ${pop.point || pop}`);
+      }
+
+      // Extract positioning statement
+      if (content.positioning_statement) {
+        recommendations.push(`Positioning: ${content.positioning_statement}`);
+      }
+
+      // Extract implementation steps
+      if (content.implementation_steps && Array.isArray(content.implementation_steps)) {
+        content.implementation_steps.slice(0, 5).forEach((step: any) => {
+          nextSteps.push(step.step || step.action || step);
+        });
+      } else if (content.action_plan && Array.isArray(content.action_plan)) {
+        content.action_plan.slice(0, 5).forEach((step: any) => {
+          nextSteps.push(step.step || step);
+        });
+      }
+    } catch (error) {
+      console.error('Error parsing Positioning Strategy:', error);
+      throw new Error('Failed to parse Positioning Strategy from AI agent.');
+    }
+
+    if (recommendations.length === 0) {
+      throw new Error('Positioning Strategy agent did not return any recommendations.');
+    }
+
+    if (nextSteps.length === 0) {
+      throw new Error('Positioning Strategy agent did not return action steps.');
+    }
+
     return {
       workflow: "positioning-strategy",
       context,
       intelligence,
       positioningStrategy,
-      recommendations: [
-        "Define clear target segment with specific needs",
-        "Articulate unique frame of reference (category you compete in)",
-        "Identify points of parity (table stakes) vs points of difference (unique value)",
-        "Craft positioning statement that guides all marketing",
-        "Test positioning with customers and refine based on feedback",
-      ],
-      nextSteps: [
-        "Workshop positioning statement with leadership team",
-        "Test positioning concepts with target customers",
-        "Align all messaging and creative around positioning",
-        "Train sales team on positioning and value prop",
-        "Monitor competitor positioning shifts",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact:
         "Medium-High - Clearer differentiation and higher conversion",
       timeline: "30-45 days for positioning development",
@@ -296,25 +442,73 @@ export class HBSFrameworksOrchestrator {
       }
     );
 
+    // Extract recommendations from AI agent response
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof innovationStrategy.content === 'string'
+        ? JSON.parse(innovationStrategy.content)
+        : innovationStrategy.content;
+
+      // Extract low-end disruption opportunities
+      if (content.low_end_disruption && Array.isArray(content.low_end_disruption)) {
+        content.low_end_disruption.slice(0, 2).forEach((opp: any) => {
+          recommendations.push(`Low-End: ${opp.opportunity || opp}`);
+        });
+      }
+
+      // Extract new market disruption opportunities
+      if (content.new_market_disruption && Array.isArray(content.new_market_disruption)) {
+        content.new_market_disruption.slice(0, 2).forEach((opp: any) => {
+          recommendations.push(`New Market: ${opp.opportunity || opp}`);
+        });
+      }
+
+      // Extract sustaining innovations
+      if (content.sustaining_innovations && Array.isArray(content.sustaining_innovations)) {
+        content.sustaining_innovations.slice(0, 2).forEach((innovation: any) => {
+          recommendations.push(`Sustaining: ${innovation.innovation || innovation}`);
+        });
+      }
+
+      // Extract disruptive opportunities (fallback if above structure not present)
+      if (recommendations.length < 3 && content.opportunities && Array.isArray(content.opportunities)) {
+        content.opportunities.slice(0, 3).forEach((opp: any) => {
+          recommendations.push(opp.opportunity || opp);
+        });
+      }
+
+      // Extract implementation roadmap
+      if (content.implementation_roadmap && Array.isArray(content.implementation_roadmap)) {
+        content.implementation_roadmap.slice(0, 5).forEach((step: any) => {
+          nextSteps.push(step.step || step.phase || step);
+        });
+      } else if (content.action_plan && Array.isArray(content.action_plan)) {
+        content.action_plan.slice(0, 5).forEach((step: any) => {
+          nextSteps.push(step.step || step);
+        });
+      }
+    } catch (error) {
+      console.error('Error parsing Innovation Strategy:', error);
+      throw new Error('Failed to parse Innovation Strategy from AI agent.');
+    }
+
+    if (recommendations.length === 0) {
+      throw new Error('Innovation Strategy agent did not return any recommendations.');
+    }
+
+    if (nextSteps.length === 0) {
+      throw new Error('Innovation Strategy agent did not return action steps.');
+    }
+
     return {
       workflow: "innovation-strategy",
       context,
       intelligence,
       innovationStrategy,
-      recommendations: [
-        "Look for low-end disruption opportunities (simpler, cheaper solutions)",
-        "Explore new market disruption (serve non-consumers)",
-        "Identify sustaining innovations for current customers",
-        "Test small before betting big on innovation",
-        "Build business model around innovation, not just product",
-      ],
-      nextSteps: [
-        "Map jobs-to-be-done that current solutions overshoot",
-        "Identify non-consumers who can't access current solutions",
-        "Prototype minimum viable disruption",
-        "Test with early adopters and iterate",
-        "Build separate business unit if disruptive innovation",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact:
         "Very High - Can unlock new markets or defend against disruption",
       timeline: "3-6 months for initial innovation experiments",
@@ -352,6 +546,85 @@ export class HBSFrameworksOrchestrator {
       }
     );
 
+    // Extract recommendations from both AI agent responses
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      // Parse AI Personalization strategy
+      const aiContent = typeof aiStrategy.content === 'string'
+        ? JSON.parse(aiStrategy.content)
+        : aiStrategy.content;
+
+      // Extract personalization opportunities
+      if (aiContent.personalization_opportunities && Array.isArray(aiContent.personalization_opportunities)) {
+        aiContent.personalization_opportunities.slice(0, 2).forEach((opp: any) => {
+          recommendations.push(`AI Personalization: ${opp.opportunity || opp}`);
+        });
+      }
+
+      // Extract segmentation strategy
+      if (aiContent.segmentation_strategy) {
+        const segment = typeof aiContent.segmentation_strategy === 'string'
+          ? aiContent.segmentation_strategy
+          : aiContent.segmentation_strategy.approach || JSON.stringify(aiContent.segmentation_strategy).slice(0, 100);
+        recommendations.push(`Segmentation: ${segment}`);
+      }
+
+      // Parse Marketing Mix Modeling strategy
+      const mixContent = typeof mixModeling.content === 'string'
+        ? JSON.parse(mixModeling.content)
+        : mixModeling.content;
+
+      // Extract channel optimization recommendations
+      if (mixContent.channel_optimization && Array.isArray(mixContent.channel_optimization)) {
+        mixContent.channel_optimization.slice(0, 2).forEach((channel: any) => {
+          recommendations.push(`Channel: ${channel.channel || channel} - ${channel.recommendation || ''}`);
+        });
+      }
+
+      // Extract budget allocation recommendations
+      if (mixContent.budget_allocation) {
+        const allocation = typeof mixContent.budget_allocation === 'string'
+          ? mixContent.budget_allocation
+          : `Optimize budget across ${Object.keys(mixContent.budget_allocation).length} channels`;
+        recommendations.push(`Budget: ${allocation}`);
+      }
+
+      // Extract implementation steps (prioritize from AI strategy)
+      if (aiContent.implementation_steps && Array.isArray(aiContent.implementation_steps)) {
+        aiContent.implementation_steps.slice(0, 3).forEach((step: any) => {
+          nextSteps.push(step.step || step);
+        });
+      }
+
+      if (mixContent.implementation_steps && Array.isArray(mixContent.implementation_steps)) {
+        mixContent.implementation_steps.slice(0, 2).forEach((step: any) => {
+          nextSteps.push(step.step || step);
+        });
+      }
+
+      // Fallback to action plans if implementation steps not found
+      if (nextSteps.length === 0) {
+        if (aiContent.action_plan && Array.isArray(aiContent.action_plan)) {
+          aiContent.action_plan.slice(0, 5).forEach((step: any) => {
+            nextSteps.push(step.step || step);
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing ML Optimization Strategy:', error);
+      throw new Error('Failed to parse ML Optimization Strategy from AI agents.');
+    }
+
+    if (recommendations.length === 0) {
+      throw new Error('ML Optimization agents did not return any recommendations.');
+    }
+
+    if (nextSteps.length === 0) {
+      throw new Error('ML Optimization agents did not return action steps.');
+    }
+
     return {
       workflow: "ml-optimization-strategy",
       context,
@@ -360,20 +633,8 @@ export class HBSFrameworksOrchestrator {
         aiPersonalization: aiStrategy,
         mixModeling: mixModeling,
       },
-      recommendations: [
-        "Implement AI-powered customer segmentation and personalization",
-        "Build marketing mix model to optimize channel allocation",
-        "Use predictive analytics for campaign performance",
-        "Automate bidding and budget optimization with ML",
-        "Set up real-time personalization engine",
-      ],
-      nextSteps: [
-        "Collect historical marketing data (6-12 months)",
-        "Build customer segmentation model",
-        "Implement marketing mix model with attribution",
-        "Launch personalization engine",
-        "Continuously optimize based on ML insights",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact:
         "ML optimization can improve marketing efficiency by 30-60% and ROAS by 2-3x",
       timeline: "60 days for setup, ongoing optimization thereafter",
@@ -445,12 +706,31 @@ Provide a synthesis in JSON format:
     try {
       synthesis = JSON.parse(synthesisResponse);
     } catch (e) {
-      synthesis = {
-        executiveSummary: synthesisResponse,
-        keyInsights: [],
-        strategicRecommendations: [],
-        implementationRoadmap: [],
-      };
+      throw new Error('Failed to parse comprehensive HBS synthesis from AI.');
+    }
+
+    // Extract recommendations from synthesis instead of hardcoded values
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    if (synthesis.strategicRecommendations && Array.isArray(synthesis.strategicRecommendations)) {
+      synthesis.strategicRecommendations.forEach((rec: string) => {
+        recommendations.push(rec);
+      });
+    }
+
+    if (synthesis.implementationRoadmap && Array.isArray(synthesis.implementationRoadmap)) {
+      synthesis.implementationRoadmap.forEach((step: string) => {
+        nextSteps.push(step);
+      });
+    }
+
+    if (recommendations.length === 0) {
+      throw new Error('Comprehensive HBS synthesis did not return strategic recommendations.');
+    }
+
+    if (nextSteps.length === 0) {
+      throw new Error('Comprehensive HBS synthesis did not return implementation roadmap.');
     }
 
     return {
@@ -463,20 +743,8 @@ Provide a synthesis in JSON format:
       innovationStrategy: innovation.innovationStrategy,
       mlOptimization: mlOpt.mlOptimization,
       synthesis,
-      recommendations: [
-        "Apply HBS frameworks systematically across your marketing",
-        "Focus on jobs-to-be-done to drive product-market fit",
-        "Optimize customer journey based on data and insights",
-        "Use positioning to differentiate in crowded markets",
-        "Leverage ML/AI for personalization and optimization",
-      ],
-      nextSteps: [
-        "Present comprehensive HBS analysis to leadership",
-        "Prioritize top 3 HBS framework initiatives",
-        "Assign cross-functional teams to each initiative",
-        "Set up quarterly reviews of HBS framework implementation",
-        "Measure impact using framework-specific KPIs",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact:
         "Very High - Academic rigor meets practical implementation for sustainable competitive advantage",
       timeline: "3-6 months for comprehensive implementation",

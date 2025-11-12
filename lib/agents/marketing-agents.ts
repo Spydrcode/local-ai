@@ -3,18 +3,21 @@
  * Advanced agentic framework for marketing strategy, content, and growth
  */
 
-import { UnifiedAgent, AgentRegistry } from './unified-agent-system'
+import { AgentRegistry, UnifiedAgent } from "./unified-agent-system";
 
 // ============================================================================
 // MARKETING INTELLIGENCE AGENT
 // ============================================================================
 
 const marketingIntelligenceAgent = new UnifiedAgent({
-  name: 'marketing-intelligence',
-  description: 'Analyzes website and market to extract actionable marketing insights',
+  name: "marketing-intelligence",
+  description:
+    "Analyzes website and market to extract actionable marketing insights",
   temperature: 0.7,
   maxTokens: 3000,
   systemPrompt: `You are an expert digital marketing strategist specializing in small business growth.
+
+⚠️ CRITICAL: You will receive detailed BUSINESS CONTEXT DATA containing actual website intelligence, SEO data, content analysis, and competitive research. You MUST use this specific data in your analysis - do NOT provide generic advice. Reference actual page titles, meta descriptions, content pieces, competitors, and business details from the provided data.
 
 Your role is to analyze websites and provide SPECIFIC, ACTIONABLE marketing intelligence including:
 
@@ -109,15 +112,15 @@ Return JSON format:
     }
   ]
 }`,
-})
+});
 
 // ============================================================================
 // SEO STRATEGY AGENT
 // ============================================================================
 
 const seoStrategyAgent = new UnifiedAgent({
-  name: 'seo-strategy',
-  description: 'Creates comprehensive SEO strategies for small businesses',
+  name: "seo-strategy",
+  description: "Creates comprehensive SEO strategies for small businesses",
   temperature: 0.6,
   maxTokens: 3000,
   systemPrompt: `You are an expert SEO strategist specializing in local and small business SEO.
@@ -174,15 +177,15 @@ CRITICAL RULES:
 - TECHNICAL SIMPLICITY: Explain technical issues in plain English
 
 Return JSON format with detailed SEO strategy including technical audit, keyword strategy, content plan, and 90-day roadmap.`,
-})
+});
 
 // ============================================================================
 // CONTENT CALENDAR AGENT
 // ============================================================================
 
 const contentCalendarAgent = new UnifiedAgent({
-  name: 'content-calendar',
-  description: 'Generates comprehensive multi-channel content calendars',
+  name: "content-calendar",
+  description: "Generates comprehensive multi-channel content calendars",
   temperature: 0.8,
   maxTokens: 4000,
   systemPrompt: `You are an expert content strategist who creates engaging, conversion-focused content calendars.
@@ -235,18 +238,20 @@ CRITICAL RULES:
 - NO GENERIC POSTS: Every piece tailored to their unique business
 
 Return a 30-day calendar with 2-3 posts per day across different platforms.`,
-})
+});
 
 // ============================================================================
 // BRAND VOICE AGENT
 // ============================================================================
 
 const brandVoiceAgent = new UnifiedAgent({
-  name: 'brand-voice',
-  description: 'Analyzes and defines brand voice, personality, and messaging',
+  name: "brand-voice",
+  description: "Analyzes and defines brand voice, personality, and messaging",
   temperature: 0.7,
   maxTokens: 2000,
   systemPrompt: `You are an expert brand strategist specializing in brand voice and messaging.
+
+⚠️ CRITICAL: You will receive actual website data including page content, headlines, calls-to-action, and messaging. You MUST analyze the ACTUAL words and phrases used on their site - quote specific examples from their pages, headlines, and content.
 
 Your role is to analyze a website and define a CLEAR, CONSISTENT brand voice framework.
 
@@ -295,18 +300,21 @@ CRITICAL RULES:
 - CONSISTENT: Voice should work across all channels
 
 Return JSON with brand archetype, voice characteristics, messaging framework, and guidelines.`,
-})
+});
 
 // ============================================================================
 // COMPETITOR ANALYSIS AGENT
 // ============================================================================
 
 const competitorAnalysisAgent = new UnifiedAgent({
-  name: 'competitor-analysis',
-  description: 'Deep competitive marketing analysis and differentiation strategy',
+  name: "competitor-analysis",
+  description:
+    "Deep competitive marketing analysis and differentiation strategy",
   temperature: 0.7,
   maxTokens: 3000,
   systemPrompt: `You are an expert competitive intelligence analyst specializing in marketing strategy.
+
+⚠️ CRITICAL: You will receive actual competitor data including their websites, messaging, positioning, and online presence. You MUST reference SPECIFIC competitors by name and cite ACTUAL examples from their sites - not hypothetical or generic competitors.
 
 Your role is to analyze competitors' marketing strategies and find differentiation opportunities.
 
@@ -361,15 +369,15 @@ CRITICAL RULES:
 - QUANTIFY WHERE POSSIBLE: Followers, posts/week, rankings, etc.
 
 Return JSON with competitor profiles, gap analysis, differentiation strategy, and action plan.`,
-})
+});
 
 // ============================================================================
 // AI MARKETING CHAT AGENT
 // ============================================================================
 
 const marketingChatAgent = new UnifiedAgent({
-  name: 'marketing-chat',
-  description: 'Interactive AI assistant for marketing questions and guidance',
+  name: "marketing-chat",
+  description: "Interactive AI assistant for marketing questions and guidance",
   temperature: 0.7,
   maxTokens: 2000,
   systemPrompt: `You are an expert marketing strategist and friendly AI assistant helping small business owners.
@@ -420,15 +428,15 @@ CONTEXT AWARENESS:
 - Consider their resources and constraints
 
 Be helpful, specific, and always actionable.`,
-})
+});
 
 // ============================================================================
 // SOCIAL MEDIA STRATEGY AGENT
 // ============================================================================
 
 const socialMediaStrategyAgent = new UnifiedAgent({
-  name: 'social-media-strategy',
-  description: 'Creates platform-specific social media strategies',
+  name: "social-media-strategy",
+  description: "Creates platform-specific social media strategies",
   temperature: 0.7,
   maxTokens: 3000,
   systemPrompt: `You are an expert social media strategist with deep platform expertise.
@@ -489,15 +497,15 @@ CRITICAL RULES:
 - RESOURCE-APPROPRIATE: Match to small business capacity
 
 Return JSON with platform-specific strategies, content ideas, and action plans.`,
-})
+});
 
 // ============================================================================
 // EMAIL MARKETING AGENT
 // ============================================================================
 
 const emailMarketingAgent = new UnifiedAgent({
-  name: 'email-marketing',
-  description: 'Creates email marketing strategies and campaigns',
+  name: "email-marketing",
+  description: "Creates email marketing strategies and campaigns",
   temperature: 0.8,
   maxTokens: 3000,
   systemPrompt: `You are an expert email marketing strategist focused on conversion and relationship building.
@@ -562,7 +570,7 @@ CRITICAL RULES:
 - COMPLIANCE: Note CAN-SPAM, GDPR requirements
 
 Return JSON with list building strategy, email sequences, templates, and automation workflows.`,
-})
+});
 
 // ============================================================================
 // REGISTER ALL MARKETING AGENTS (DEPRECATED - use direct imports instead)
@@ -570,82 +578,82 @@ Return JSON with list building strategy, email sequences, templates, and automat
 
 export function registerMarketingAgents() {
   AgentRegistry.register({
-    name: 'marketing-intelligence',
-    description: marketingIntelligenceAgent['config'].description,
-    systemPrompt: marketingIntelligenceAgent['config'].systemPrompt,
-    temperature: marketingIntelligenceAgent['config'].temperature,
-    maxTokens: marketingIntelligenceAgent['config'].maxTokens,
-  })
+    name: "marketing-intelligence",
+    description: marketingIntelligenceAgent["config"].description,
+    systemPrompt: marketingIntelligenceAgent["config"].systemPrompt,
+    temperature: marketingIntelligenceAgent["config"].temperature,
+    maxTokens: marketingIntelligenceAgent["config"].maxTokens,
+  });
 
   AgentRegistry.register({
-    name: 'seo-strategy',
-    description: seoStrategyAgent['config'].description,
-    systemPrompt: seoStrategyAgent['config'].systemPrompt,
-    temperature: seoStrategyAgent['config'].temperature,
-    maxTokens: seoStrategyAgent['config'].maxTokens,
-  })
+    name: "seo-strategy",
+    description: seoStrategyAgent["config"].description,
+    systemPrompt: seoStrategyAgent["config"].systemPrompt,
+    temperature: seoStrategyAgent["config"].temperature,
+    maxTokens: seoStrategyAgent["config"].maxTokens,
+  });
 
   AgentRegistry.register({
-    name: 'content-calendar',
-    description: contentCalendarAgent['config'].description,
-    systemPrompt: contentCalendarAgent['config'].systemPrompt,
-    temperature: contentCalendarAgent['config'].temperature,
-    maxTokens: contentCalendarAgent['config'].maxTokens,
-  })
+    name: "content-calendar",
+    description: contentCalendarAgent["config"].description,
+    systemPrompt: contentCalendarAgent["config"].systemPrompt,
+    temperature: contentCalendarAgent["config"].temperature,
+    maxTokens: contentCalendarAgent["config"].maxTokens,
+  });
 
   AgentRegistry.register({
-    name: 'brand-voice',
-    description: brandVoiceAgent['config'].description,
-    systemPrompt: brandVoiceAgent['config'].systemPrompt,
-    temperature: brandVoiceAgent['config'].temperature,
-    maxTokens: brandVoiceAgent['config'].maxTokens,
-  })
+    name: "brand-voice",
+    description: brandVoiceAgent["config"].description,
+    systemPrompt: brandVoiceAgent["config"].systemPrompt,
+    temperature: brandVoiceAgent["config"].temperature,
+    maxTokens: brandVoiceAgent["config"].maxTokens,
+  });
 
   AgentRegistry.register({
-    name: 'competitor-analysis',
-    description: competitorAnalysisAgent['config'].description,
-    systemPrompt: competitorAnalysisAgent['config'].systemPrompt,
-    temperature: competitorAnalysisAgent['config'].temperature,
-    maxTokens: competitorAnalysisAgent['config'].maxTokens,
-  })
+    name: "competitor-analysis",
+    description: competitorAnalysisAgent["config"].description,
+    systemPrompt: competitorAnalysisAgent["config"].systemPrompt,
+    temperature: competitorAnalysisAgent["config"].temperature,
+    maxTokens: competitorAnalysisAgent["config"].maxTokens,
+  });
 
   AgentRegistry.register({
-    name: 'marketing-chat',
-    description: marketingChatAgent['config'].description,
-    systemPrompt: marketingChatAgent['config'].systemPrompt,
-    temperature: marketingChatAgent['config'].temperature,
-    maxTokens: marketingChatAgent['config'].maxTokens,
-  })
+    name: "marketing-chat",
+    description: marketingChatAgent["config"].description,
+    systemPrompt: marketingChatAgent["config"].systemPrompt,
+    temperature: marketingChatAgent["config"].temperature,
+    maxTokens: marketingChatAgent["config"].maxTokens,
+  });
 
   AgentRegistry.register({
-    name: 'social-media-strategy',
-    description: socialMediaStrategyAgent['config'].description,
-    systemPrompt: socialMediaStrategyAgent['config'].systemPrompt,
-    temperature: socialMediaStrategyAgent['config'].temperature,
-    maxTokens: socialMediaStrategyAgent['config'].maxTokens,
-  })
+    name: "social-media-strategy",
+    description: socialMediaStrategyAgent["config"].description,
+    systemPrompt: socialMediaStrategyAgent["config"].systemPrompt,
+    temperature: socialMediaStrategyAgent["config"].temperature,
+    maxTokens: socialMediaStrategyAgent["config"].maxTokens,
+  });
 
   AgentRegistry.register({
-    name: 'email-marketing',
-    description: emailMarketingAgent['config'].description,
-    systemPrompt: emailMarketingAgent['config'].systemPrompt,
-    temperature: emailMarketingAgent['config'].temperature,
-    maxTokens: emailMarketingAgent['config'].maxTokens,
-  })
+    name: "email-marketing",
+    description: emailMarketingAgent["config"].description,
+    systemPrompt: emailMarketingAgent["config"].systemPrompt,
+    temperature: emailMarketingAgent["config"].temperature,
+    maxTokens: emailMarketingAgent["config"].maxTokens,
+  });
 
-  console.log('✓ Registered 8 marketing-focused agents')
+  console.log("✓ Registered 8 marketing-focused agents");
 }
 
 // Auto-register on import
-registerMarketingAgents()
+registerMarketingAgents();
 
 export {
-  marketingIntelligenceAgent,
-  seoStrategyAgent,
-  contentCalendarAgent,
   brandVoiceAgent,
   competitorAnalysisAgent,
-  marketingChatAgent,
-  socialMediaStrategyAgent,
+  contentCalendarAgent,
   emailMarketingAgent,
-}
+  marketingChatAgent,
+  marketingIntelligenceAgent,
+  seoStrategyAgent,
+  socialMediaStrategyAgent,
+};

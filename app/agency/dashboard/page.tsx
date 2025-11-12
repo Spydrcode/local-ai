@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
 interface Client {
   id: string
-  business_name: string
-  website_url: string
-  industry: string | null
+  business_name?: string  // Optional since column might not exist
+  website_url?: string
+  site_summary?: string   // Alternative name used in some places
+  industry?: string | null
   created_at: string
-  created_by_email: string
+  created_by_email?: string
 }
 
 export default function AgencyDashboardPage() {
@@ -22,8 +23,8 @@ export default function AgencyDashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [showNewClientModal, setShowNewClientModal] = useState(false)
 
-  // TODO: Replace with actual agency ID from auth/context
-  const agencyId = 'YOUR_AGENCY_ID'
+  // For demo purposes, we'll load all demos instead of filtering by agency
+  // TODO: Implement proper auth and agency-specific filtering
 
   useEffect(() => {
     loadClients()
@@ -37,9 +38,9 @@ export default function AgencyDashboardPage() {
       setFilteredClients(
         clients.filter(
           c =>
-            c.business_name.toLowerCase().includes(query) ||
-            c.website_url.toLowerCase().includes(query) ||
-            c.industry?.toLowerCase().includes(query)
+            (c.business_name || '').toLowerCase().includes(query) ||
+            (c.website_url || '').toLowerCase().includes(query) ||
+            (c.industry || '').toLowerCase().includes(query)
         )
       )
     }
@@ -47,7 +48,8 @@ export default function AgencyDashboardPage() {
 
   const loadClients = async () => {
     try {
-      const response = await fetch(`/api/agency/${agencyId}/clients`)
+      // Load all demos for now (no agency filtering)
+      const response = await fetch('/api/demos')
       if (!response.ok) throw new Error('Failed to load clients')
       const data = await response.json()
       setClients(data)
@@ -171,27 +173,35 @@ export default function AgencyDashboardPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-semibold text-white">{client.business_name}</h3>
+                      <h3 className="text-xl font-semibold text-white">
+                        {client.business_name || client.site_summary || 'Unnamed Business'}
+                      </h3>
                       {client.industry && (
                         <span className="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">
                           {client.industry}
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-slate-400 mb-3">
-                      <a
-                        href={client.website_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-emerald-400 transition-colors"
-                      >
-                        {client.website_url}
-                      </a>
-                    </div>
+                    {client.website_url && (
+                      <div className="text-sm text-slate-400 mb-3">
+                        <a
+                          href={client.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-emerald-400 transition-colors"
+                        >
+                          {client.website_url}
+                        </a>
+                      </div>
+                    )}
                     <div className="flex items-center gap-4 text-xs text-slate-500">
                       <span>Created {formatDate(client.created_at)}</span>
-                      <span>•</span>
-                      <span>By {client.created_by_email}</span>
+                      {client.created_by_email && (
+                        <>
+                          <span>•</span>
+                          <span>By {client.created_by_email}</span>
+                        </>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

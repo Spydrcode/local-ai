@@ -20,7 +20,9 @@
       "Bash(for file in positioning-map customer-journey okr-framework)",
       "Bash(do echo \"\")",
       "Bash(\"pages/api/strategic-frameworks/$file/[demoId].ts\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(powershell -Command:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

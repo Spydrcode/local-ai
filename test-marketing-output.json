@@ -1,0 +1,123 @@
+﻿{
+    "workflow":  "quick-analysis",
+    "context":  {
+                    "website":  "https://diamondbackpropane.com",
+                    "businessName":  "Diamondback Propane"
+                },
+    "intelligence":  {
+                         "website":  "https://diamondbackpropane.com",
+                         "collectedAt":  "2025-11-11T16:36:17.846Z",
+                         "brandAnalysis":  {
+                                               "businessName":  "DIAMONDBACK PROPANE",
+                                               "tagline":  "Diamondback Propane is a premiere provider of propane. We are locally owned and operated with more t",
+                                               "headlines":  [
+
+                                                             ],
+                                               "keyMessages":  [
+
+                                                               ],
+                                               "tone":  "friendly",
+                                               "emotionalAppeal":  [
+                                                                       "experienced",
+                                                                       "reliable",
+                                                                       "guaranteed"
+                                                                   ]
+                                           },
+                         "contentAnalysis":  {
+                                                 "hasBlog":  true,
+                                                 "contentTypes":  [
+                                                                      "blog"
+                                                                  ],
+                                                 "mediaRichness":  2,
+                                                 "contentTopics":  [
+
+                                                                   ]
+                                             },
+                         "seoData":  {
+                                         "metaTitle":  "HomeDiamondback Propane",
+                                         "metaDescription":  "Diamondback Propane is a premiere provider of propane. We are locally owned and operated with more than 30 years experience in the industry. When you choose Diamondback Propane  you are choosing service and dependability.",
+                                         "h1Tags":  [
+
+                                                    ],
+                                         "h2Tags":  [
+
+                                                    ],
+                                         "targetKeywords":  [
+                                                                "homediamondback",
+                                                                "propane"
+                                                            ],
+                                         "imageCount":  8,
+                                         "imagesWithAlt":  8,
+                                         "internalLinks":  18,
+                                         "externalLinks":  5,
+                                         "hasSchema":  false
+                                     },
+                         "socialLinks":  {
+                                             "facebook":  "https://www.facebook.com/Diamondback-Propane-106178450774563/"
+                                         },
+                         "conversionAnalysis":  {
+                                                    "ctaButtons":  [
+
+                                                                   ],
+                                                    "leadMagnets":  [
+
+                                                                    ],
+                                                    "formsFound":  0,
+                                                    "chatWidget":  false,
+                                                    "phoneNumbers":  [
+                                                                         "9411481939",
+                                                                         "8488572479",
+                                                                         "4320453571"
+                                                                     ],
+                                                    "emailAddresses":  [
+
+                                                                       ],
+                                                    "bookingSystem":  false
+                                                },
+                         "competitiveSignals":  {
+                                                    "awardsAndCertifications":  [
+                                                                                    "We provide only fully inspected and certified aluminum cylinders as well as galvanized, lockable OSHA compliant storage racks.",
+                                                                                    "Being locally owned and operated means you will always speak to your local office - never an out-of-state or out-of-country call center."
+                                                                                ],
+                                                    "priceSignals":  [
+
+                                                                     ],
+                                                    "socialProof":  {
+                                                                        "testimonialCount":  0,
+                                                                        "reviewBadges":  [
+
+                                                                                         ],
+                                                                        "clientLogos":  true,
+                                                                        "caseStudies":  false
+                                                                    }
+                                                },
+                         "visualBrand":  {
+                                             "primaryColors":  [
+                                                                   "#626262",
+                                                                   "#d5d5d5",
+                                                                   "#818181",
+                                                                   "#17757e",
+                                                                   "#2a2a2a"
+                                                               ],
+                                             "logoFound":  false,
+                                             "imageStyle":  "custom",
+                                             "videoPresence":  false
+                                         }
+                     },
+    "recommendations":  [
+                            "Quick SEO win: Add schema markup (LocalBusiness or Organization)",
+                            "Establish presence on 2-3 social media platforms your customers use",
+                            "Add more visual content (photos, videos) to engage visitors",
+                            "Set up Google Analytics and Google Search Console to track performance"
+                        ],
+    "nextSteps":  [
+                      "Day 1-2: Add schema markup to homepage and key pages",
+                      "Week 1: Set up Google Analytics and Search Console",
+                      "Week 2: Create simple 30-day content calendar (2-3 posts/week)",
+                      "Week 3-4: Optimize top 3 pages for conversion (clear CTAs, contact forms)"
+                  ],
+    "estimatedImpact":  "Medium - Quick wins and foundation for growth",
+    "timeline":  "1-2 weeks for initial improvements",
+    "executedAt":  "2025-11-11T16:36:17.883Z",
+    "executionTime":  574
+}

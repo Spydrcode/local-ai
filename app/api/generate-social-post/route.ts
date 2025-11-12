@@ -147,11 +147,21 @@ export async function POST(request: Request) {
     );
 
     const post = await generateContent(augmentedPrompt);
+
+    console.log("Generated social post:", {
+      platform,
+      hasCaption: !!post.caption,
+      hasHashtags: !!post.hashtags,
+    });
+
     return NextResponse.json(post);
   } catch (error) {
     console.error("Social post generation error:", error);
     return NextResponse.json(
-      { error: "Failed to generate post" },
+      {
+        error: "Failed to generate post",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

@@ -78,6 +78,31 @@ export class UnifiedAgent {
     const startTime = Date.now();
     const provider = getActiveProvider();
 
+    // Build enhanced user message with context data
+    let enhancedMessage = userMessage;
+    if (context && Object.keys(context).length > 0) {
+      enhancedMessage += "\n\n=== BUSINESS CONTEXT DATA ===\n";
+      Object.entries(context).forEach(([key, value]) => {
+        // Skip empty or null values
+        if (!value) return;
+
+        // Format the context data for better readability
+        if (typeof value === "string") {
+          try {
+            // Try to parse JSON strings for better formatting
+            const parsed = JSON.parse(value);
+            enhancedMessage += `\n${key.toUpperCase()}:\n${JSON.stringify(parsed, null, 2)}\n`;
+          } catch {
+            // Not JSON, add as-is
+            enhancedMessage += `\n${key.toUpperCase()}:\n${value}\n`;
+          }
+        } else {
+          enhancedMessage += `\n${key.toUpperCase()}:\n${JSON.stringify(value, null, 2)}\n`;
+        }
+      });
+      enhancedMessage += "\n=== END CONTEXT DATA ===\n";
+    }
+
     // Build messages
     const messages: AgentMessage[] = [
       {
@@ -86,7 +111,7 @@ export class UnifiedAgent {
       },
       {
         role: "user",
-        content: userMessage,
+        content: enhancedMessage,
       },
     ];
 

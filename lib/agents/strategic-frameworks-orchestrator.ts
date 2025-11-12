@@ -171,26 +171,41 @@ export class StrategicFrameworksOrchestrator {
       }
     );
 
+    // Extract recommendations from AI agent response
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof strategy.content === 'string' ? JSON.parse(strategy.content) : strategy.content;
+
+      // Extract Four Actions Framework recommendations
+      if (content.four_actions) {
+        if (content.four_actions.eliminate) recommendations.push(`Eliminate: ${Array.isArray(content.four_actions.eliminate) ? content.four_actions.eliminate[0] : content.four_actions.eliminate}`);
+        if (content.four_actions.reduce) recommendations.push(`Reduce: ${Array.isArray(content.four_actions.reduce) ? content.four_actions.reduce[0] : content.four_actions.reduce}`);
+        if (content.four_actions.raise) recommendations.push(`Raise: ${Array.isArray(content.four_actions.raise) ? content.four_actions.raise[0] : content.four_actions.raise}`);
+        if (content.four_actions.create) recommendations.push(`Create: ${Array.isArray(content.four_actions.create) ? content.four_actions.create[0] : content.four_actions.create}`);
+      }
+
+      if (content.value_proposition) recommendations.push(`Value Proposition: ${content.value_proposition}`);
+      if (content.implementation_steps && Array.isArray(content.implementation_steps)) {
+        content.implementation_steps.slice(0, 5).forEach((step: any) => nextSteps.push(step.step || step));
+      }
+    } catch (error) {
+      console.error('Error parsing Blue Ocean strategy:', error);
+      throw new Error('Failed to parse Blue Ocean strategy analysis from AI agent.');
+    }
+
+    if (recommendations.length === 0) throw new Error('Blue Ocean strategy agent did not return recommendations.');
+    if (nextSteps.length === 0) throw new Error('Blue Ocean strategy agent did not return action steps.');
+
     return {
       workflow: "blue-ocean-strategy",
       context,
       intelligence,
       blueOceanStrategy: strategy,
-      recommendations: [
-        "Identify and eliminate costly industry factors customers don't value",
-        "Reduce over-delivered factors below industry standard",
-        "Raise underserved factors to create differentiation",
-        "Create new value factors competitors don't offer",
-        "Position in uncontested market space",
-      ],
-      nextSteps: [
-        "Analyze current competitive factors in your industry",
-        "Identify customer pain points competitors ignore",
-        "Design value curve that breaks cost-differentiation tradeoff",
-        "Test blue ocean positioning with target segments",
-        "Launch repositioning campaign",
-      ],
-      estimatedImpact: "High - Can unlock 30-50% new market demand",
+      recommendations,
+      nextSteps,
+      estimatedImpact: "High - Uncontested market space creation",
       timeline: "3-6 months to execute repositioning",
       executedAt: new Date().toISOString(),
       executionTime: 0,
@@ -216,26 +231,36 @@ export class StrategicFrameworksOrchestrator {
       }
     );
 
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof matrix.content === 'string' ? JSON.parse(matrix.content) : matrix.content;
+
+      if (content.market_penetration) recommendations.push(`Market Penetration: ${content.market_penetration.strategy || content.market_penetration}`);
+      if (content.market_development) recommendations.push(`Market Development: ${content.market_development.strategy || content.market_development}`);
+      if (content.product_development) recommendations.push(`Product Development: ${content.product_development.strategy || content.product_development}`);
+      if (content.diversification) recommendations.push(`Diversification: ${content.diversification.strategy || content.diversification}`);
+
+      if (content.recommended_approach && Array.isArray(content.recommended_approach)) {
+        content.recommended_approach.slice(0, 5).forEach((step: any) => nextSteps.push(step.action || step));
+      }
+    } catch (error) {
+      console.error('Error parsing Ansoff Matrix:', error);
+      throw new Error('Failed to parse Ansoff Matrix analysis from AI agent.');
+    }
+
+    if (recommendations.length === 0) throw new Error('Ansoff Matrix agent did not return recommendations.');
+    if (nextSteps.length === 0) throw new Error('Ansoff Matrix agent did not return action steps.');
+
     return {
       workflow: "ansoff-matrix",
       context,
       intelligence,
       ansoffMatrix: matrix,
-      recommendations: [
-        "Market Penetration: Increase share in current markets (lowest risk)",
-        "Market Development: Expand to new geographic or demographic markets",
-        "Product Development: Create new offerings for existing customers",
-        "Diversification: Enter new markets with new products (highest risk)",
-      ],
-      nextSteps: [
-        "Prioritize growth quadrants based on resources and risk tolerance",
-        "Start with market penetration quick wins",
-        "Research adjacent markets for expansion",
-        "Gather customer feedback for product development",
-        "Evaluate diversification only after mastering core business",
-      ],
-      estimatedImpact:
-        "Medium-High - Systematic growth across multiple dimensions",
+      recommendations,
+      nextSteps,
+      estimatedImpact: "Medium-High - Systematic growth across multiple dimensions",
       timeline: "6-12 months for phased execution",
       executedAt: new Date().toISOString(),
       executionTime: 0,
@@ -261,25 +286,35 @@ export class StrategicFrameworksOrchestrator {
       }
     );
 
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof portfolio.content === 'string' ? JSON.parse(portfolio.content) : portfolio.content;
+
+      if (content.stars && Array.isArray(content.stars)) content.stars.slice(0, 2).forEach((item: any) => recommendations.push(`Star: ${item.product || item} - ${item.strategy || 'invest for growth'}`));
+      if (content.cash_cows && Array.isArray(content.cash_cows)) content.cash_cows.slice(0, 2).forEach((item: any) => recommendations.push(`Cash Cow: ${item.product || item} - ${item.strategy || 'harvest profits'}`));
+      if (content.question_marks && Array.isArray(content.question_marks)) recommendations.push(`Question Mark: ${content.question_marks[0]?.product || content.question_marks[0]} - ${content.question_marks[0]?.strategy || 'invest or divest'}`);
+      if (content.dogs && Array.isArray(content.dogs)) recommendations.push(`Dog: ${content.dogs[0]?.product || content.dogs[0]} - ${content.dogs[0]?.strategy || 'divest'}`);
+
+      if (content.portfolio_recommendations && Array.isArray(content.portfolio_recommendations)) {
+        content.portfolio_recommendations.slice(0, 5).forEach((rec: any) => nextSteps.push(rec.action || rec));
+      }
+    } catch (error) {
+      console.error('Error parsing BCG Matrix:', error);
+      throw new Error('Failed to parse BCG Matrix analysis from AI agent.');
+    }
+
+    if (recommendations.length === 0) throw new Error('BCG Matrix agent did not return recommendations.');
+    if (nextSteps.length === 0) throw new Error('BCG Matrix agent did not return action steps.');
+
     return {
       workflow: "bcg-matrix",
       context,
       intelligence,
       bcgMatrix: portfolio,
-      recommendations: [
-        "Stars: Invest aggressively to maintain market leadership",
-        "Cash Cows: Harvest profits while maintaining position",
-        "Question Marks: Selectively invest or divest",
-        "Dogs: Divest or minimize investment",
-        "Rebalance portfolio for optimal cash flow",
-      ],
-      nextSteps: [
-        "Categorize all products/services into BCG quadrants",
-        "Allocate marketing budget based on portfolio strategy",
-        "Invest in stars to secure future cash cows",
-        "Make tough decisions on dogs and question marks",
-        "Monitor market growth rates for portfolio shifts",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact: "Medium - Better resource allocation and focus",
       timeline: "1-3 months for portfolio analysis and decisions",
       executedAt: new Date().toISOString(),
@@ -306,25 +341,36 @@ export class StrategicFrameworksOrchestrator {
       }
     );
 
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof map.content === 'string' ? JSON.parse(map.content) : map.content;
+
+      if (content.current_position) recommendations.push(`Current Position: ${content.current_position}`);
+      if (content.target_position) recommendations.push(`Target Position: ${content.target_position}`);
+      if (content.white_space_opportunities && Array.isArray(content.white_space_opportunities)) {
+        content.white_space_opportunities.slice(0, 3).forEach((opp: any) => recommendations.push(`Opportunity: ${opp.description || opp}`));
+      }
+
+      if (content.repositioning_steps && Array.isArray(content.repositioning_steps)) {
+        content.repositioning_steps.slice(0, 5).forEach((step: any) => nextSteps.push(step.action || step));
+      }
+    } catch (error) {
+      console.error('Error parsing Positioning Map:', error);
+      throw new Error('Failed to parse Positioning Map analysis from AI agent.');
+    }
+
+    if (recommendations.length === 0) throw new Error('Positioning Map agent did not return recommendations.');
+    if (nextSteps.length === 0) throw new Error('Positioning Map agent did not return action steps.');
+
     return {
       workflow: "positioning-map",
       context,
       intelligence,
       positioningMap: map,
-      recommendations: [
-        "Identify key dimensions customers use to evaluate options",
-        "Plot your position vs competitors on 2D map",
-        "Find white space opportunities (underserved positions)",
-        "Reposition toward more defensible market space",
-        "Communicate positioning consistently across all channels",
-      ],
-      nextSteps: [
-        "Survey customers on key evaluation criteria",
-        "Research competitor positioning and messaging",
-        "Identify gaps in competitive landscape",
-        "Design repositioning strategy",
-        "Execute positioning campaign",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact: "Medium-High - Clear differentiation and positioning",
       timeline: "2-4 months for repositioning",
       executedAt: new Date().toISOString(),
@@ -351,25 +397,42 @@ export class StrategicFrameworksOrchestrator {
       }
     );
 
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof journey.content === 'string' ? JSON.parse(journey.content) : journey.content;
+
+      if (content.pain_points && Array.isArray(content.pain_points)) {
+        content.pain_points.slice(0, 4).forEach((pain: any) => {
+          recommendations.push(`Fix: ${pain.stage || 'Stage'} - ${pain.description || pain}`);
+        });
+      }
+
+      if (content.opportunities && Array.isArray(content.opportunities)) {
+        content.opportunities.slice(0, 2).forEach((opp: any) => {
+          recommendations.push(`Opportunity: ${opp.description || opp}`);
+        });
+      }
+
+      if (content.action_plan && Array.isArray(content.action_plan)) {
+        content.action_plan.slice(0, 5).forEach((action: any) => nextSteps.push(action.action || action));
+      }
+    } catch (error) {
+      console.error('Error parsing Customer Journey Map:', error);
+      throw new Error('Failed to parse Customer Journey Map analysis from AI agent.');
+    }
+
+    if (recommendations.length === 0) throw new Error('Customer Journey Map agent did not return recommendations.');
+    if (nextSteps.length === 0) throw new Error('Customer Journey Map agent did not return action steps.');
+
     return {
       workflow: "customer-journey-map",
       context,
       intelligence,
       customerJourneyMap: journey,
-      recommendations: [
-        "Map all customer touchpoints from awareness to advocacy",
-        "Identify pain points and friction at each stage",
-        "Prioritize fixes by business impact",
-        "Create moments of delight to build loyalty",
-        "Measure and optimize key journey metrics",
-      ],
-      nextSteps: [
-        "Interview customers about their experience",
-        "Track customer behavior across touchpoints",
-        "Fix critical pain points first",
-        "Test improvements and measure impact",
-        "Continuously optimize based on data",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact: "High - Better conversion and retention rates",
       timeline: "1-3 months for initial improvements",
       executedAt: new Date().toISOString(),
@@ -396,25 +459,41 @@ export class StrategicFrameworksOrchestrator {
       }
     );
 
+    const recommendations: string[] = [];
+    const nextSteps: string[] = [];
+
+    try {
+      const content = typeof okrs.content === 'string' ? JSON.parse(okrs.content) : okrs.content;
+
+      if (content.objectives && Array.isArray(content.objectives)) {
+        content.objectives.slice(0, 5).forEach((obj: any) => {
+          recommendations.push(`Objective: ${obj.objective || obj}`);
+          if (obj.key_results && Array.isArray(obj.key_results)) {
+            obj.key_results.slice(0, 2).forEach((kr: any) => {
+              recommendations.push(`  KR: ${kr.key_result || kr}`);
+            });
+          }
+        });
+      }
+
+      if (content.implementation_plan && Array.isArray(content.implementation_plan)) {
+        content.implementation_plan.slice(0, 5).forEach((step: any) => nextSteps.push(step.action || step));
+      }
+    } catch (error) {
+      console.error('Error parsing OKR Framework:', error);
+      throw new Error('Failed to parse OKR Framework analysis from AI agent.');
+    }
+
+    if (recommendations.length === 0) throw new Error('OKR Framework agent did not return recommendations.');
+    if (nextSteps.length === 0) throw new Error('OKR Framework agent did not return action steps.');
+
     return {
       workflow: "okr-framework",
       context,
       intelligence,
       okrFramework: okrs,
-      recommendations: [
-        "Set 3-5 ambitious but achievable quarterly objectives",
-        "Define 3-5 measurable key results per objective",
-        "Ensure OKRs align across company and teams",
-        "Review progress weekly or biweekly",
-        "Celebrate 0.7+ scores as success (stretch goals)",
-      ],
-      nextSteps: [
-        "Finalize quarterly OKRs with leadership team",
-        "Communicate OKRs company-wide",
-        "Set up tracking dashboards",
-        "Schedule regular check-ins",
-        "Adjust OKRs if circumstances change significantly",
-      ],
+      recommendations: recommendations.slice(0, 10),
+      nextSteps,
       estimatedImpact: "High - Clear goals and accountability",
       timeline: "1 quarter (3 months)",
       executedAt: new Date().toISOString(),
@@ -488,13 +567,15 @@ Provide a synthesis in JSON format:
     try {
       synthesis = JSON.parse(synthesisResponse);
     } catch (e) {
-      synthesis = {
-        executiveSummary: synthesisResponse,
-        strategicPriorities: [],
-        strategicInitiatives: [],
-        crossFrameworkInsights: [],
-      };
+      throw new Error('Failed to parse comprehensive strategic synthesis from AI.');
     }
+
+    // Extract recommendations from synthesis
+    const recommendations: string[] = synthesis.strategicPriorities || [];
+    const nextSteps: string[] = synthesis.strategicInitiatives || [];
+
+    if (recommendations.length === 0) throw new Error('Comprehensive strategic analysis did not return strategic priorities.');
+    if (nextSteps.length === 0) throw new Error('Comprehensive strategic analysis did not return strategic initiatives.');
 
     return {
       workflow: "comprehensive-strategic-analysis",
@@ -507,20 +588,8 @@ Provide a synthesis in JSON format:
       customerJourneyMap: journey.customerJourneyMap,
       okrFramework: okr.okrFramework,
       synthesis,
-      recommendations: [
-        "Review all 6 frameworks to understand full strategic picture",
-        "Focus on cross-framework insights for highest-impact actions",
-        "Prioritize initiatives based on resource constraints",
-        "Align team around strategic priorities",
-        "Track OKRs to measure progress on strategic initiatives",
-      ],
-      nextSteps: [
-        "Present synthesized strategy to leadership team",
-        "Choose top 3 strategic priorities for next quarter",
-        "Assign owners to each strategic initiative",
-        "Set up monthly strategic review meetings",
-        "Adjust strategy based on market feedback",
-      ],
+      recommendations,
+      nextSteps,
       estimatedImpact: "Very High - Complete strategic clarity and alignment",
       timeline: "3-6 months for comprehensive execution",
       executedAt: new Date().toISOString(),

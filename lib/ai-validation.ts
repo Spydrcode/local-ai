@@ -394,6 +394,43 @@ export function validateProfitInsights(
   const suggestions: string[] = [];
   const insightsLower = insights.toLowerCase();
 
+  // Check for forbidden example names/data from prompts (indicates AI is copying examples)
+  const forbiddenExamples = [
+    "joe's bbq",
+    "joe's",
+    "phoenix propane",
+    "propane depot",
+    "denver",
+    "springfield",
+    "phoenix",
+    "east valley",
+    "atlanta",
+    "14-hour smok",
+    "14-hour brisket",
+    "tank exchange program",
+    "competition-grade",
+    "state champion",
+    "single-origin ethiopian",
+    "third-wave",
+    "$25 swap",
+    "$40 new fill",
+    "$18/lb",
+    "$12/person",
+  ];
+
+  const foundForbiddenExamples = forbiddenExamples.filter((example) =>
+    insightsLower.includes(example)
+  );
+
+  if (foundForbiddenExamples.length > 0) {
+    issues.push(
+      `AI is copying prompt examples: found "${foundForbiddenExamples.slice(0, 3).join('", "')}"`
+    );
+    suggestions.push(
+      "AI must analyze the ACTUAL business, not copy prompt examples. Reject this output and retry with stricter anti-hallucination instructions."
+    );
+  }
+
   // Check for action items with specificity (look for bullet points or numbered lists)
   const bulletPoints = insights.match(/[-•*]\s*[A-Z]/g)?.length || 0;
   const numberedItems = insights.match(/^\d+\.\s+[A-Z]/gm)?.length || 0;

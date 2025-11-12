@@ -11,15 +11,34 @@
  * This replaces LLM hallucinations with actual data.
  */
 
-import { scrapeWebsite } from "./website-scraper";
 import { findCompetitors } from "./competitor-discovery";
+import {
+  MetaAdsLibraryCollector,
+  type MetaAdsIntelligence,
+} from "./meta-ads-library";
 import { aggregateReviews } from "./review-aggregator";
 import { analyzeSEO } from "./seo-analyzer";
 import { detectSocialPresence } from "./social-detector";
+import { scrapeWebsite } from "./website-scraper";
 
 // ============================================================================
 // Type Definitions
 // ============================================================================
+
+export interface BusinessContext {
+  industry?: string;
+  subNiche?: string;
+  targetAudience?: string;
+  primaryServices?: string[];
+  competitors?: Array<{ name: string; website?: string; pageId?: string }>;
+  marketingGoals?: string[];
+  currentChallenges?: string[];
+  budget?: {
+    monthly?: number;
+    currency?: string;
+  };
+  geographicScope?: string[];
+}
 
 export interface BusinessData {
   name: string;
@@ -123,6 +142,8 @@ export interface DataCollectionResult {
   reviews: ReviewSummary;
   seo: SEOMetrics;
   social: SocialPresence;
+  metaAds?: MetaAdsIntelligence;
+  businessContext?: BusinessContext;
   metadata: {
     collectedAt: string;
     duration: number;
@@ -141,6 +162,7 @@ export class DataCollector {
     maxReviews: number;
     timeout: number;
     enableCache: boolean;
+    metaAdsToken?: string;
   };
 
   constructor(
@@ -149,6 +171,7 @@ export class DataCollector {
       maxReviews?: number;
       timeout?: number;
       enableCache?: boolean;
+      metaAdsToken?: string;
     } = {}
   ) {
     this.options = {
@@ -156,13 +179,17 @@ export class DataCollector {
       maxReviews: options.maxReviews ?? 50,
       timeout: options.timeout ?? 60000,
       enableCache: options.enableCache ?? true,
+      metaAdsToken: options.metaAdsToken,
     };
   }
 
   /**
    * Collect comprehensive business intelligence
    */
-  async collect(url: string): Promise<DataCollectionResult> {
+  async collect(
+    url: string,
+    businessContext?: BusinessContext
+  ): Promise<DataCollectionResult> {
     const startTime = Date.now();
     const warnings: string[] = [];
     const sources: string[] = [];
@@ -173,11 +200,24 @@ export class DataCollector {
       const business = await scrapeWebsite(url);
       sources.push("website-scrape");
 
+      // Merge business context if provided
+      const mergedContext: BusinessContext = {
+        industry: businessContext?.industry || business.industry,
+        targetAudience: businessContext?.targetAudience,
+        primaryServices: businessContext?.primaryServices || business.services,
+        competitors: businessContext?.competitors,
+        marketingGoals: businessContext?.marketingGoals,
+        currentChallenges: businessContext?.currentChallenges,
+        budget: businessContext?.budget,
+        geographicScope: businessContext?.geographicScope,
+        ...businessContext,
+      };
+
       // Step 2: Find and analyze competitors (parallel)
       console.log("[DataCollector] Finding competitors...");
       const competitors = await findCompetitors({
         businessName: business.name,
-        industry: business.industry,
+        industry: mergedContext.industry,
         location: business.location,
         limit: this.options.maxCompetitors,
       }).catch((error) => {
@@ -228,12 +268,40 @@ export class DataCollector {
         sources.push("social-detection");
       }
 
+      // Step 6: Collect Meta Ads intelligence (if token provided and competitors listed)
+      let metaAds: MetaAdsIntelligence | undefined;
+      if (
+        this.options.metaAdsToken &&
+        mergedContext.competitors &&
+        mergedContext.competitors.length > 0
+      ) {
+        console.log(
+          "[DataCollector] Collecting Meta Ads competitive intelligence..."
+        );
+        try {
+          const metaCollector = new MetaAdsLibraryCollector(
+            this.options.metaAdsToken
+          );
+          metaAds = await metaCollector.collectCompetitiveIntelligence({
+            competitors: mergedContext.competitors,
+            industry: mergedContext.industry,
+          });
+          sources.push("meta-ads-library");
+        } catch (error) {
+          warnings.push(
+            `Meta Ads collection failed: ${error instanceof Error ? error.message : String(error)}`
+          );
+        }
+      }
+
       return {
         business,
         competitors,
         reviews,
         seo,
         social,
+        metaAds,
+        businessContext: mergedContext,
         metadata: {
           collectedAt: new Date().toISOString(),
           duration: Date.now() - startTime,
@@ -353,8 +421,18 @@ export function getDataCollector(): DataCollector {
 }
 
 // Re-export sub-modules for direct access if needed
-export { scrapeWebsite } from "./website-scraper";
 export { findCompetitors } from "./competitor-discovery";
+export {
+  getCompetitorAdsIntelligence,
+  MetaAdsLibraryCollector,
+  searchCompetitorAds,
+} from "./meta-ads-library";
+export type {
+  CompetitorAdsProfile,
+  MetaAdInsight,
+  MetaAdsIntelligence,
+} from "./meta-ads-library";
 export { aggregateReviews } from "./review-aggregator";
 export { analyzeSEO } from "./seo-analyzer";
 export { detectSocialPresence } from "./social-detector";
+export { scrapeWebsite } from "./website-scraper";
