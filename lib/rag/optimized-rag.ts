@@ -16,13 +16,13 @@
  * - Cost: <$0.005 per query
  */
 
-import { createChatCompletion } from "../openai";
-import { getEmbeddingService } from "../embeddings/embedding-service";
-import { VectorRepository } from "../repositories/vector-repository";
 import { createClient } from "@supabase/supabase-js";
-import { LLMReranker, KeywordReranker } from "./reranker";
-import { QueryExpander, ExpansionStrategy } from "./query-expansion";
+import { getEmbeddingService } from "../embeddings/embedding-service";
+import { createChatCompletion } from "../openai";
+import { VectorRepository } from "../repositories/vector-repository";
 import { guardrails } from "../security/llm-guardrails";
+import { ExpansionStrategy, QueryExpander } from "./query-expansion";
+import { KeywordReranker, LLMReranker } from "./reranker";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -133,13 +133,17 @@ export class OptimizedRAG {
     if (options.useQueryExpansion) {
       const expanded = await this.queryExpander.expandQuery(params.query, {
         maxVariations: 2,
-        generateHypothetical: options.expansionStrategy === ExpansionStrategy.HYDE,
+        generateHypothetical:
+          options.expansionStrategy === ExpansionStrategy.HYDE,
       });
 
       queries = [params.query, ...expanded.variations];
 
       // Add hypothetical answer for HyDE
-      if (expanded.hypotheticalAnswer && options.expansionStrategy === ExpansionStrategy.HYDE) {
+      if (
+        expanded.hypotheticalAnswer &&
+        options.expansionStrategy === ExpansionStrategy.HYDE
+      ) {
         queries.push(expanded.hypotheticalAnswer);
       }
     }
@@ -278,8 +282,12 @@ export class OptimizedRAG {
         // Combine and normalize results
         const sources = [
           ...porterResults.map((r: any) => this.normalizeResult(r, "porter")),
-          ...competitorResults.map((r: any) => this.normalizeResult(r, "competitor")),
-          ...quickWinResults.map((r: any) => this.normalizeResult(r, "quick_wins")),
+          ...competitorResults.map((r: any) =>
+            this.normalizeResult(r, "competitor")
+          ),
+          ...quickWinResults.map((r: any) =>
+            this.normalizeResult(r, "quick_wins")
+          ),
           ...dbResults,
         ];
 
@@ -348,7 +356,10 @@ export class OptimizedRAG {
 
     for (const ctx of contexts) {
       // Use first 200 chars as fingerprint
-      const fingerprint = ctx.content.slice(0, 200).toLowerCase().replace(/\s+/g, "");
+      const fingerprint = ctx.content
+        .slice(0, 200)
+        .toLowerCase()
+        .replace(/\s+/g, "");
 
       if (!seen.has(fingerprint)) {
         seen.add(fingerprint);
@@ -396,9 +407,7 @@ USER QUERY: ${params.query}
 
 Provide a clear, well-cited answer:`;
 
-    const messages: any[] = [
-      { role: "system", content: systemPrompt },
-    ];
+    const messages: any[] = [{ role: "system", content: systemPrompt }];
 
     if (params.conversationHistory) {
       messages.push(...params.conversationHistory);
@@ -419,11 +428,12 @@ Provide a clear, well-cited answer:`;
 
     // Adjust confidence based on citation quality
     const hasCitations = /\[Source \d+\]/g.test(response);
-    const confidence = contexts.length > 0
-      ? hasCitations
-        ? avgRelevance
-        : avgRelevance * 0.8
-      : 0.3;
+    const confidence =
+      contexts.length > 0
+        ? hasCitations
+          ? avgRelevance
+          : avgRelevance * 0.8
+        : 0.3;
 
     return {
       answer: response,
