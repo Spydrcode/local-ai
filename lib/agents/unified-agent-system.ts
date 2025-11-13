@@ -152,6 +152,12 @@ export class UnifiedAgent {
       });
     }
 
+    // Add JSON instruction when JSON mode is enabled (required by OpenAI)
+    if (this.config.jsonMode) {
+      prompt +=
+        "\n\nIMPORTANT: You must respond with valid JSON only. Do not include any text outside the JSON structure.";
+    }
+
     return prompt;
   }
 

@@ -70,12 +70,37 @@ export async function createChatCompletion({
     );
   }
 
+  // If JSON mode is requested, ensure the prompt mentions JSON
+  const useJsonMode = response_format || jsonMode;
+  const finalMessages = useJsonMode
+    ? messages.map((msg, idx) => {
+        // Add JSON instruction to system message if it doesn't already contain "json"
+        if (
+          idx === 0 &&
+          msg.role === "system" &&
+          !msg.content.toLowerCase().includes("json")
+        ) {
+          return {
+            ...msg,
+            content:
+              msg.content +
+              "\n\nIMPORTANT: You must respond with valid JSON only. Do not include any text outside the JSON structure.",
+          };
+        }
+        return msg;
+      })
+    : messages;
+
   const response = await client.chat.completions.create({
     model,
     temperature,
     max_tokens: max_tokens || maxTokens,
-    messages,
-    ...(response_format ? { response_format } : jsonMode ? { response_format: { type: "json_object" } } : {}),
+    messages: finalMessages,
+    ...(response_format
+      ? { response_format }
+      : jsonMode
+        ? { response_format: { type: "json_object" } }
+        : {}),
   });
 
   const content = response.choices[0]?.message?.content;

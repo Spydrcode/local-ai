@@ -8,7 +8,7 @@
  * Required APIs: Places API, Maps JavaScript API
  */
 
-import { Client, PlaceData } from "@googlemaps/google-maps-services-js";
+import { Client } from "@googlemaps/google-maps-services-js";
 
 const client = new Client({});
 
@@ -67,7 +67,9 @@ export async function findGoogleBusiness(
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
-    console.warn("⚠️  GOOGLE_MAPS_API_KEY not configured - skipping Google My Business data");
+    console.warn(
+      "⚠️  GOOGLE_MAPS_API_KEY not configured - skipping Google My Business data"
+    );
     return null;
   }
 
@@ -76,7 +78,7 @@ export async function findGoogleBusiness(
     const findResponse = await client.findPlaceFromText({
       params: {
         input: `${businessName} ${location}`,
-        inputtype: "textquery",
+        inputtype: "textquery" as any,
         fields: ["place_id", "name"],
         key: apiKey,
       },
@@ -86,7 +88,9 @@ export async function findGoogleBusiness(
     const placeId = findResponse.data.candidates?.[0]?.place_id;
 
     if (!placeId) {
-      console.log(`ℹ️  No Google My Business listing found for "${businessName}" in ${location}`);
+      console.log(
+        `ℹ️  No Google My Business listing found for "${businessName}" in ${location}`
+      );
       return null;
     }
 
@@ -128,7 +132,9 @@ export async function findGoogleBusiness(
     if (error.response?.status === 401) {
       console.error("❌ Google Maps API: Invalid API key");
     } else if (error.response?.status === 403) {
-      console.error("❌ Google Maps API: Access forbidden - check API restrictions");
+      console.error(
+        "❌ Google Maps API: Access forbidden - check API restrictions"
+      );
     } else if (error.response?.status === 429) {
       console.error("❌ Google Maps API: Quota exceeded");
     } else {
@@ -168,7 +174,8 @@ export function extractHoursOfOperation(place: GooglePlace): {
   }
 
   // Check if always open (24/7)
-  const alwaysOpen = place.opening_hours.periods?.length === 1 &&
+  const alwaysOpen =
+    place.opening_hours.periods?.length === 1 &&
     place.opening_hours.periods[0].open.day === 0 &&
     place.opening_hours.periods[0].open.time === "0000" &&
     !place.opening_hours.periods[0].close;
@@ -236,7 +243,8 @@ export function analyzeGoogleReviews(place: GooglePlace): {
   };
 
   place.reviews.forEach((review) => {
-    ratingDistribution[review.rating] = (ratingDistribution[review.rating] || 0) + 1;
+    ratingDistribution[review.rating] =
+      (ratingDistribution[review.rating] || 0) + 1;
   });
 
   // Extract common themes from reviews (simple keyword extraction)
@@ -335,13 +343,15 @@ export async function getNearbyCompetitors(
   location: { lat: number; lng: number },
   businessType: string,
   radiusMeters: number = 5000
-): Promise<Array<{
-  name: string;
-  rating: number;
-  userRatingsTotal: number;
-  vicinity: string;
-  priceLevel?: number;
-}>> {
+): Promise<
+  Array<{
+    name: string;
+    rating: number;
+    userRatingsTotal: number;
+    vicinity: string;
+    priceLevel?: number;
+  }>
+> {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   if (!apiKey) return [];
 
@@ -418,7 +428,9 @@ export async function getGoogleMyBusinessData(
   const pricing = extractPricingLevel(place);
   const reviewAnalysis = analyzeGoogleReviews(place);
   const photos =
-    place.photos?.slice(0, 5).map((p) => getGooglePhotoUrl(p.photo_reference)) || [];
+    place.photos
+      ?.slice(0, 5)
+      .map((p) => getGooglePhotoUrl(p.photo_reference)) || [];
 
   const duration = Date.now() - startTime;
   console.log(`✅ Google My Business data collection complete (${duration}ms)`);

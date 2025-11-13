@@ -24,14 +24,33 @@ function ensureMarketingAgentsRegistered() {
       description: "Analyzes brand voice, messaging, and positioning",
       systemPrompt: `You are a brand strategist specializing in voice and messaging analysis.
 
-Analyze the brand's:
-- Voice and tone characteristics
-- Messaging clarity and consistency
-- Brand positioning in market
-- Messaging gaps and opportunities
-- Recommendations for improvement
+Analyze THIS specific business's brand based on their actual website content:
 
-Always provide actionable insights specific to the business context provided.`,
+REQUIREMENTS:
+1. Quote or reference ACTUAL text from their website
+2. Identify their current brand voice characteristics based on what they wrote
+3. Find SPECIFIC messaging gaps based on what's missing from their content
+4. Recommend SPECIFIC improvements that align with their industry and target audience
+
+Return JSON format:
+{
+  "brand_voice": {
+    "current_characteristics": ["Trait 1 with example quote", "Trait 2"],
+    "tone": "professional/friendly/authoritative/etc",
+    "messaging_gaps": [
+      "SPECIFIC gap (e.g., 'No mention of 24/7 availability despite offering emergency service')"
+    ],
+    "improvements": [
+      {
+        "gap": "Specific thing missing",
+        "recommendation": "Specific way to address it",
+        "example": "Concrete example of messaging to add"
+      }
+    ]
+  }
+}
+
+Base ALL analysis on actual content from the website data. Return ONLY valid JSON.`,
       temperature: 0.7,
       maxTokens: 2000,
       jsonMode: true,
@@ -44,14 +63,51 @@ Always provide actionable insights specific to the business context provided.`,
       description: "Creates comprehensive SEO strategies",
       systemPrompt: `You are an SEO expert specializing in local business optimization.
 
-Create a complete SEO strategy including:
-- Technical SEO assessment and fixes
-- Keyword strategy (primary and secondary keywords)
-- Content recommendations and content clusters
-- Link building opportunities
-- 90-day action plan with quick wins, medium-term, and long-term initiatives
+Analyze THIS specific business's website and create a customized SEO strategy:
 
-Return structured JSON with actionable recommendations.`,
+REQUIREMENTS:
+1. Recommend ACTUAL keywords for their specific business and location
+2. Reference their ACTUAL pages and content when suggesting improvements
+3. Provide SPECIFIC technical fixes based on the SEO data provided
+4. Create actionable tasks they can implement immediately
+
+Return JSON format:
+{
+  "keyword_strategy": {
+    "primary_keywords": [
+      {
+        "keyword": "ACTUAL keyword phrase (e.g., 'propane delivery Austin TX')",
+        "search_volume": "estimated monthly searches",
+        "difficulty": "easy/medium/hard",
+        "opportunity": "Why this keyword is valuable for THIS business"
+      }
+    ],
+    "content_clusters": [
+      {
+        "pillar_topic": "Main topic for THIS business",
+        "supporting_articles": ["Specific article 1", "Specific article 2"]
+      }
+    ]
+  },
+  "technical_fixes": [
+    {
+      "issue": "SPECIFIC issue from the SEO data (reference actual problems found)",
+      "fix": "Exact steps to fix it",
+      "impact": "Expected improvement",
+      "priority": "high/medium/low"
+    }
+  ],
+  "quick_wins": [
+    "Immediate action they can take based on their actual website"
+  ],
+  "90_day_plan": {
+    "month_1": ["Specific tasks for month 1"],
+    "month_2": ["Specific tasks for month 2"],
+    "month_3": ["Specific tasks for month 3"]
+  }
+}
+
+Base ALL recommendations on the actual business and SEO data provided. Return ONLY valid JSON.`,
       temperature: 0.7,
       maxTokens: 2500,
       jsonMode: true,
@@ -101,17 +157,54 @@ Focus on practical, actionable strategies for small business owners.`,
     AgentRegistry.register({
       name: "marketing-intelligence",
       description: "Creates comprehensive marketing strategies",
-      systemPrompt: `You are a marketing strategist for local businesses.
+      systemPrompt: `You are an expert marketing strategist analyzing a specific business. You MUST provide SPECIFIC, CUSTOMIZED recommendations based on the actual business data provided.
 
-Create a complete marketing strategy including:
-- Market positioning
-- Growth campaigns with clear objectives
-- Channel strategy with fit scores
-- Content strategy with SEO opportunities
-- Competitive differentiation
+CRITICAL RULES:
+1. NO GENERIC ADVICE - Every recommendation must reference specific details about this business
+2. Use the actual business name, industry, services, and location from the data
+3. Recommend specific keywords, campaigns, and tactics relevant to their industry
+4. Reference what you see on their website (their current content, offerings, gaps)
+5. Every recommendation must explain WHY it works for THIS specific business
 
-Provide specific, actionable recommendations with estimated impact.`,
-      temperature: 0.7,
+Analyze the provided website data and create a comprehensive marketing strategy in JSON format:
+
+{
+  "growth_campaigns": [
+    {
+      "campaign_name": "SPECIFIC campaign (e.g., 'Residential Propane Winter Preparedness Campaign')",
+      "objective": "Measurable goal for THIS business",
+      "tactics": ["Specific tactic 1 using their actual services", "Specific tactic 2"],
+      "expected_impact": "Quantified result based on their market"
+    }
+  ],
+  "channel_strategy": [
+    {
+      "channel": "Platform (Google Ads, Facebook, etc.)",
+      "fit_score": 1-10,
+      "quick_win": "SPECIFIC immediate action they can take (reference their actual business)",
+      "strategy": "Detailed channel strategy for their industry and location"
+    }
+  ],
+  "content_strategy": {
+    "seo_opportunities": [
+      {
+        "keyword": "ACTUAL keyword phrase relevant to their business (e.g., 'propane delivery in [city]')",
+        "difficulty": "easy/medium/hard",
+        "strategy": "Specific content plan to rank for this keyword"
+      }
+    ],
+    "recommended_content_types": [
+      {
+        "type": "blog/video/guide",
+        "topic": "SPECIFIC topic about their actual services",
+        "rationale": "Why THIS business should create THIS content"
+      }
+    ]
+  }
+}
+
+BEFORE RESPONDING: Review the business data and ensure EVERY recommendation is customized to THIS specific business. Return ONLY valid JSON.`,
+      temperature: 0.75,
       maxTokens: 2500,
       jsonMode: true,
     });
@@ -121,16 +214,34 @@ Provide specific, actionable recommendations with estimated impact.`,
     AgentRegistry.register({
       name: "competitor-analysis",
       description: "Analyzes competitive landscape",
-      systemPrompt: `You are a competitive intelligence analyst.
+      systemPrompt: `You are a competitive intelligence analyst. Analyze THIS specific business and its competitive landscape.
 
-Analyze the competitive landscape:
-- Key competitors and their positioning
-- Competitive gaps to exploit
-- Differentiation strategies
-- Market opportunities
-- Actionable competitive advantages
+REQUIREMENTS:
+1. Identify 3-5 actual competitors based on the business's industry and location
+2. Find SPECIFIC gaps this business can exploit
+3. Recommend SPECIFIC differentiation strategies based on what they currently offer
+4. Reference actual services, pricing, or positioning from the website data
 
-Be specific about how the business can differentiate and win.`,
+Return JSON format:
+{
+  "competitive_marketing": {
+    "gaps_to_exploit": [
+      "SPECIFIC opportunity this business can leverage (e.g., 'Competitors don't offer 24/7 emergency service - emphasize your availability')"
+    ],
+    "differentiation_strategies": [
+      {
+        "strategy": "Specific way to stand out",
+        "implementation": "How to implement this for THIS business",
+        "expected_impact": "Measurable outcome"
+      }
+    ],
+    "competitor_weaknesses": [
+      "Specific weakness competitors have that this business can capitalize on"
+    ]
+  }
+}
+
+Base ALL analysis on the actual business data provided. Return ONLY valid JSON.`,
       temperature: 0.7,
       maxTokens: 2000,
       jsonMode: true,
@@ -284,18 +395,20 @@ export interface MarketingStrategyResult {
 
 export class MarketingOrchestrator {
   private static instance: MarketingOrchestrator;
-  private dataCollector: MarketingIntelligenceCollector;
-  private enhancedCollector: DataCollector; // NEW: Enhanced data collector with Meta Ads
+  private dataCollector: DataCollector; // Comprehensive data: competitors, reviews, SEO, social
+  private marketingCollector: MarketingIntelligenceCollector; // Marketing-specific: brand voice, content, CTAs
   private cache: Map<
     string,
     { result: MarketingStrategyResult; expiresAt: number }
   >;
 
   private constructor() {
-    this.dataCollector = new MarketingIntelligenceCollector();
-    this.enhancedCollector = new DataCollector({
+    this.dataCollector = new DataCollector({
+      maxCompetitors: 5,
+      maxReviews: 50,
       metaAdsToken: process.env.META_ADS_LIBRARY_TOKEN,
     });
+    this.marketingCollector = new MarketingIntelligenceCollector();
     this.cache = new Map();
   }
 
@@ -446,80 +559,138 @@ export class MarketingOrchestrator {
   private async executeFullMarketingStrategy(
     context: MarketingContext
   ): Promise<MarketingStrategyResult> {
-    console.log("Step 1/4: Collecting marketing intelligence...");
-    const intelligence = await this.dataCollector.collect(context.website);
+    try {
+      console.log("Step 1/5: Collecting comprehensive business data...");
+      // Collect FULL data: competitors, reviews, SEO, social, Meta Ads
+      const comprehensiveData = await this.dataCollector.collect(context.website);
+      console.log("✓ Comprehensive data collected");
 
-    console.log("Step 2/4: Analyzing brand and messaging...");
-    const brandVoiceAgent = AgentRegistry.get("brand-voice");
-    if (!brandVoiceAgent) throw new Error("Brand voice agent not registered");
+      console.log("Step 2/5: Collecting marketing-specific intelligence...");
+      // Collect marketing intelligence: brand voice, CTAs, content analysis
+      const marketingIntel = await this.marketingCollector.collect(
+        context.website
+      );
+      console.log("✓ Marketing intelligence collected");
 
-    const brandAnalysis = await brandVoiceAgent.execute(
-      `Analyze the brand voice and messaging for ${context.businessName || intelligence.brandAnalysis.businessName} in the ${context.industry || "general"} industry.`,
-      {
-        websiteData: JSON.stringify(intelligence),
-        businessName:
-          context.businessName || intelligence.brandAnalysis.businessName,
-        industry: context.industry,
-      }
-    );
+      // Merge both data sources for complete picture
+      const businessName =
+        context.businessName ||
+        comprehensiveData.business.name ||
+        marketingIntel.brandAnalysis.businessName;
+      const industry = context.industry || comprehensiveData.business.industry;
 
-    console.log("Step 3/4: Creating marketing strategy...");
-    const marketingIntelligenceAgent = AgentRegistry.get(
-      "marketing-intelligence"
-    );
-    if (!marketingIntelligenceAgent)
-      throw new Error("Marketing intelligence agent not registered");
+      console.log(`📊 Analyzing ${businessName} in ${industry || 'general'} industry`);
 
-    const marketingStrategy = await marketingIntelligenceAgent.execute(
-      `Create a comprehensive marketing strategy for ${context.businessName || intelligence.brandAnalysis.businessName}.`,
-      {
-        websiteData: JSON.stringify(intelligence),
-        brandAnalysis: JSON.stringify(brandAnalysis),
-        businessName:
-          context.businessName || intelligence.brandAnalysis.businessName,
-        industry: context.industry,
-        goals: context.goals?.join(", "),
-        targetAudience: context.targetAudience,
-      }
-    );
+      // Create merged intelligence object for AI agents
+      const mergedIntelligence = {
+        // From comprehensive collector
+        business: comprehensiveData.business,
+        competitors: comprehensiveData.competitors,
+        reviews: comprehensiveData.reviews,
+        seo: comprehensiveData.seo,
+        social: comprehensiveData.social,
+        metaAds: comprehensiveData.metaAds,
+        // From marketing collector
+        brandAnalysis: marketingIntel.brandAnalysis,
+        contentAnalysis: marketingIntel.contentAnalysis,
+        seoData: marketingIntel.seoData,
+        socialLinks: marketingIntel.socialLinks,
+        conversionAnalysis: marketingIntel.conversionAnalysis,
+        competitiveSignals: marketingIntel.competitiveSignals,
+        visualBrand: marketingIntel.visualBrand,
+      };
 
-    console.log("Step 4/4: Analyzing competitors...");
-    const competitorAnalysisAgent = AgentRegistry.get("competitor-analysis");
-    if (!competitorAnalysisAgent)
-      throw new Error("Competitor analysis agent not registered");
+      console.log("Step 3/5: Analyzing brand and messaging...");
+      const brandVoiceAgent = AgentRegistry.get("brand-voice");
+      if (!brandVoiceAgent) throw new Error("Brand voice agent not registered");
 
-    const competitorAnalysis = await competitorAnalysisAgent.execute(
-      `Analyze the competitive landscape for ${context.businessName || intelligence.brandAnalysis.businessName} in the ${context.industry || "general"} industry.`,
-      {
-        websiteData: JSON.stringify(intelligence),
-        businessName:
-          context.businessName || intelligence.brandAnalysis.businessName,
-        industry: context.industry,
-      }
-    );
+      const brandAnalysis = await brandVoiceAgent.execute(
+        `Analyze the brand voice and messaging for ${businessName} in the ${industry} industry.`,
+        {
+          websiteData: JSON.stringify(mergedIntelligence),
+          businessName,
+          industry,
+          brandData: JSON.stringify(marketingIntel.brandAnalysis),
+          conversionElements: JSON.stringify(marketingIntel.conversionAnalysis),
+        }
+      );
+      console.log("✓ Brand analysis complete");
 
-    // Synthesize recommendations
-    const recommendations = this.synthesizeRecommendations({
-      intelligence,
-      brandAnalysis,
-      marketingStrategy,
-      competitorAnalysis,
-    });
+      console.log("Step 4/5: Creating marketing strategy...");
+      const marketingIntelligenceAgent = AgentRegistry.get(
+        "marketing-intelligence"
+      );
+      if (!marketingIntelligenceAgent)
+        throw new Error("Marketing intelligence agent not registered");
 
-    return {
-      workflow: "full-marketing-strategy",
-      context,
-      intelligence,
-      brandAnalysis,
-      marketingStrategy,
-      competitorAnalysis,
-      recommendations: recommendations.recommendations,
-      nextSteps: recommendations.nextSteps,
-      estimatedImpact: recommendations.estimatedImpact,
-      timeline: recommendations.timeline,
-      executedAt: new Date().toISOString(),
-      executionTime: 0,
-    };
+      const marketingStrategy = await marketingIntelligenceAgent.execute(
+        `Create a comprehensive marketing strategy for ${businessName}.`,
+        {
+          websiteData: JSON.stringify(mergedIntelligence),
+          brandAnalysis: JSON.stringify(brandAnalysis),
+          businessName,
+          industry,
+          location: comprehensiveData.business.location,
+          services: JSON.stringify(comprehensiveData.business.services),
+          competitors: JSON.stringify(comprehensiveData.competitors),
+          reviews: JSON.stringify(comprehensiveData.reviews),
+          socialPresence: JSON.stringify(comprehensiveData.social),
+          metaAdsIntel: comprehensiveData.metaAds
+            ? JSON.stringify(comprehensiveData.metaAds)
+            : undefined,
+          goals: context.goals?.join(", "),
+          targetAudience: context.targetAudience,
+        }
+      );
+      console.log("✓ Marketing strategy complete");
+
+      console.log("Step 5/5: Analyzing competitors...");
+      const competitorAnalysisAgent = AgentRegistry.get("competitor-analysis");
+      if (!competitorAnalysisAgent)
+        throw new Error("Competitor analysis agent not registered");
+
+      const competitorAnalysis = await competitorAnalysisAgent.execute(
+        `Analyze the competitive landscape for ${businessName} in the ${industry} industry.`,
+        {
+          websiteData: JSON.stringify(mergedIntelligence),
+          businessName,
+          industry,
+          location: comprehensiveData.business.location,
+          competitors: JSON.stringify(comprehensiveData.competitors),
+          metaAdsIntel: comprehensiveData.metaAds
+            ? JSON.stringify(comprehensiveData.metaAds)
+            : undefined,
+        }
+      );
+      console.log("✓ Competitor analysis complete");
+
+      // Synthesize recommendations with FULL data
+      const recommendations = this.synthesizeRecommendations({
+        intelligence: mergedIntelligence,
+        brandAnalysis,
+        marketingStrategy,
+        competitorAnalysis,
+      });
+
+      return {
+        workflow: "full-marketing-strategy",
+        context,
+        intelligence: mergedIntelligence,
+        brandAnalysis,
+        marketingStrategy,
+        competitorAnalysis,
+        recommendations: recommendations.recommendations,
+        nextSteps: recommendations.nextSteps,
+        estimatedImpact: recommendations.estimatedImpact,
+        timeline: recommendations.timeline,
+        executedAt: new Date().toISOString(),
+        executionTime: 0,
+      };
+    } catch (error) {
+      console.error("❌ Full marketing strategy failed:", error);
+      console.error("Error details:", error instanceof Error ? error.message : String(error));
+      throw error;
+    }
   }
 
   /**
@@ -528,22 +699,34 @@ export class MarketingOrchestrator {
   private async executeSEOStrategy(
     context: MarketingContext
   ): Promise<MarketingStrategyResult> {
-    console.log("Step 1/2: Collecting website SEO data...");
-    const intelligence = await this.dataCollector.collect(context.website);
+    console.log("Step 1/3: Collecting comprehensive business data...");
+    const comprehensiveData = await this.dataCollector.collect(context.website);
 
-    console.log("Step 2/2: Generating SEO strategy...");
+    console.log("Step 2/3: Collecting marketing intelligence...");
+    const marketingIntel = await this.marketingCollector.collect(
+      context.website
+    );
+
+    const businessName =
+      context.businessName ||
+      comprehensiveData.business.name ||
+      marketingIntel.brandAnalysis.businessName;
+
+    console.log("Step 3/3: Generating SEO strategy...");
     const seoStrategyAgent = AgentRegistry.get("seo-strategy");
     if (!seoStrategyAgent) throw new Error("SEO strategy agent not registered");
 
     const seoStrategy = await seoStrategyAgent.execute(
-      `Generate an SEO strategy for ${context.businessName || intelligence.brandAnalysis.businessName}.`,
+      `Generate an SEO strategy for ${businessName}.`,
       {
-        websiteData: JSON.stringify(intelligence),
-        seoData: JSON.stringify(intelligence.seoData),
-        contentData: JSON.stringify(intelligence.contentAnalysis),
-        businessName:
-          context.businessName || intelligence.brandAnalysis.businessName,
-        industry: context.industry,
+        businessName,
+        industry: context.industry || comprehensiveData.business.industry,
+        location: comprehensiveData.business.location,
+        seoData: JSON.stringify(comprehensiveData.seo),
+        marketingSeoData: JSON.stringify(marketingIntel.seoData),
+        contentData: JSON.stringify(marketingIntel.contentAnalysis),
+        competitors: JSON.stringify(comprehensiveData.competitors),
+        socialPresence: JSON.stringify(comprehensiveData.social),
       }
     );
 
@@ -644,10 +827,21 @@ export class MarketingOrchestrator {
       );
     }
 
+    // Merge intelligence for return
+    const mergedIntelligence = {
+      business: comprehensiveData.business,
+      competitors: comprehensiveData.competitors,
+      seo: comprehensiveData.seo,
+      social: comprehensiveData.social,
+      brandAnalysis: marketingIntel.brandAnalysis,
+      contentAnalysis: marketingIntel.contentAnalysis,
+      seoData: marketingIntel.seoData,
+    };
+
     return {
       workflow: "seo-strategy",
       context,
-      intelligence,
+      intelligence: mergedIntelligence,
       seoStrategy,
       recommendations: recommendations.slice(0, 6),
       nextSteps: nextSteps.slice(0, 5),
@@ -664,22 +858,33 @@ export class MarketingOrchestrator {
   private async executeContentStrategy(
     context: MarketingContext
   ): Promise<MarketingStrategyResult> {
-    console.log("Step 1/2: Collecting website content data...");
-    const intelligence = await this.dataCollector.collect(context.website);
+    console.log("Step 1/3: Collecting comprehensive business data...");
+    const comprehensiveData = await this.dataCollector.collect(context.website);
 
-    console.log("Step 2/2: Creating content calendar and strategy...");
+    console.log("Step 2/3: Collecting marketing intelligence...");
+    const marketingIntel = await this.marketingCollector.collect(
+      context.website
+    );
+
+    const businessName =
+      context.businessName ||
+      comprehensiveData.business.name ||
+      marketingIntel.brandAnalysis.businessName;
+
+    console.log("Step 3/3: Creating content calendar and strategy...");
     const contentCalendarAgent = AgentRegistry.get("content-calendar");
     if (!contentCalendarAgent)
       throw new Error("Content calendar agent not registered");
 
     const contentStrategy = await contentCalendarAgent.execute(
-      `Create a content strategy and calendar for ${context.businessName || intelligence.brandAnalysis.businessName}.`,
+      `Create a content strategy and calendar for ${businessName}.`,
       {
-        websiteData: JSON.stringify(intelligence),
-        contentData: JSON.stringify(intelligence.contentAnalysis),
-        businessName:
-          context.businessName || intelligence.brandAnalysis.businessName,
-        industry: context.industry,
+        businessName,
+        industry: context.industry || comprehensiveData.business.industry,
+        location: comprehensiveData.business.location,
+        contentData: JSON.stringify(marketingIntel.contentAnalysis),
+        brandData: JSON.stringify(marketingIntel.brandAnalysis),
+        competitors: JSON.stringify(comprehensiveData.competitors),
         targetAudience: context.targetAudience,
       }
     );
@@ -770,10 +975,19 @@ export class MarketingOrchestrator {
       );
     }
 
+    // Merge intelligence for return
+    const mergedIntelligence = {
+      business: comprehensiveData.business,
+      competitors: comprehensiveData.competitors,
+      social: comprehensiveData.social,
+      brandAnalysis: marketingIntel.brandAnalysis,
+      contentAnalysis: marketingIntel.contentAnalysis,
+    };
+
     return {
       workflow: "content-strategy",
       context,
-      intelligence,
+      intelligence: mergedIntelligence,
       contentStrategy,
       recommendations: recommendations.slice(0, 6),
       nextSteps: nextSteps.slice(0, 5),
@@ -790,21 +1004,34 @@ export class MarketingOrchestrator {
   private async executeSocialMediaStrategy(
     context: MarketingContext
   ): Promise<MarketingStrategyResult> {
-    console.log("Step 1/2: Analyzing social media presence...");
-    const intelligence = await this.dataCollector.collect(context.website);
+    console.log("Step 1/3: Collecting comprehensive business data...");
+    const comprehensiveData = await this.dataCollector.collect(context.website);
 
-    console.log("Step 2/2: Creating social media strategy...");
+    console.log("Step 2/3: Collecting marketing intelligence...");
+    const marketingIntel = await this.marketingCollector.collect(
+      context.website
+    );
+
+    const businessName =
+      context.businessName ||
+      comprehensiveData.business.name ||
+      marketingIntel.brandAnalysis.businessName;
+
+    console.log("Step 3/3: Creating social media strategy...");
     const socialMediaStrategyAgent = AgentRegistry.get("social-media-strategy");
     if (!socialMediaStrategyAgent)
       throw new Error("Social media strategy agent not registered");
 
     const socialStrategy = await socialMediaStrategyAgent.execute(
-      `Create a social media strategy for ${context.businessName || intelligence.brandAnalysis.businessName}.`,
+      `Create a social media strategy for ${businessName}.`,
       {
-        websiteData: JSON.stringify(intelligence),
-        businessName:
-          context.businessName || intelligence.brandAnalysis.businessName,
-        industry: context.industry,
+        businessName,
+        industry: context.industry || comprehensiveData.business.industry,
+        location: comprehensiveData.business.location,
+        socialPresence: JSON.stringify(comprehensiveData.social),
+        brandData: JSON.stringify(marketingIntel.brandAnalysis),
+        contentData: JSON.stringify(marketingIntel.contentAnalysis),
+        competitors: JSON.stringify(comprehensiveData.competitors),
         targetAudience: context.targetAudience,
       }
     );
@@ -875,10 +1102,19 @@ export class MarketingOrchestrator {
       );
     }
 
+    // Merge intelligence for return
+    const mergedIntelligence = {
+      business: comprehensiveData.business,
+      social: comprehensiveData.social,
+      competitors: comprehensiveData.competitors,
+      brandAnalysis: marketingIntel.brandAnalysis,
+      contentAnalysis: marketingIntel.contentAnalysis,
+    };
+
     return {
       workflow: "social-media-strategy",
       context,
-      intelligence,
+      intelligence: mergedIntelligence,
       socialStrategy,
       recommendations: recommendations.slice(0, 6),
       nextSteps: nextSteps.slice(0, 5),
@@ -895,20 +1131,32 @@ export class MarketingOrchestrator {
   private async executeBrandAnalysis(
     context: MarketingContext
   ): Promise<MarketingStrategyResult> {
-    console.log("Step 1/2: Collecting brand data...");
-    const intelligence = await this.dataCollector.collect(context.website);
+    console.log("Step 1/3: Collecting comprehensive business data...");
+    const comprehensiveData = await this.dataCollector.collect(context.website);
 
-    console.log("Step 2/2: Analyzing brand voice and positioning...");
+    console.log("Step 2/3: Collecting marketing intelligence...");
+    const marketingIntel = await this.marketingCollector.collect(
+      context.website
+    );
+
+    const businessName =
+      context.businessName ||
+      comprehensiveData.business.name ||
+      marketingIntel.brandAnalysis.businessName;
+
+    console.log("Step 3/3: Analyzing brand voice and positioning...");
     const brandVoiceAgent = AgentRegistry.get("brand-voice");
     if (!brandVoiceAgent) throw new Error("Brand voice agent not registered");
 
     const brandAnalysis = await brandVoiceAgent.execute(
-      `Analyze the brand voice and positioning for ${context.businessName || intelligence.brandAnalysis.businessName}.`,
+      `Analyze the brand voice and positioning for ${businessName}.`,
       {
-        websiteData: JSON.stringify(intelligence),
-        businessName:
-          context.businessName || intelligence.brandAnalysis.businessName,
-        industry: context.industry,
+        businessName,
+        industry: context.industry || comprehensiveData.business.industry,
+        brandData: JSON.stringify(marketingIntel.brandAnalysis),
+        visualBrand: JSON.stringify(marketingIntel.visualBrand),
+        conversionElements: JSON.stringify(marketingIntel.conversionAnalysis),
+        competitors: JSON.stringify(comprehensiveData.competitors),
       }
     );
 
@@ -996,10 +1244,18 @@ export class MarketingOrchestrator {
       );
     }
 
+    // Merge intelligence for return
+    const mergedIntelligence = {
+      business: comprehensiveData.business,
+      competitors: comprehensiveData.competitors,
+      brandAnalysis: marketingIntel.brandAnalysis,
+      visualBrand: marketingIntel.visualBrand,
+    };
+
     return {
       workflow: "brand-analysis",
       context,
-      intelligence,
+      intelligence: mergedIntelligence,
       brandAnalysis,
       recommendations: recommendations.slice(0, 6),
       nextSteps: nextSteps.slice(0, 5),
@@ -1016,22 +1272,35 @@ export class MarketingOrchestrator {
   private async executeCompetitorAnalysis(
     context: MarketingContext
   ): Promise<MarketingStrategyResult> {
-    console.log("Step 1/2: Collecting competitive intelligence...");
-    const intelligence = await this.dataCollector.collect(context.website);
+    console.log("Step 1/3: Collecting comprehensive business data...");
+    const comprehensiveData = await this.dataCollector.collect(context.website);
 
-    console.log("Step 2/2: Analyzing competitive landscape...");
+    console.log("Step 2/3: Collecting marketing intelligence...");
+    const marketingIntel = await this.marketingCollector.collect(
+      context.website
+    );
+
+    const businessName =
+      context.businessName ||
+      comprehensiveData.business.name ||
+      marketingIntel.brandAnalysis.businessName;
+
+    console.log("Step 3/3: Analyzing competitive landscape...");
     const competitorAnalysisAgent = AgentRegistry.get("competitor-analysis");
     if (!competitorAnalysisAgent)
       throw new Error("Competitor analysis agent not registered");
 
     const competitorAnalysis = await competitorAnalysisAgent.execute(
-      `Analyze the competitive landscape for ${context.businessName || intelligence.brandAnalysis.businessName}.`,
+      `Analyze the competitive landscape for ${businessName}.`,
       {
-        websiteData: JSON.stringify(intelligence),
-        businessName:
-          context.businessName || intelligence.brandAnalysis.businessName,
-        industry: context.industry,
-        competitors: intelligence.competitiveSignals,
+        businessName,
+        industry: context.industry || comprehensiveData.business.industry,
+        location: comprehensiveData.business.location,
+        competitors: JSON.stringify(comprehensiveData.competitors),
+        competitiveSignals: JSON.stringify(marketingIntel.competitiveSignals),
+        metaAdsIntel: comprehensiveData.metaAds
+          ? JSON.stringify(comprehensiveData.metaAds)
+          : undefined,
       }
     );
 
@@ -1114,10 +1383,18 @@ export class MarketingOrchestrator {
       );
     }
 
+    // Merge intelligence for return
+    const mergedIntelligence = {
+      business: comprehensiveData.business,
+      competitors: comprehensiveData.competitors,
+      metaAds: comprehensiveData.metaAds,
+      competitiveSignals: marketingIntel.competitiveSignals,
+    };
+
     return {
       workflow: "competitor-analysis",
       context,
-      intelligence,
+      intelligence: mergedIntelligence,
       competitorAnalysis,
       recommendations: recommendations.slice(0, 6),
       nextSteps: nextSteps.slice(0, 5),
@@ -1134,35 +1411,40 @@ export class MarketingOrchestrator {
   private async executeQuickAnalysis(
     context: MarketingContext
   ): Promise<MarketingStrategyResult> {
-    console.log("Performing quick marketing analysis...");
-    const intelligence = await this.dataCollector.collect(context.website);
+    console.log("Step 1/2: Collecting comprehensive business data...");
+    const comprehensiveData = await this.dataCollector.collect(context.website);
+
+    console.log("Step 2/2: Collecting marketing intelligence...");
+    const marketingIntel = await this.marketingCollector.collect(
+      context.website
+    );
 
     const recommendations: string[] = [];
     const nextSteps: string[] = [];
 
     // Build recommendations from actual data
-    if (!intelligence.seoData.hasSchema) {
+    if (!marketingIntel.seoData.hasSchema) {
       recommendations.push(
         "Quick SEO win: Add schema markup (LocalBusiness or Organization)"
       );
     }
 
     const missingAltText =
-      intelligence.seoData.imageCount - intelligence.seoData.imagesWithAlt;
+      marketingIntel.seoData.imageCount - marketingIntel.seoData.imagesWithAlt;
     if (missingAltText > 0) {
       recommendations.push(
         `SEO: Add alt text to ${missingAltText} images for better rankings`
       );
     }
 
-    if (!intelligence.contentAnalysis.hasBlog) {
+    if (!marketingIntel.contentAnalysis.hasBlog) {
       recommendations.push(
         "Start a blog to improve SEO and demonstrate expertise"
       );
     }
 
     const socialPlatforms = Object.values(
-      intelligence.socialLinks || {}
+      marketingIntel.socialLinks || {}
     ).filter(Boolean).length;
     if (socialPlatforms < 2) {
       recommendations.push(
@@ -1174,7 +1456,7 @@ export class MarketingOrchestrator {
       );
     }
 
-    if (intelligence.contentAnalysis.mediaRichness < 5) {
+    if (marketingIntel.contentAnalysis.mediaRichness < 5) {
       recommendations.push(
         "Add more visual content (photos, videos) to engage visitors"
       );
@@ -1185,7 +1467,7 @@ export class MarketingOrchestrator {
     );
 
     // Build next steps
-    if (!intelligence.seoData.hasSchema) {
+    if (!marketingIntel.seoData.hasSchema) {
       nextSteps.push("Day 1-2: Add schema markup to homepage and key pages");
     }
     if (missingAltText > 0) {
@@ -1197,17 +1479,28 @@ export class MarketingOrchestrator {
     nextSteps.push(
       "Week 2: Create simple 30-day content calendar (2-3 posts/week)"
     );
-    if (!intelligence.contentAnalysis.hasBlog) {
+    if (!marketingIntel.contentAnalysis.hasBlog) {
       nextSteps.push("Week 2-3: Set up blog and publish first 2-3 posts");
     }
     nextSteps.push(
       "Week 3-4: Optimize top 3 pages for conversion (clear CTAs, contact forms)"
     );
 
+    // Merge intelligence for return
+    const mergedIntelligence = {
+      business: comprehensiveData.business,
+      competitors: comprehensiveData.competitors,
+      seo: comprehensiveData.seo,
+      social: comprehensiveData.social,
+      brandAnalysis: marketingIntel.brandAnalysis,
+      contentAnalysis: marketingIntel.contentAnalysis,
+      seoData: marketingIntel.seoData,
+    };
+
     return {
       workflow: "quick-analysis",
       context,
-      intelligence,
+      intelligence: mergedIntelligence,
       recommendations: recommendations.slice(0, 6),
       nextSteps: nextSteps.slice(0, 6),
       estimatedImpact: "Medium - Quick wins and foundation for growth",
@@ -1497,14 +1790,27 @@ export class MarketingOrchestrator {
 
     // Ensure AI agents returned actual recommendations
     if (recommendations.length === 0) {
+      // This should NOT happen with improved agents - log warning
+      console.error("❌ AI AGENTS FAILED TO GENERATE RECOMMENDATIONS!");
+      console.error(
+        "This indicates the AI agents did not return valid JSON or the parsing failed."
+      );
+      console.error("Using emergency fallback recommendations...");
+
+      // Use business-specific fallback based on intelligence data
+      const businessName =
+        data.intelligence?.brandAnalysis?.businessName || "your business";
+      const industry =
+        data.intelligence?.brandAnalysis?.industry || "your industry";
+
       recommendations.push(
-        "Analyze your competitive landscape and identify differentiation opportunities"
+        `Launch targeted local SEO campaign for "${businessName}" focusing on ${industry}-specific keywords`
       );
       recommendations.push(
-        "Develop a content strategy targeting your ideal customer personas"
+        `Create content showcasing ${businessName}'s unique value proposition and customer success stories`
       );
       recommendations.push(
-        "Optimize your website for search engines and conversion"
+        `Develop social media presence highlighting what sets ${businessName} apart from competitors in ${industry}`
       );
     }
 

@@ -3,14 +3,13 @@
  * Production-grade RAG with LangChain ecosystem
  */
 
-import { PineconeStore } from "@langchain/pinecone";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { Pinecone } from "@pinecone-database/pinecone";
-import { ChatOpenAI } from "@langchain/openai";
-import { PromptTemplate } from "@langchain/core/prompts";
 import { Document } from "@langchain/core/documents";
-import { RunnableSequence } from "@langchain/core/runnables";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import { PromptTemplate } from "@langchain/core/prompts";
+import { RunnableSequence } from "@langchain/core/runnables";
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { PineconeStore } from "@langchain/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
 
 // ============================================================================
 // CONFIGURATION
@@ -53,11 +52,12 @@ export class LangChainVectorStore {
     indexName?: string;
     namespace?: string;
   }): Promise<PineconeStore> {
-    const indexName = params.indexName || process.env.PINECONE_INDEX_NAME || "local-ai-demos";
+    const indexName =
+      params.indexName || process.env.PINECONE_INDEX_NAME || "local-ai-demos";
     const index = this.pinecone.index(indexName);
 
     return await PineconeStore.fromExistingIndex(this.embeddings, {
-      pineconeIndex: index,
+      pineconeIndex: index as any,
       namespace: params.namespace,
     });
   }
@@ -137,7 +137,12 @@ export class LangChainVectorStore {
 export interface RAGQueryParams {
   query: string;
   namespace?: string;
-  agentType?: "porter" | "marketing" | "strategic" | "business_intelligence" | "optimization";
+  agentType?:
+    | "porter"
+    | "marketing"
+    | "strategic"
+    | "business_intelligence"
+    | "optimization";
   k?: number;
   filter?: Record<string, any>;
   conversationHistory?: Array<{ role: string; content: string }>;
@@ -202,7 +207,8 @@ export class LangChainRAG {
       .join("\n\n");
 
     // Create custom prompt template
-    const promptTemplate = PromptTemplate.fromTemplate(`You are an expert business analyst providing insights based on the following context.
+    const promptTemplate =
+      PromptTemplate.fromTemplate(`You are an expert business analyst providing insights based on the following context.
 
 Context:
 {context}
@@ -295,9 +301,10 @@ Provide a comprehensive summary that synthesizes insights across all analysis ty
 
     return {
       results,
-      summary: typeof summaryResponse.content === 'string'
-        ? summaryResponse.content
-        : JSON.stringify(summaryResponse.content),
+      summary:
+        typeof summaryResponse.content === "string"
+          ? summaryResponse.content
+          : JSON.stringify(summaryResponse.content),
     };
   }
 
@@ -309,10 +316,12 @@ Provide a comprehensive summary that synthesizes insights across all analysis ty
 
     // Simple heuristic: based on number and quality of retrieved documents
     const docCount = Math.min(documents.length, 5) / 5; // Max 5 docs
-    const avgLength = documents.reduce((sum, doc) => sum + doc.pageContent.length, 0) / documents.length;
+    const avgLength =
+      documents.reduce((sum, doc) => sum + doc.pageContent.length, 0) /
+      documents.length;
     const lengthScore = Math.min(avgLength / 500, 1); // Assume 500 chars is good
 
-    return (docCount * 0.6 + lengthScore * 0.4);
+    return docCount * 0.6 + lengthScore * 0.4;
   }
 }
 
