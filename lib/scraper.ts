@@ -1,5 +1,4 @@
 import { chromium } from "playwright";
-import * as cheerio from "cheerio";
 
 /**
  * Fetch site pages using Playwright (local) or puppeteer-core with @sparticuz/chromium (production/Vercel)
@@ -76,12 +75,12 @@ async function fetchSitePagesPuppeteer(
       // Optimize chromium args for faster execution
       const args = [
         ...chromiumPackage.default.args,
-        '--disable-gpu',
-        '--disable-dev-shm-usage',
-        '--disable-setuid-sandbox',
-        '--no-sandbox',
-        '--single-process',
-        '--no-zygote'
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote",
       ];
 
       // Launch browser with @sparticuz/chromium configuration
@@ -125,7 +124,10 @@ async function fetchSitePagesPuppeteer(
       }
     }
   } catch (error) {
-    console.error("[Scraper] Puppeteer failed, falling back to cheerio + fetch:", error);
+    console.error(
+      "[Scraper] Puppeteer failed, falling back to cheerio + fetch:",
+      error
+    );
     return fetchSitePagesCheerio(url, paths);
   }
 }

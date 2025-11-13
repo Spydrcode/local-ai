@@ -1,29 +1,60 @@
+import { blogWriterAgent } from "@/lib/agents/ContentMarketingAgents";
 import { NextResponse } from "next/server";
-import { executeToolAgent, validateToolRequest } from "@/lib/agents/tool-agent-helper";
-
-/**
- * Blog Writer API Route
- * NOW USES UNIFIED AGENT SYSTEM for consistency and proper agentic framework
- */
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const {
+      business_name,
+      business_type,
+      blog_topic,
+      keywords,
+      tone,
+      generate_variations,
+      intelligence,
+    } = await request.json();
 
-    console.log("Blog writer request:", {
-      business_name: body.business_name,
-      business_type: body.business_type,
-      topic: body.topic,
-      has_website_analysis: !!body.website_analysis,
+    if (!business_name || !business_type || !blog_topic) {
+      return NextResponse.json(
+        {
+          error:
+            "Missing required fields: business_name, business_type, blog_topic",
+        },
+        { status: 400 }
+      );
+    }
+
+    const params = {
+      businessName: business_name,
+      businessType: business_type,
+      topic: blog_topic,
+      keywords: keywords || [],
+      tone: tone as
+        | "educational"
+        | "authoritative"
+        | "conversational"
+        | "inspirational"
+        | undefined,
+      intelligence,
+    };
+
+    // Generate variations if requested
+    if (generate_variations) {
+      const variations = await blogWriterAgent.generateVariations(params);
+      return NextResponse.json({
+        primary: variations[0],
+        variations: variations.slice(1),
+        message:
+          "Generated blog posts in different tones. Choose what matches your brand!",
+      });
+    }
+
+    // Generate single blog post
+    const result = await blogWriterAgent.generateBlogPost(params);
+
+    return NextResponse.json({
+      ...result,
+      tip: "Want different writing styles? Add 'generate_variations: true' to your request!",
     });
-
-    // Validate request
-    validateToolRequest(body);
-
-    // Execute using unified agent system
-    const result = await executeToolAgent('blog-writer', body);
-
-    return NextResponse.json(result);
   } catch (error) {
     console.error("Blog post generation error:", error);
     return NextResponse.json(

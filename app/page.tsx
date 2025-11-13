@@ -105,7 +105,8 @@ const workflows = [
 
 export default function Home() {
   const [websiteUrl, setWebsiteUrl] = useState("")
-  const [selectedWorkflow, setSelectedWorkflow] = useState("full-marketing-strategy")
+  const [businessName, setBusinessName] = useState("")
+  const [industry, setIndustry] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
@@ -121,16 +122,59 @@ export default function Home() {
     setError("")
 
     try {
-      // Store selection and redirect to unified dashboard
-      sessionStorage.setItem('marketingRequest', JSON.stringify({
-        website: websiteUrl,
-        workflow: selectedWorkflow,
-        timestamp: new Date().toISOString()
-      }))
+      console.log("[Homepage] Starting website intelligence scan for:", websiteUrl)
+      
+      // Call WebScraperAgent API for comprehensive analysis
+      const response = await fetch('/api/web-scraper', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: websiteUrl,
+          mode: 'comprehensive', // Full intelligence extraction
+          paths: ["/", "/about", "/services", "/pricing", "/contact"]
+        })
+      })
 
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.details || errorData.error || 'Failed to analyze website')
+      }
+
+      const { data, duration } = await response.json()
+      
+      console.log(`[Homepage] Intelligence scan completed in ${duration}ms`)
+      console.log("[Homepage] Data collected:", {
+        business: !!data.business,
+        competitors: data.competitors?.length || 0,
+        seo: !!data.seo,
+        social: !!data.social,
+        reviews: data.reviews?.totalReviews || 0,
+        brandAnalysis: !!data.brandAnalysis,
+        contentAnalysis: !!data.contentAnalysis
+      })
+
+      // Store comprehensive intelligence data for all tools to use
+      const intelligenceData = {
+        ...data,
+        // Add optional user-provided context
+        userProvidedName: businessName || undefined,
+        userProvidedIndustry: industry || undefined,
+        scrapedAt: new Date().toISOString(),
+        source: 'web-scraper-agent'
+      }
+
+      sessionStorage.setItem('websiteIntelligence', JSON.stringify(intelligenceData))
+      
+      // Also store in marketingAnalysis for backward compatibility
+      sessionStorage.setItem('marketingAnalysis', JSON.stringify(intelligenceData))
+
+      console.log("[Homepage] Intelligence data stored, redirecting to dashboard")
+      
+      // Redirect to dashboard with all tools
       router.push("/dashboard")
-    } catch (err) {
-      setError("Something went wrong. Please try again.")
+    } catch (err: any) {
+      console.error("[Homepage] Analysis failed:", err)
+      setError(err.message || "Failed to analyze website. Please check the URL and try again.")
       setIsAnalyzing(false)
     }
   }
@@ -192,26 +236,23 @@ export default function Home() {
                 />
               </div>
 
-              {/* Workflow Selection */}
-              <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {workflows.slice(0, 6).map((workflow) => (
-                  <button
-                    key={workflow.id}
-                    type="button"
-                    onClick={() => setSelectedWorkflow(workflow.id)}
-                    className={`rounded-lg border-2 p-4 text-left transition-all ${
-                      selectedWorkflow === workflow.id
-                        ? 'border-emerald-500 bg-emerald-500/10'
-                        : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
-                    }`}
-                  >
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="text-2xl">{workflow.icon}</span>
-                      <span className="text-xs text-slate-400">{workflow.time}</span>
-                    </div>
-                    <div className="text-sm font-medium text-white">{workflow.name}</div>
-                  </button>
-                ))}
+              <div className="mb-4 grid gap-3 sm:grid-cols-2">
+                <Input
+                  type="text"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder="Business Name (Optional)"
+                  className="h-12 text-base"
+                  disabled={isAnalyzing}
+                />
+                <Input
+                  type="text"
+                  value={industry}
+                  onChange={(e) => setIndustry(e.target.value)}
+                  placeholder="Industry (e.g., Plumbing, Restaurant)"
+                  className="h-12 text-base"
+                  disabled={isAnalyzing}
+                />
               </div>
 
               {error && (

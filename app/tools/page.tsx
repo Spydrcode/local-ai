@@ -316,9 +316,34 @@ export default function ToolsPage() {
   const [error, setError] = useState("")
   const [websiteAnalysis, setWebsiteAnalysis] = useState<any>(null)
 
-  // Auto-fill from initial analysis if available
+  // Auto-fill from marketing analysis if available
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // First check for marketing analysis (from /grow page)
+      const marketingAnalysis = sessionStorage.getItem('marketingAnalysis')
+      if (marketingAnalysis) {
+        try {
+          const analysis = JSON.parse(marketingAnalysis)
+
+          // Store the full intelligence data for use in tool generation
+          if (analysis.intelligence) {
+            setWebsiteAnalysis(analysis.intelligence)
+          }
+
+          // Auto-fill business info
+          if (analysis.business_name) {
+            setBusinessName(analysis.business_name)
+          }
+          if (analysis.industry) {
+            setBusinessType(analysis.industry)
+          }
+        } catch (err) {
+          console.error('Failed to parse marketing analysis:', err)
+        }
+        return
+      }
+
+      // Fallback to old initialAnalysis format
       const storedAnalysis = sessionStorage.getItem('initialAnalysis')
       if (storedAnalysis) {
         try {

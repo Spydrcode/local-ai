@@ -12,14 +12,14 @@
 import OpenAI from "openai";
 
 export type EmbeddingModel =
-  | "text-embedding-3-large"   // 3072d - Best quality (2024)
-  | "text-embedding-3-small"   // 1536d - Fast & cheap (2024)
-  | "text-embedding-ada-002";  // 1536d - Legacy (deprecated)
+  | "text-embedding-3-large" // 3072d - Best quality (2024)
+  | "text-embedding-3-small" // 1536d - Fast & cheap (2024)
+  | "text-embedding-ada-002"; // 1536d - Legacy (deprecated)
 
 export interface EmbeddingConfig {
   model: EmbeddingModel;
-  dimensions?: number;  // For 3-large/3-small (optional downscaling)
-  version: string;      // Track embedding version for migrations
+  dimensions?: number; // For 3-large/3-small (optional downscaling)
+  version: string; // Track embedding version for migrations
 }
 
 export interface EmbeddingResult {
@@ -34,8 +34,8 @@ export interface EmbeddingResult {
  * Change this to upgrade all embeddings system-wide
  */
 export const PRODUCTION_EMBEDDING_CONFIG: EmbeddingConfig = {
-  model: "text-embedding-3-small",  // Start with small for cost
-  dimensions: 1536,                  // Match legacy ada-002 dimension
+  model: "text-embedding-3-small", // Start with small for cost
+  dimensions: 1536, // Match legacy ada-002 dimension
   version: "v1.0.0",
 };
 
@@ -44,7 +44,7 @@ export const PRODUCTION_EMBEDDING_CONFIG: EmbeddingConfig = {
  */
 export const RECOMMENDED_EMBEDDING_CONFIG: EmbeddingConfig = {
   model: "text-embedding-3-large",
-  dimensions: 3072,  // Full quality
+  dimensions: 3072, // Full quality
   version: "v2.0.0",
 };
 
@@ -78,7 +78,10 @@ export class EmbeddingService {
     };
 
     // Add dimensions parameter for 3-large/3-small models
-    if (this.config.dimensions && this.config.model !== "text-embedding-ada-002") {
+    if (
+      this.config.dimensions &&
+      this.config.model !== "text-embedding-ada-002"
+    ) {
       requestParams.dimensions = this.config.dimensions;
     }
 
@@ -110,14 +113,17 @@ export class EmbeddingService {
     const results: EmbeddingResult[] = [];
 
     for (let i = 0; i < texts.length; i += batchSize) {
-      const batch = texts.slice(i, i + batchSize).map(t => t.slice(0, 32000));
+      const batch = texts.slice(i, i + batchSize).map((t) => t.slice(0, 32000));
 
       const requestParams: any = {
         model: this.config.model,
         input: batch,
       };
 
-      if (this.config.dimensions && this.config.model !== "text-embedding-ada-002") {
+      if (
+        this.config.dimensions &&
+        this.config.model !== "text-embedding-ada-002"
+      ) {
         requestParams.dimensions = this.config.dimensions;
       }
 
@@ -155,13 +161,22 @@ export class EmbeddingService {
 /**
  * Global singleton instance
  * Use this for consistent embeddings across the application
+ * Lazy-loaded to allow environment variables to be set first
  */
-export const embeddingService = new EmbeddingService();
+let _embeddingService: EmbeddingService | null = null;
+
+export function getEmbeddingService(): EmbeddingService {
+  if (!_embeddingService) {
+    _embeddingService = new EmbeddingService();
+  }
+  return _embeddingService;
+}
 
 /**
  * Convenience function for backward compatibility
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const result = await embeddingService.generateEmbedding(text);
+  const service = getEmbeddingService();
+  const result = await service.generateEmbedding(text);
   return result.embedding;
 }

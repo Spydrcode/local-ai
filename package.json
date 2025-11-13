@@ -18,6 +18,7 @@
     "migrate:vectors": "npx tsx --env-file=.env.local scripts/migrate-vectors.ts",
     "seed:porter": "npx tsx scripts/seed-porter-vectors.ts",
     "seed:marketing": "npx tsx scripts/seed-marketing-vectors.ts",
+    "seed:content-marketing": "npx tsx scripts/seed-content-marketing-vectors.ts",
     "seed:all": "npx tsx scripts/seed-all-vectors.ts"
   },
   "dependencies": {

@@ -1,4 +1,4 @@
-import { faqAgent } from "@/lib/agents/ContentMarketingAgents";
+import { instagramMarketingAgent } from "@/lib/agents/SocialMediaAgents";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -6,14 +6,15 @@ export async function POST(request: Request) {
     const {
       business_name,
       business_type,
-      focus_area,
+      post_topic,
+      caption_length,
       generate_variations,
       intelligence,
     } = await request.json();
 
     if (!business_name || !business_type) {
       return NextResponse.json(
-        { error: "Missing required fields: business_name, business_type" },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
@@ -21,33 +22,40 @@ export async function POST(request: Request) {
     const params = {
       businessName: business_name,
       businessType: business_type,
-      focusArea: focus_area,
+      topic: post_topic,
+      captionLength: caption_length as
+        | "micro"
+        | "short"
+        | "medium"
+        | "long"
+        | undefined,
       intelligence,
     };
 
     // Generate variations if requested
     if (generate_variations) {
-      const variations = await faqAgent.generateVariations(params);
+      const variations =
+        await instagramMarketingAgent.generateVariations(params);
       return NextResponse.json({
         primary: variations[0],
         variations: variations.slice(1),
         message:
-          "Generated FAQs with different focus areas. Combine them for comprehensive coverage!",
+          "Generated captions in different styles. Pick your favorite! ✨",
       });
     }
 
-    // Generate single FAQ set
-    const result = await faqAgent.generateFAQ(params);
+    // Generate single post
+    const result = await instagramMarketingAgent.generatePost(params);
 
     return NextResponse.json({
       ...result,
-      tip: "Want FAQs for different topics? Add 'generate_variations: true' to your request!",
+      tip: "Want different caption styles? Add 'generate_variations: true' to your request!",
     });
   } catch (error) {
-    console.error("FAQ generation error:", error);
+    console.error("Instagram post generation error:", error);
     return NextResponse.json(
       {
-        error: "Failed to generate FAQ",
+        error: "Failed to generate Instagram post",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }

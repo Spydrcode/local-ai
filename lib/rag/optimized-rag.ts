@@ -17,7 +17,7 @@
  */
 
 import { createChatCompletion } from "../openai";
-import { embeddingService } from "../embeddings/embedding-service";
+import { getEmbeddingService } from "../embeddings/embedding-service";
 import { VectorRepository } from "../repositories/vector-repository";
 import { createClient } from "@supabase/supabase-js";
 import { LLMReranker, KeywordReranker } from "./reranker";
@@ -253,6 +253,7 @@ export class OptimizedRAG {
     // Retrieve for each query variation in parallel
     await Promise.all(
       queries.map(async (query) => {
+        const embeddingService = getEmbeddingService();
         const embedding = await embeddingService.generateEmbedding(query);
 
         // Multi-source retrieval
