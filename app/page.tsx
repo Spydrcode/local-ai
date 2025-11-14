@@ -160,13 +160,21 @@ export default function Home() {
         userProvidedName: businessName || undefined,
         userProvidedIndustry: industry || undefined,
         scrapedAt: new Date().toISOString(),
-        source: 'web-scraper-agent'
+        source: 'web-scraper-agent',
+        // Ensure URL is stored in metadata
+        metadata: {
+          ...data.metadata,
+          url: websiteUrl
+        }
       }
 
       sessionStorage.setItem('websiteIntelligence', JSON.stringify(intelligenceData))
       
       // Also store in marketingAnalysis for backward compatibility
       sessionStorage.setItem('marketingAnalysis', JSON.stringify(intelligenceData))
+      
+      // Store URL separately for easy access
+      sessionStorage.setItem('lastAnalyzedUrl', websiteUrl)
 
       console.log("[Homepage] Intelligence data stored, redirecting to dashboard")
       

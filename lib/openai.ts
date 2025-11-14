@@ -64,6 +64,10 @@ export async function createChatCompletion({
   response_format,
   max_tokens,
 }: ChatCompletionOptions) {
+  console.log("[OpenAI] createChatCompletion called");
+  console.log("[OpenAI] Model:", model);
+  console.log("[OpenAI] API Key exists:", !!apiKey);
+
   if (!apiKey) {
     throw new Error(
       "OPENAI_API_KEY is missing. Set it in .env.local to enable chat."
@@ -91,6 +95,7 @@ export async function createChatCompletion({
       })
     : messages;
 
+  console.log("[OpenAI] Calling OpenAI API...");
   const response = await client.chat.completions.create({
     model,
     temperature,
@@ -103,6 +108,7 @@ export async function createChatCompletion({
         : {}),
   });
 
+  console.log("[OpenAI] API call successful");
   const content = response.choices[0]?.message?.content;
 
   if (!content) {

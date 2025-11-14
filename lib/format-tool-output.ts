@@ -69,6 +69,45 @@ export function formatToolOutput(toolId: string, data: any): string {
 }
 
 function formatSocialPost(data: any): string {
+  // Handle multi-platform mode (mode=all)
+  if (data.structured_outputs?.all_platforms) {
+    let output = "🌐 MULTI-PLATFORM SOCIAL MEDIA POSTS\n\n";
+
+    // Facebook
+    if (data.structured_outputs.all_platforms.facebook) {
+      const fb = data.structured_outputs.all_platforms.facebook;
+      output += "📘 FACEBOOK POST\n";
+      output += "━".repeat(50) + "\n";
+      output += fb.post + "\n\n";
+      output += `Hashtags: ${fb.hashtags}\n`;
+      output += `Best Time: ${fb.best_time}\n\n\n`;
+    }
+
+    // Instagram
+    if (data.structured_outputs.all_platforms.instagram) {
+      const ig = data.structured_outputs.all_platforms.instagram;
+      output += "📸 INSTAGRAM POST\n";
+      output += "━".repeat(50) + "\n";
+      output += ig.caption + "\n\n";
+      output += `Visual Suggestion: ${ig.visual_suggestion}\n`;
+      output += `Hashtags: ${ig.hashtags}\n`;
+      output += `Best Time: ${ig.best_time}\n\n\n`;
+    }
+
+    // LinkedIn
+    if (data.structured_outputs.all_platforms.linkedin) {
+      const li = data.structured_outputs.all_platforms.linkedin;
+      output += "💼 LINKEDIN POST\n";
+      output += "━".repeat(50) + "\n";
+      output += li.post + "\n\n";
+      output += `Hashtags: ${li.hashtags}\n`;
+      output += `Best Time: ${li.best_time}\n`;
+    }
+
+    return output.trim();
+  }
+
+  // Handle single platform mode or legacy format
   let output = "";
 
   if (data.post || data.body || data.text) {

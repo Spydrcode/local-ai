@@ -6,12 +6,12 @@ import { formatToolOutput } from "@/lib/format-tool-output"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
-// All AI Tools organized by category
+// Unified Tool System powered by specialized agents
 const toolCategories = [
   {
     id: "web-scraper",
     title: "🌐 Website Intelligence",
-    description: "Primary tool: Analyze any website to extract comprehensive business data",
+    description: "Analyze any website to extract comprehensive business data",
     color: "emerald",
     tools: [
       {
@@ -20,345 +20,78 @@ const toolCategories = [
         description: "Deep-scan any website for business intelligence, competitors, SEO, social, brand analysis",
         icon: "🔍",
         isPrimary: true,
-        apiEndpoint: "/api/marketing-strategy"
+        apiEndpoint: "/api/marketing-strategy",
+        agents: ['web-scraper-agent']
       }
     ]
   },
   {
-    id: "content-marketing",
-    title: "📝 Content Marketing",
-    description: "Create engaging content that attracts customers",
-    color: "orange",
+    id: "strategic",
+    title: "🎯 Strategic Growth & Analysis",
+    description: "Deep business analysis and strategic planning",
+    color: "emerald",
     tools: [
       {
-        id: "facebook-post",
-        title: "Facebook Post",
-        description: "Engaging Facebook posts with emojis",
-        icon: "📘",
-        apiEndpoint: "/api/tools/facebook-post"
-      },
-      {
-        id: "instagram-post",
-        title: "Instagram Post",
-        description: "Scroll-stopping Instagram captions with hashtags",
-        icon: "📸",
-        apiEndpoint: "/api/tools/instagram-post"
-      },
-      {
-        id: "linkedin-post",
-        title: "LinkedIn Post",
-        description: "Professional thought leadership posts",
-        icon: "💼",
-        apiEndpoint: "/api/tools/linkedin-post"
-      },
-      {
-        id: "blog-writer",
-        title: "Blog Post Writer",
-        description: "SEO-optimized blog posts for your industry",
-        icon: "✍️",
-        apiEndpoint: "/api/tools/blog-writer"
-      },
-      {
-        id: "video-script",
-        title: "Video Script Writer",
-        description: "Scripts for social media and YouTube videos",
-        icon: "🎥",
-        apiEndpoint: "/api/tools/video-script"
-      },
-      {
-        id: "newsletter",
-        title: "Newsletter Creator",
-        description: "Monthly newsletters for your email list",
-        icon: "📬",
-        apiEndpoint: "/api/tools/newsletter"
-      },
-      {
-        id: "faq-builder",
-        title: "FAQ Builder",
-        description: "Answer common customer questions",
-        icon: "❓",
-        apiEndpoint: "/api/tools/faq-builder"
-      }
-    ]
-  },
-  {
-    id: "competitive",
-    title: "🏆 Stand Out from Competitors",
-    description: "Highlight what makes your business unique",
-    color: "purple",
-    tools: [
-      {
-        id: "why-choose-us",
-        title: "Why Choose Us Page",
-        description: "Showcase your differentiators vs competitors",
-        icon: "⭐",
-        apiEndpoint: "/api/tools/why-choose-us"
-      },
-      {
-        id: "positioning-statement",
-        title: "Positioning Statement",
-        description: "Clarify how you're uniquely different",
-        icon: "🎪",
-        apiEndpoint: "/api/tools/positioning-statement"
-      },
-      {
-        id: "usp-generator",
-        title: "USP Generator",
-        description: "Unique selling proposition that converts",
-        icon: "💎",
-        apiEndpoint: "/api/tools/usp-generator"
-      },
-      {
-        id: "case-study",
-        title: "Case Study Writer",
-        description: "Success stories that build credibility",
-        icon: "📊",
-        apiEndpoint: "/api/tools/case-study"
-      }
-    ]
-  },
-  {
-    id: "social-proof",
-    title: "⭐ Reviews & Social Proof",
-    description: "Build trust and credibility",
-    color: "yellow",
-    tools: [
-      {
-        id: "review-responder",
-        title: "Review Responder",
-        description: "Professional responses to customer reviews",
-        icon: "💬",
-        apiEndpoint: "/api/tools/review-responder"
-      },
-      {
-        id: "negative-review",
-        title: "Negative Review Handler",
-        description: "Turn bad reviews into opportunities",
-        icon: "🔧",
-        apiEndpoint: "/api/tools/negative-review"
-      },
-      {
-        id: "testimonial-request",
-        title: "Testimonial Request",
-        description: "Email templates to ask for testimonials",
-        icon: "🌟",
-        apiEndpoint: "/api/tools/testimonial-request"
-      },
-      {
-        id: "social-testimonial",
-        title: "Social Testimonial Post",
-        description: "Turn reviews into social media posts",
-        icon: "📱",
-        apiEndpoint: "/api/tools/social-testimonial"
-      }
-    ]
-  },
-  {
-    id: "local-seo",
-    title: "📍 Local SEO Tools",
-    description: "Get found by local customers searching for your services",
-    color: "blue",
-    tools: [
-      {
-        id: "gmb-post",
-        title: "Google Business Post",
-        description: "Weekly GMB posts to boost local search rankings",
-        icon: "🏪",
-        apiEndpoint: "/api/tools/gmb-post"
-      },
-      {
-        id: "local-seo-meta",
-        title: "Local SEO Meta Tags",
-        description: "Page titles & descriptions that rank in local search",
-        icon: "🔍",
-        apiEndpoint: "/api/tools/local-seo-meta"
-      },
-      {
-        id: "location-page",
-        title: "Location Page Writer",
-        description: "SEO-optimized service area pages",
-        icon: "🗺️",
-        apiEndpoint: "/api/tools/location-page"
-      }
-    ]
-  },
-  {
-    id: "customer-retention",
-    title: "💝 Customer Retention",
-    description: "Keep customers coming back and boost lifetime value",
-    color: "pink",
-    tools: [
-      {
-        id: "win-back-email",
-        title: "Win-Back Email",
-        description: "Re-engage customers who haven't bought in 60+ days",
-        icon: "🔄",
-        apiEndpoint: "/api/tools/win-back-email"
-      },
-      {
-        id: "loyalty-program",
-        title: "Loyalty Program Designer",
-        description: "Simple reward programs that increase repeat business",
-        icon: "🎁",
-        apiEndpoint: "/api/tools/loyalty-program"
-      },
-      {
-        id: "referral-request",
-        title: "Referral Request Email",
-        description: "Ask happy customers for referrals the right way",
-        icon: "🤝",
-        apiEndpoint: "/api/tools/referral-request"
-      }
-    ]
-  },
-  {
-    id: "sales-conversion",
-    title: "💰 Sales & Conversion",
-    description: "Turn more visitors into paying customers",
-    color: "green",
-    tools: [
-      {
-        id: "landing-page",
-        title: "Landing Page Copy",
-        description: "High-converting landing pages for your services",
+        id: "business-audit",
+        title: "Complete Business Audit",
+        description: "Full strategic analysis: SWOT, Porter's 5 Forces, Blue Ocean, competitor analysis, content gaps, local SEO",
         icon: "🎯",
-        apiEndpoint: "/api/tools/landing-page"
-      },
-      {
-        id: "sales-sequence",
-        title: "Sales Email Sequence",
-        description: "3-email series to convert leads into customers",
-        icon: "📧",
-        apiEndpoint: "/api/tools/sales-sequence"
-      },
-      {
-        id: "objection-handler",
-        title: "Objection Handler",
-        description: "Responses to price, timing, and competitor objections",
-        icon: "💬",
-        apiEndpoint: "/api/tools/objection-handler"
+        apiEndpoint: "/api/tools/business-audit",
+        agents: ['web-scraper-agent', 'strategic-analysis', 'competitive-intelligence', 'marketing-content'],
+        requiresWebsiteData: true
       },
       {
         id: "pricing-strategy",
-        title: "Pricing Strategy",
-        description: "Data-driven pricing recommendations",
+        title: "Pricing Strategy Analyzer",
+        description: "Data-driven pricing optimization with competitor comparison and tier recommendations",
         icon: "💵",
-        apiEndpoint: "/api/tools/pricing-strategy"
-      }
-    ]
-  },
-  {
-    id: "advertising",
-    title: "📣 Advertising & Promotion",
-    description: "Paid advertising that drives results",
-    color: "red",
-    tools: [
-      {
-        id: "ad-copy",
-        title: "Ad Copy Generator",
-        description: "Facebook, Google, and Instagram ads",
-        icon: "💸",
-        apiEndpoint: "/api/tools/ad-copy"
-      },
-      {
-        id: "partnership-pitch",
-        title: "Partnership Pitch",
-        description: "Proposals for business partnerships",
-        icon: "🤝",
-        apiEndpoint: "/api/tools/partnership-pitch"
-      },
-      {
-        id: "sponsorship-pitch",
-        title: "Sponsorship Pitch",
-        description: "Pitch local sponsorship opportunities",
-        icon: "🎯",
-        apiEndpoint: "/api/tools/sponsorship-pitch"
-      }
-    ]
-  },
-  {
-    id: "customer-service",
-    title: "💼 Customer Service & Operations",
-    description: "Streamline communication and operations",
-    color: "cyan",
-    tools: [
-      {
-        id: "email-writer",
-        title: "Email Writer",
-        description: "Professional emails for any situation",
-        icon: "📧",
-        apiEndpoint: "/api/tools/email-writer"
-      },
-      {
-        id: "auto-response",
-        title: "Auto-Response Templates",
-        description: "Quick replies to common inquiries",
-        icon: "⚡",
-        apiEndpoint: "/api/tools/auto-response"
-      },
-      {
-        id: "booking-confirmation",
-        title: "Booking Confirmation",
-        description: "Appointment confirmation emails",
-        icon: "📅",
-        apiEndpoint: "/api/tools/booking-confirmation"
-      },
-      {
-        id: "invoice-followup",
-        title: "Invoice Follow-up",
-        description: "Friendly payment reminder emails",
-        icon: "💳",
-        apiEndpoint: "/api/tools/invoice-followup"
-      },
-      {
-        id: "apology-email",
-        title: "Apology Email",
-        description: "Professional apologies that rebuild trust",
-        icon: "🙏",
-        apiEndpoint: "/api/tools/apology-email"
-      },
-      {
-        id: "crisis-communication",
-        title: "Crisis Communication",
-        description: "Handle business emergencies professionally",
-        icon: "🚨",
-        apiEndpoint: "/api/tools/crisis-communication"
-      }
-    ]
-  },
-  {
-    id: "business-operations",
-    title: "⚙️ Business Operations",
-    description: "Internal business management tools",
-    color: "gray",
-    tools: [
-      {
-        id: "job-description",
-        title: "Job Description Writer",
-        description: "Attract top talent with clear job posts",
-        icon: "👥",
-        apiEndpoint: "/api/tools/job-description"
-      },
-      {
-        id: "policy-generator",
-        title: "Policy Generator",
-        description: "Refund, shipping, and privacy policies",
-        icon: "📜",
-        apiEndpoint: "/api/tools/policy-generator"
+        apiEndpoint: "/api/tools/pricing-strategy",
+        agents: ['pricing-intelligence', 'competitive-intelligence'],
+        requiresWebsiteData: false
       },
       {
         id: "service-packages",
         title: "Service Package Designer",
-        description: "Tiered service offerings that upsell",
+        description: "Generate Good/Better/Best service tiers with upsell strategies",
         icon: "📦",
-        apiEndpoint: "/api/tools/service-packages"
+        apiEndpoint: "/api/tools/service-packages",
+        agents: ['strategic-analysis', 'revenue-intelligence'],
+        requiresWebsiteData: false
+      }
+    ]
+  },
+  {
+    id: "marketing",
+    title: "📢 Marketing & Content Creation",
+    description: "AI-powered content for all marketing channels",
+    color: "orange",
+    tools: [
+      {
+        id: "social-content",
+        title: "Social Media Content Generator",
+        description: "Platform-optimized posts for Facebook, Instagram, LinkedIn (all 3 platforms at once!)",
+        icon: "📱",
+        apiEndpoint: "/api/tools/social-content",
+        agents: ['facebook-marketing', 'instagram-marketing', 'linkedin-marketing'],
+        requiresWebsiteData: false
       },
       {
-        id: "networking-followup",
-        title: "Networking Follow-up",
-        description: "Professional follow-up emails",
-        icon: "🤝",
-        apiEndpoint: "/api/tools/networking-followup"
+        id: "blog-seo-writer",
+        title: "Blog & SEO Content Writer",
+        description: "SEO-optimized blog posts, service pages, and long-form content",
+        icon: "✍️",
+        apiEndpoint: "/api/tools/blog-seo-writer",
+        agents: ['blog-writer'],
+        requiresWebsiteData: false
+      },
+      {
+        id: "email-hub",
+        title: "Email Marketing Hub",
+        description: "Newsletters, campaigns, and automated email sequences",
+        icon: "📧",
+        apiEndpoint: "/api/tools/email-hub",
+        agents: ['newsletter'],
+        requiresWebsiteData: false
       }
     ]
   }
@@ -391,13 +124,24 @@ export default function DashboardPage() {
   // Check for existing analysis data
   useEffect(() => {
     const marketingAnalysis = sessionStorage.getItem('marketingAnalysis')
+    const savedUrl = sessionStorage.getItem('lastAnalyzedUrl')
+    
     if (marketingAnalysis) {
       try {
         const analysis = JSON.parse(marketingAnalysis)
-        setHasWebsiteData(true)
-        setWebsiteUrl(analysis.website || "")
-        setBusinessName(analysis.business_name || "")
-        setBusinessType(analysis.industry || "")
+        const url = savedUrl || 
+                   analysis.metadata?.url || 
+                   analysis.website || 
+                   ""
+        
+        // Only set hasWebsiteData if we actually have a URL
+        if (url) {
+          setHasWebsiteData(true)
+          setWebsiteUrl(url)
+        }
+        
+        setBusinessName(analysis.business_name || analysis.business?.name || "")
+        setBusinessType(analysis.industry || analysis.business?.industry || "")
       } catch (err) {
         console.error('Failed to parse analysis:', err)
       }
@@ -452,12 +196,18 @@ export default function DashboardPage() {
         userProvidedName: businessName || undefined,
         userProvidedIndustry: businessType || undefined,
         scrapedAt: new Date().toISOString(),
-        source: 'web-scraper-agent'
+        source: 'web-scraper-agent',
+        metadata: {
+          ...data.metadata,
+          url: websiteUrl // Ensure URL is stored
+        }
       }
 
       sessionStorage.setItem('websiteIntelligence', JSON.stringify(intelligenceData))
       // Also store in marketingAnalysis for backward compatibility
       sessionStorage.setItem('marketingAnalysis', JSON.stringify(intelligenceData))
+      // Store the URL separately for easy access
+      sessionStorage.setItem('lastAnalyzedUrl', websiteUrl)
 
       setHasWebsiteData(true)
       
@@ -506,7 +256,7 @@ export default function DashboardPage() {
       })
 
       // Prepare comprehensive payload for the tool
-      const payload = {
+      const basePayload = {
         // Business details
         business_name: intelligence?.business?.name || 
                       intelligence?.userProvidedName || 
@@ -530,6 +280,37 @@ export default function DashboardPage() {
         
         // Backward compatibility
         website_analysis: intelligence
+      }
+
+      // Add tool-specific required fields
+      let payload: any = { ...basePayload }
+      
+      if (tool.id === 'social-content') {
+        // Default to ALL platforms mode
+        payload.mode = 'all' // Generates Facebook, Instagram, LinkedIn simultaneously
+        payload.tone = 'friendly'
+      } else if (tool.id === 'blog-seo-writer') {
+        // Use first keyword from intelligence or generate from business type
+        payload.primary_keyword = intelligence?.seo?.keywords?.[0] || 
+                                  intelligence?.business?.services?.[0] ||
+                                  `best ${payload.business_type.toLowerCase()}`
+        payload.tone = 'educational'
+      } else if (tool.id === 'email-hub') {
+        payload.email_type = 'newsletter' // Default email type
+        payload.tone = 'professional'
+      } else if (tool.id === 'business-audit') {
+        // Get URL from multiple sources in priority order
+        payload.website_url = websiteUrl || // Current state variable
+                             intelligence?.metadata?.url || 
+                             sessionStorage.getItem('lastAnalyzedUrl') ||
+                             ''
+      } else if (tool.id === 'ad-copy') {
+        payload.platform = 'facebook'
+        payload.campaign_goal = 'awareness'
+      } else if (tool.id === 'website-copy') {
+        payload.page_type = 'landing-page'
+      } else if (tool.id === 'objection-handler') {
+        payload.objection_type = 'price'
       }
 
       const response = await fetch(tool.apiEndpoint, {
@@ -659,24 +440,123 @@ export default function DashboardPage() {
               </div>
 
               {/* Formatted Output - Ready to Copy/Paste */}
-              <div className="bg-slate-950 p-6 rounded-lg mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-medium text-emerald-400">✓ Ready to Copy & Paste</span>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      const formatted = formatToolOutput(selectedTool.id, toolResult);
-                      navigator.clipboard.writeText(formatted);
-                    }}
-                    className="bg-emerald-500 hover:bg-emerald-600"
-                  >
-                    📋 Copy Content
-                  </Button>
+              {selectedTool.id === 'social-content' && toolResult.structured_outputs?.all_platforms ? (
+                // Special rendering for multi-platform social content
+                <div className="space-y-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-medium text-emerald-400">✓ Posts Generated for All Platforms</span>
+                    <Button
+                      size="sm"
+                      onClick={() => handleRunTool(selectedTool)}
+                      className="bg-purple-500 hover:bg-purple-600"
+                    >
+                      🔄 Regenerate All
+                    </Button>
+                  </div>
+
+                  {/* Facebook Post */}
+                  <div className="bg-slate-950 p-6 rounded-lg border border-blue-500/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">📘</span>
+                        <h4 className="text-lg font-bold text-white">Facebook</h4>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(toolResult.structured_outputs.all_platforms.facebook.post);
+                        }}
+                        className="bg-blue-500 hover:bg-blue-600"
+                      >
+                        📋 Copy Facebook Post
+                      </Button>
+                    </div>
+                    <pre className="whitespace-pre-wrap text-sm text-slate-200 leading-relaxed mb-3">
+                      {toolResult.structured_outputs.all_platforms.facebook.post}
+                    </pre>
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <p><strong>Hashtags:</strong> {toolResult.structured_outputs.all_platforms.facebook.hashtags}</p>
+                      <p><strong>Best Time:</strong> {toolResult.structured_outputs.all_platforms.facebook.best_time}</p>
+                      <p><strong>Characters:</strong> {toolResult.structured_outputs.all_platforms.facebook.character_count}</p>
+                    </div>
+                  </div>
+
+                  {/* Instagram Post */}
+                  <div className="bg-slate-950 p-6 rounded-lg border border-pink-500/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">📸</span>
+                        <h4 className="text-lg font-bold text-white">Instagram</h4>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const fullPost = `${toolResult.structured_outputs.all_platforms.instagram.caption}\n\n${toolResult.structured_outputs.all_platforms.instagram.hashtags}`;
+                          navigator.clipboard.writeText(fullPost);
+                        }}
+                        className="bg-pink-500 hover:bg-pink-600"
+                      >
+                        📋 Copy Instagram Post
+                      </Button>
+                    </div>
+                    <pre className="whitespace-pre-wrap text-sm text-slate-200 leading-relaxed mb-3">
+                      {toolResult.structured_outputs.all_platforms.instagram.caption}
+                    </pre>
+                    <div className="text-xs text-slate-400 space-y-1 mb-3">
+                      <p><strong>Visual Suggestion:</strong> {toolResult.structured_outputs.all_platforms.instagram.visual_suggestion}</p>
+                      <p><strong>Hashtags:</strong> {toolResult.structured_outputs.all_platforms.instagram.hashtags}</p>
+                      <p><strong>Best Time:</strong> {toolResult.structured_outputs.all_platforms.instagram.best_time}</p>
+                    </div>
+                  </div>
+
+                  {/* LinkedIn Post */}
+                  <div className="bg-slate-950 p-6 rounded-lg border border-blue-400/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">💼</span>
+                        <h4 className="text-lg font-bold text-white">LinkedIn</h4>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(toolResult.structured_outputs.all_platforms.linkedin.post);
+                        }}
+                        className="bg-blue-400 hover:bg-blue-500"
+                      >
+                        📋 Copy LinkedIn Post
+                      </Button>
+                    </div>
+                    <pre className="whitespace-pre-wrap text-sm text-slate-200 leading-relaxed mb-3">
+                      {toolResult.structured_outputs.all_platforms.linkedin.post}
+                    </pre>
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <p><strong>Hashtags:</strong> {toolResult.structured_outputs.all_platforms.linkedin.hashtags}</p>
+                      <p><strong>Best Time:</strong> {toolResult.structured_outputs.all_platforms.linkedin.best_time}</p>
+                      <p><strong>Characters:</strong> {toolResult.structured_outputs.all_platforms.linkedin.character_count}</p>
+                    </div>
+                  </div>
                 </div>
+              ) : (
+                // Default rendering for other tools
+                <div className="bg-slate-950 p-6 rounded-lg mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-medium text-emerald-400">✓ Ready to Copy & Paste</span>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const formatted = formatToolOutput(selectedTool.id, toolResult);
+                        navigator.clipboard.writeText(formatted);
+                      }}
+                      className="bg-emerald-500 hover:bg-emerald-600"
+                    >
+                      📋 Copy Content
+                    </Button>
+                  </div>
                 <pre className="whitespace-pre-wrap text-sm text-slate-200 font-mono leading-relaxed">
                   {formatToolOutput(selectedTool.id, toolResult)}
                 </pre>
-              </div>
+                </div>
+              )}
 
               {/* Raw JSON (collapsible) */}
               <details className="mb-4">
