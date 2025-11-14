@@ -13,20 +13,60 @@ export async function POST(request: Request) {
       intelligence,
     } = await request.json();
 
-    if (!business_name || !business_type || !video_topic) {
+    if (!business_name || !business_type) {
       return NextResponse.json(
         {
-          error:
-            "Missing required fields: business_name, business_type, video_topic",
+          error: "Missing required fields: business_name, business_type",
         },
         { status: 400 }
       );
     }
 
+    // Let the agent intelligently generate topic from business intelligence
+    let finalTopic = video_topic;
+
+    if (!video_topic && intelligence) {
+      const topicSuggestions = [];
+
+      // From customer testimonials/reviews
+      if (intelligence.reviews?.summary) {
+        topicSuggestions.push(`Real ${business_name} Customer Results`);
+      }
+
+      // From differentiators
+      if (intelligence.business?.differentiators?.length > 0) {
+        topicSuggestions.push(
+          `${intelligence.business.differentiators[0]} - ${business_name}`
+        );
+      }
+
+      // From services
+      if (intelligence.business?.services?.length > 0) {
+        topicSuggestions.push(
+          `Behind the Scenes: ${intelligence.business.services[0]} at ${business_name}`
+        );
+      }
+
+      // Fallback
+      if (topicSuggestions.length === 0) {
+        topicSuggestions.push(
+          `Meet ${business_name} - Your ${business_type} Experts`,
+          `Why Customers Choose ${business_name}`
+        );
+      }
+
+      finalTopic = topicSuggestions[0];
+      console.log(
+        `[Video Script Agent] Generated contextual topic: ${finalTopic}`
+      );
+    } else if (!video_topic) {
+      finalTopic = `Why Choose ${business_name} for ${business_type}`;
+    }
+
     const params = {
       businessName: business_name,
       businessType: business_type,
-      videoTopic: video_topic,
+      videoTopic: finalTopic,
       videoType: video_type as
         | "explainer"
         | "promotional"
