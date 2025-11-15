@@ -118,3 +118,76 @@ export async function POST(req: NextRequest) {
     )
   }
 }
+
+// DELETE /api/demos?id=xxx - Delete a specific client
+// DELETE /api/demos?cleanup=unnamed - Delete all "Unnamed Business" clients
+export async function DELETE(req: NextRequest) {
+  try {
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Database not configured" },
+        { status: 503 }
+      )
+    }
+
+    const { searchParams } = new URL(req.url)
+    const clientId = searchParams.get('id')
+    const cleanup = searchParams.get('cleanup')
+
+    // Cleanup operation - delete all "Unnamed Business" entries
+    if (cleanup === 'unnamed') {
+      const { data, error } = await supabase
+        .from('demos')
+        .delete()
+        .eq('business_name', 'Unnamed Business')
+        .select()
+
+      if (error) {
+        console.error('Cleanup error:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+
+      console.log(`Cleaned up ${data?.length || 0} unnamed clients`)
+      return NextResponse.json({
+        message: `Deleted ${data?.length || 0} unnamed clients`,
+        count: data?.length || 0
+      })
+    }
+
+    // Delete specific client by ID
+    if (!clientId) {
+      return NextResponse.json(
+        { error: "Client ID is required (use ?id=xxx or ?cleanup=unnamed)" },
+        { status: 400 }
+      )
+    }
+
+    const { data, error } = await supabase
+      .from('demos')
+      .delete()
+      .eq('id', clientId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Delete error:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        { error: "Client not found" },
+        { status: 404 }
+      )
+    }
+
+    console.log('Client deleted:', clientId)
+    return NextResponse.json({ message: "Client deleted successfully", id: clientId })
+  } catch (error: any) {
+    console.error("Failed to delete client:", error)
+    return NextResponse.json(
+      { error: error.message || "Failed to delete client" },
+      { status: 500 }
+    )
+  }
+}

@@ -141,6 +141,10 @@ export default function AgencyDashboardPage() {
   const [analyzedWebsite, setAnalyzedWebsite] = useState<any>(null)
   const [analysisError, setAnalysisError] = useState('')
 
+  // Cleanup state
+  const [showCleanupConfirm, setShowCleanupConfirm] = useState(false)
+  const [isCleaningUp, setIsCleaningUp] = useState(false)
+
   // For demo purposes, we'll load all demos instead of filtering by agency
   // TODO: Implement proper auth and agency-specific filtering
 
@@ -307,6 +311,54 @@ export default function AgencyDashboardPage() {
     }
   }
 
+  const handleDeleteClient = async (clientId: string) => {
+    if (!confirm('Are you sure you want to delete this client?')) return
+
+    try {
+      const response = await fetch(`/api/demos?id=${clientId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to delete client')
+      }
+
+      // Reload clients list
+      await loadClients()
+    } catch (err: any) {
+      console.error('Failed to delete client:', err)
+      alert(err.message || 'Failed to delete client')
+    }
+  }
+
+  const handleCleanupUnnamed = async () => {
+    setIsCleaningUp(true)
+
+    try {
+      const response = await fetch('/api/demos?cleanup=unnamed', {
+        method: 'DELETE'
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to cleanup')
+      }
+
+      alert(`Successfully deleted ${result.count} unnamed clients`)
+
+      // Reload clients list
+      await loadClients()
+      setShowCleanupConfirm(false)
+    } catch (err: any) {
+      console.error('Failed to cleanup:', err)
+      alert(err.message || 'Failed to cleanup clients')
+    } finally {
+      setIsCleaningUp(false)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -417,9 +469,14 @@ export default function AgencyDashboardPage() {
                   className="w-full"
                 />
               </div>
-              <Button className="bg-slate-700 hover:bg-slate-600">
-                🔍 Filter
-              </Button>
+              {clients.filter(c => c.business_name === 'Unnamed Business').length > 0 && (
+                <Button
+                  onClick={() => setShowCleanupConfirm(true)}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  🗑️ Clean Up Test Data ({clients.filter(c => c.business_name === 'Unnamed Business').length})
+                </Button>
+              )}
             </div>
 
             {/* Clients Table */}
@@ -485,6 +542,13 @@ export default function AgencyDashboardPage() {
                     </Link>
                     <Button className="bg-emerald-500 hover:bg-emerald-600">
                       📄 Export
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteClient(client.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                      title="Delete client"
+                    >
+                      🗑️
                     </Button>
                   </div>
                 </div>
@@ -652,6 +716,38 @@ export default function AgencyDashboardPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Cleanup Confirmation Modal */}
+      {showCleanupConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md bg-slate-900 border-slate-700 p-8">
+            <div className="text-center">
+              <div className="text-5xl mb-4">⚠️</div>
+              <h2 className="text-2xl font-bold text-white mb-4">Clean Up Test Data?</h2>
+              <p className="text-slate-400 mb-6">
+                This will permanently delete all {clients.filter(c => c.business_name === 'Unnamed Business').length} clients named "Unnamed Business".
+                This action cannot be undone.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Button
+                  onClick={() => setShowCleanupConfirm(false)}
+                  variant="outline"
+                  disabled={isCleaningUp}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCleanupUnnamed}
+                  className="bg-red-600 hover:bg-red-700"
+                  disabled={isCleaningUp}
+                >
+                  {isCleaningUp ? 'Deleting...' : 'Delete All Unnamed'}
+                </Button>
+              </div>
             </div>
           </Card>
         </div>
