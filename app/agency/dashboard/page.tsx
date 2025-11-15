@@ -135,11 +135,18 @@ export default function AgencyDashboardPage() {
   const [showNewClientModal, setShowNewClientModal] = useState(false)
   const [activeTab, setActiveTab] = useState<'clients' | 'tools'>('clients')
 
+  // New client form state
+  const [newClientUrl, setNewClientUrl] = useState('')
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analyzedWebsite, setAnalyzedWebsite] = useState<any>(null)
+  const [analysisError, setAnalysisError] = useState('')
+
   // For demo purposes, we'll load all demos instead of filtering by agency
   // TODO: Implement proper auth and agency-specific filtering
 
   useEffect(() => {
     loadClients()
+    checkForAnalyzedWebsite()
   }, [])
 
   useEffect(() => {
@@ -158,6 +165,18 @@ export default function AgencyDashboardPage() {
     }
   }, [searchQuery, clients])
 
+  const checkForAnalyzedWebsite = () => {
+    const intelligence = sessionStorage.getItem('websiteIntelligence') || sessionStorage.getItem('marketingAnalysis')
+    if (intelligence) {
+      try {
+        const data = JSON.parse(intelligence)
+        setAnalyzedWebsite(data)
+      } catch (err) {
+        console.error('Failed to parse analyzed website:', err)
+      }
+    }
+  }
+
   const loadClients = async () => {
     try {
       // Load all demos for now (no agency filtering)
@@ -170,6 +189,103 @@ export default function AgencyDashboardPage() {
       console.error('Failed to load clients:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleAnalyzeWebsite = async () => {
+    if (!newClientUrl.trim()) {
+      setAnalysisError('Please enter a website URL')
+      return
+    }
+
+    // Add https:// if missing
+    let url = newClientUrl.trim()
+    if (!url.match(/^https?:\/\//)) {
+      url = 'https://' + url
+    }
+
+    // Validate URL
+    try {
+      new URL(url)
+    } catch {
+      setAnalysisError('Please enter a valid website URL')
+      return
+    }
+
+    setIsAnalyzing(true)
+    setAnalysisError('')
+
+    try {
+      const response = await fetch('/api/web-scraper', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: url,
+          mode: 'comprehensive',
+          paths: ["/", "/about", "/services", "/pricing", "/contact"]
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.details || errorData.error || 'Failed to analyze website')
+      }
+
+      const { data } = await response.json()
+
+      // Store intelligence data
+      const intelligenceData = {
+        ...data,
+        scrapedAt: new Date().toISOString(),
+        source: 'web-scraper-agent',
+        metadata: {
+          ...data.metadata,
+          url: url
+        }
+      }
+
+      sessionStorage.setItem('websiteIntelligence', JSON.stringify(intelligenceData))
+      setAnalyzedWebsite(intelligenceData)
+      setNewClientUrl('')
+    } catch (err: any) {
+      setAnalysisError(err.message || 'Failed to analyze website')
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  const handleAddAsClient = async () => {
+    if (!analyzedWebsite) return
+
+    try {
+      // Create demo/client entry
+      const url = analyzedWebsite.metadata?.url || analyzedWebsite.website || ''
+      const businessName = analyzedWebsite.business?.name || 'Unnamed Business'
+      const industry = analyzedWebsite.business?.industry || null
+
+      const response = await fetch('/api/demos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          website_url: url,
+          business_name: businessName,
+          industry: industry,
+          intelligence_data: analyzedWebsite
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to add client')
+
+      // Reload clients list
+      await loadClients()
+
+      // Clear analyzed website and close modal
+      setAnalyzedWebsite(null)
+      sessionStorage.removeItem('websiteIntelligence')
+      sessionStorage.removeItem('marketingAnalysis')
+      setShowNewClientModal(false)
+    } catch (err: any) {
+      setAnalysisError(err.message || 'Failed to add client')
     }
   }
 
@@ -391,32 +507,133 @@ export default function AgencyDashboardPage() {
 
       {/* New Client Modal */}
       {showNewClientModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-2xl mx-4 p-8 bg-slate-900 border-slate-700">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">New Client Analysis</h2>
-              <button
-                onClick={() => setShowNewClientModal(false)}
-                className="text-slate-400 hover:text-white text-2xl"
-              >
-                ×
-              </button>
-            </div>
-            <p className="text-slate-400 mb-6">
-              This will redirect you to create a new analysis. The client will be automatically associated with your agency.
-            </p>
-            <div className="flex justify-end gap-3">
-              <Button
-                onClick={() => setShowNewClientModal(false)}
-                className="bg-slate-700 hover:bg-slate-600"
-              >
-                Cancel
-              </Button>
-              <Link href="/">
-                <Button className="bg-emerald-500 hover:bg-emerald-600">
-                  Continue to Analysis
-                </Button>
-              </Link>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-2xl bg-slate-900 border-slate-700 max-h-[90vh] overflow-y-auto">
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Add New Client</h2>
+                <button
+                  onClick={() => {
+                    setShowNewClientModal(false)
+                    setAnalysisError('')
+                    setNewClientUrl('')
+                  }}
+                  className="text-slate-400 hover:text-white text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Show analyzed website if available */}
+              {analyzedWebsite ? (
+                <div className="space-y-6">
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <h3 className="text-lg font-semibold text-white">Website Analyzed Successfully!</h3>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-start gap-2">
+                        <span className="text-slate-400 w-24">Business:</span>
+                        <span className="text-white font-medium">{analyzedWebsite.business?.name || 'Not detected'}</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-slate-400 w-24">Website:</span>
+                        <span className="text-emerald-400">{analyzedWebsite.metadata?.url || 'N/A'}</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-slate-400 w-24">Industry:</span>
+                        <span className="text-white">{analyzedWebsite.business?.industry || 'Not detected'}</span>
+                      </div>
+                      {analyzedWebsite.business?.description && (
+                        <div className="flex items-start gap-2 mt-3">
+                          <span className="text-slate-400 w-24">Description:</span>
+                          <span className="text-slate-300 text-xs">{analyzedWebsite.business.description.substring(0, 200)}...</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between gap-3">
+                    <Button
+                      onClick={() => {
+                        setAnalyzedWebsite(null)
+                        sessionStorage.removeItem('websiteIntelligence')
+                        sessionStorage.removeItem('marketingAnalysis')
+                      }}
+                      variant="outline"
+                      className="text-slate-400"
+                    >
+                      Analyze Different Website
+                    </Button>
+                    <Button
+                      onClick={handleAddAsClient}
+                      className="bg-emerald-500 hover:bg-emerald-600"
+                    >
+                      Add as Client
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <p className="text-slate-400">
+                    Enter a client's website URL to analyze and add them to your agency dashboard.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Client Website URL
+                      </label>
+                      <Input
+                        type="url"
+                        value={newClientUrl}
+                        onChange={(e) => {
+                          setNewClientUrl(e.target.value)
+                          setAnalysisError('')
+                        }}
+                        placeholder="e.g., clientbusiness.com"
+                        className="w-full"
+                        disabled={isAnalyzing}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleAnalyzeWebsite()
+                          }
+                        }}
+                      />
+                    </div>
+
+                    {analysisError && (
+                      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-sm text-red-400">
+                        {analysisError}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end gap-3">
+                    <Button
+                      onClick={() => {
+                        setShowNewClientModal(false)
+                        setAnalysisError('')
+                        setNewClientUrl('')
+                      }}
+                      variant="outline"
+                      disabled={isAnalyzing}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleAnalyzeWebsite}
+                      className="bg-emerald-500 hover:bg-emerald-600"
+                      disabled={isAnalyzing || !newClientUrl.trim()}
+                    >
+                      {isAnalyzing ? 'Analyzing...' : 'Analyze Website'}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
         </div>
