@@ -26,23 +26,28 @@ export default function AgencySettingsPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // TODO: Replace with actual agency ID from auth/context
-  const agencyId = 'YOUR_AGENCY_ID'
+  const agencyId = 'demo-agency'
 
   useEffect(() => {
     loadSettings()
   }, [])
 
   const loadSettings = async () => {
-    try {
-      const response = await fetch(`/api/agency/${agencyId}`)
-      if (!response.ok) throw new Error('Failed to load settings')
-      const data = await response.json()
-      setSettings(data)
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to load settings' })
-    } finally {
-      setIsLoading(false)
-    }
+    // For now, use demo/default settings since there's no auth system yet
+    // TODO: Implement proper API call when auth is added
+    setSettings({
+      id: 'demo-agency',
+      name: 'Your Agency Name',
+      logo_url: null,
+      primary_color: '#10b981', // Emerald
+      secondary_color: '#6366f1', // Indigo
+      footer_text: 'Powered by Local AI Marketing Platform',
+      website_url: null,
+      plan: 'demo',
+      reports_used_this_month: 0,
+      monthly_report_limit: -1, // Unlimited for demo
+    })
+    setIsLoading(false)
   }
 
   const handleSave = async () => {
@@ -51,22 +56,21 @@ export default function AgencySettingsPage() {
     setIsSaving(true)
     setMessage(null)
 
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    // For demo mode, just save to localStorage
+    // TODO: Implement proper API call when auth system is added
     try {
-      const response = await fetch(`/api/agency/${agencyId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: settings.name,
-          primary_color: settings.primary_color,
-          secondary_color: settings.secondary_color,
-          footer_text: settings.footer_text,
-          website_url: settings.website_url,
-        }),
-      })
+      localStorage.setItem('agency-settings', JSON.stringify({
+        name: settings.name,
+        primary_color: settings.primary_color,
+        secondary_color: settings.secondary_color,
+        footer_text: settings.footer_text,
+        website_url: settings.website_url,
+      }))
 
-      if (!response.ok) throw new Error('Failed to save settings')
-
-      setMessage({ type: 'success', text: 'Settings saved successfully!' })
+      setMessage({ type: 'success', text: 'Settings saved successfully! (Demo mode - changes are local only)' })
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to save settings' })
     } finally {

@@ -15,6 +15,9 @@ import { NextResponse } from "next/server";
  * Agents: WebScraperAgent, PricingIntelligenceAgent, CompetitiveIntelligenceAgent
  */
 
+// Increase timeout for scraping and multi-agent analysis
+export const maxDuration = 60; // 60 seconds
+
 export async function POST(request: Request) {
   try {
     const input: PricingToolInput = await request.json();
@@ -36,17 +39,15 @@ export async function POST(request: Request) {
     let intelligence = input.intelligence;
 
     if (!intelligence && input.website_url) {
-      console.log(
-        "[Pricing Strategy] Deep scraping for pricing intelligence..."
-      );
+      // Use quick scrape for demo mode (homepage only) to avoid timeouts
+      console.log("[Pricing Strategy] Quick scraping for pricing intelligence (demo mode)...");
       const scraperAgent = new WebScraperAgent();
       intelligence = await scraperAgent.scrapeAndAnalyze({
         url: input.website_url,
-        paths: ["/", "/pricing", "/services", "/about"],
+        paths: ["/"], // Only homepage for speed - upgradeable to ["/", "/pricing", "/services", "/about"] for paid
         extractors: {
           business: true,
-          competitors: true,
-          seo: true,
+          seo: true, // Minimal extractors for speed
         },
       });
     }

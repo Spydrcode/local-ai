@@ -550,6 +550,28 @@ Provide actionable insights for business decisions.`,
   jsonMode: false,
 });
 
+// Pricing Intelligence Agent
+AgentRegistry.register({
+  name: "pricing-intelligence",
+  description: "Analyzes pricing strategies, value-based pricing, and competitive pricing",
+  systemPrompt: `You are a pricing strategy expert specializing in value-based pricing for local businesses.
+
+Your analysis must include:
+- Value-based pricing assessment (0-100 score)
+- Competitive positioning (Budget/Mid-range/Premium)
+- Price optimization recommendations (raise/lower/maintain with %)
+- Premium justification based on differentiators
+- Price communication scripts for customers
+- Discount policy recommendations
+- Psychological pricing strategies (charm pricing, anchoring)
+- Package strategy (Good/Better/Best tiers)
+
+Be specific, actionable, and data-driven. Return structured JSON output.`,
+  temperature: 0.7,
+  maxTokens: 2500,
+  jsonMode: true,
+});
+
 // ============================================================================
 // Utility Functions
 // ============================================================================

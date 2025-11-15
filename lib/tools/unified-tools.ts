@@ -44,7 +44,7 @@ export const UNIFIED_TOOLS: UnifiedTool[] = [
     id: "business-audit",
     title: "Complete Business Audit",
     description:
-      "Full strategic analysis: SWOT, Porter's 5 Forces, Blue Ocean, competitor analysis, content gaps, local SEO opportunities",
+      "Full business analysis: strengths & weaknesses, competitor comparison, SEO opportunities, and growth strategy",
     icon: "🎯",
     agents: [
       "web-scraper-agent",
@@ -65,7 +65,7 @@ export const UNIFIED_TOOLS: UnifiedTool[] = [
     id: "social-content",
     title: "Social Media Content Generator",
     description:
-      "Create platform-optimized content for Facebook, Instagram, LinkedIn, TikTok, GMB posts",
+      "Create ready-to-post content for Facebook, Instagram, LinkedIn, TikTok, and Google Business Profile",
     icon: "📱",
     agents: ["facebook-marketing", "instagram-marketing", "linkedin-marketing"],
     apiEndpoint: "/api/tools/social-content",
@@ -362,7 +362,7 @@ export const UNIFIED_TOOLS: UnifiedTool[] = [
     id: "pricing-strategy",
     title: "Pricing Strategy Analyzer",
     description:
-      "Analyze pricing structure and generate optimized pricing tiers",
+      "Find the right price for your services based on what competitors charge and what customers will pay",
     icon: "💵",
     agents: ["pricing-intelligence-agent", "competitive-analysis-agent"],
     apiEndpoint: "/api/tools/pricing-strategy",
@@ -376,7 +376,7 @@ export const UNIFIED_TOOLS: UnifiedTool[] = [
   {
     id: "service-packages",
     title: "Service Package & Offer Designer",
-    description: "Generate service tiers, bundles, upsells, and value ladders",
+    description: "Create Basic, Standard, and Premium service packages that help customers choose and increase your revenue",
     icon: "📦",
     agents: [
       "blue-ocean-strategy",

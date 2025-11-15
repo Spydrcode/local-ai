@@ -15,6 +15,9 @@ import { NextResponse } from "next/server";
  * Agents: WebScraperAgent, StrategicAnalysisAgent, RevenueIntelligenceAgent
  */
 
+// Increase timeout for scraping and multi-agent analysis
+export const maxDuration = 60; // 60 seconds
+
 export async function POST(request: Request) {
   try {
     const input: PackageDesignerInput = await request.json();
@@ -36,11 +39,12 @@ export async function POST(request: Request) {
     let intelligence = input.intelligence;
 
     if (!intelligence && input.website_url) {
-      console.log("[Service Packages] Scraping for service intelligence...");
+      // Use quick scrape for demo mode (homepage only) to avoid timeouts
+      console.log("[Service Packages] Quick scraping for service intelligence (demo mode)...");
       const scraperAgent = new WebScraperAgent();
       intelligence = await scraperAgent.scrapeAndAnalyze({
         url: input.website_url,
-        paths: ["/", "/services", "/pricing", "/packages"],
+        paths: ["/"], // Only homepage for speed - upgradeable to ["/", "/services", "/pricing", "/packages"] for paid
         extractors: {
           business: true,
           seo: true,

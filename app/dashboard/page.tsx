@@ -26,41 +26,6 @@ const toolCategories = [
     ]
   },
   {
-    id: "strategic",
-    title: "🎯 Strategic Growth & Analysis",
-    description: "Deep business analysis and strategic planning",
-    color: "emerald",
-    tools: [
-      {
-        id: "business-audit",
-        title: "Complete Business Audit",
-        description: "Full strategic analysis: SWOT, Porter's 5 Forces, Blue Ocean, competitor analysis, content gaps, local SEO",
-        icon: "🎯",
-        apiEndpoint: "/api/tools/business-audit",
-        agents: ['web-scraper-agent', 'strategic-analysis', 'competitive-intelligence', 'marketing-content'],
-        requiresWebsiteData: true
-      },
-      {
-        id: "pricing-strategy",
-        title: "Pricing Strategy Analyzer",
-        description: "Data-driven pricing optimization with competitor comparison and tier recommendations",
-        icon: "💵",
-        apiEndpoint: "/api/tools/pricing-strategy",
-        agents: ['pricing-intelligence', 'competitive-intelligence'],
-        requiresWebsiteData: false
-      },
-      {
-        id: "service-packages",
-        title: "Service Package Designer",
-        description: "Generate Good/Better/Best service tiers with upsell strategies",
-        icon: "📦",
-        apiEndpoint: "/api/tools/service-packages",
-        agents: ['strategic-analysis', 'revenue-intelligence'],
-        requiresWebsiteData: false
-      }
-    ]
-  },
-  {
     id: "marketing",
     title: "📢 Marketing & Content Creation",
     description: "AI-powered content for all marketing channels",
@@ -91,6 +56,41 @@ const toolCategories = [
         icon: "📧",
         apiEndpoint: "/api/tools/email-hub",
         agents: ['newsletter'],
+        requiresWebsiteData: false
+      }
+    ]
+  },
+  {
+    id: "strategic",
+    title: "🎯 Strategic Growth & Analysis",
+    description: "Deep business analysis and strategic planning",
+    color: "emerald",
+    tools: [
+      {
+        id: "business-audit",
+        title: "Complete Business Audit",
+        description: "Full business analysis: strengths & weaknesses, competitor comparison, SEO opportunities, and growth strategy",
+        icon: "🎯",
+        apiEndpoint: "/api/tools/business-audit",
+        agents: ['web-scraper-agent', 'strategic-analysis', 'competitive-intelligence', 'marketing-content'],
+        requiresWebsiteData: true
+      },
+      {
+        id: "pricing-strategy",
+        title: "Pricing Strategy Analyzer",
+        description: "Find the right price for your services based on what competitors charge and what customers will pay",
+        icon: "💵",
+        apiEndpoint: "/api/tools/pricing-strategy",
+        agents: ['pricing-intelligence', 'competitive-intelligence'],
+        requiresWebsiteData: false
+      },
+      {
+        id: "service-packages",
+        title: "Service Package Designer",
+        description: "Create Basic, Standard, and Premium service packages that help customers choose and increase your revenue",
+        icon: "📦",
+        apiEndpoint: "/api/tools/service-packages",
+        agents: ['strategic-analysis', 'revenue-intelligence'],
         requiresWebsiteData: false
       }
     ]
@@ -419,25 +419,31 @@ export default function DashboardPage() {
 
         {/* Tool Result Modal */}
         {toolResult && selectedTool && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-            <Card className="max-w-4xl w-full max-h-[80vh] overflow-y-auto bg-slate-900 border-slate-700 p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">{selectedTool.icon} {selectedTool.title}</h3>
-                  <p className="text-slate-400">{selectedTool.description}</p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 overflow-y-auto">
+            <Card className="max-w-4xl w-full my-8 bg-slate-900 border-slate-700 flex flex-col max-h-[90vh]">
+              {/* Sticky Header */}
+              <div className="sticky top-0 z-10 bg-slate-900 border-b border-slate-700 p-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">{selectedTool.icon} {selectedTool.title}</h3>
+                    <p className="text-slate-400">{selectedTool.description}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setToolResult(null)
+                      setSelectedTool(null)
+                    }}
+                    className="text-slate-400 hover:text-white ml-4"
+                  >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    setToolResult(null)
-                    setSelectedTool(null)
-                  }}
-                  className="text-slate-400 hover:text-white"
-                >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
               </div>
+
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto p-6 flex-1">
 
               {/* Formatted Output - Ready to Copy/Paste */}
               {selectedTool.id === 'social-content' && toolResult.structured_outputs?.all_platforms ? (
@@ -559,7 +565,7 @@ export default function DashboardPage() {
               )}
 
               {/* Raw JSON (collapsible) */}
-              <details className="mb-4">
+              <details>
                 <summary className="cursor-pointer text-sm text-slate-400 hover:text-white mb-2">
                   View Raw JSON Data
                 </summary>
@@ -567,34 +573,38 @@ export default function DashboardPage() {
                   {JSON.stringify(toolResult, null, 2)}
                 </pre>
               </details>
+              </div>
 
-              <div className="flex gap-4">
-                <Button
-                  onClick={() => {
-                    const formatted = formatToolOutput(selectedTool.id, toolResult);
-                    navigator.clipboard.writeText(formatted);
-                  }}
-                  className="bg-emerald-500 hover:bg-emerald-600"
-                >
-                  📋 Copy Formatted Content
-                </Button>
-                <Button
-                  onClick={() => {
-                    navigator.clipboard.writeText(JSON.stringify(toolResult, null, 2));
-                  }}
-                  variant="outline"
-                >
-                  Copy JSON
-                </Button>
-                <Button
-                  onClick={() => {
-                    setToolResult(null)
-                    setSelectedTool(null)
-                  }}
-                  variant="outline"
-                >
-                  Close
-                </Button>
+              {/* Sticky Footer */}
+              <div className="sticky bottom-0 z-10 bg-slate-900 border-t border-slate-700 p-6">
+                <div className="flex gap-4">
+                  <Button
+                    onClick={() => {
+                      const formatted = formatToolOutput(selectedTool.id, toolResult);
+                      navigator.clipboard.writeText(formatted);
+                    }}
+                    className="bg-emerald-500 hover:bg-emerald-600"
+                  >
+                    📋 Copy Formatted Content
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(JSON.stringify(toolResult, null, 2));
+                    }}
+                    variant="outline"
+                  >
+                    Copy JSON
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setToolResult(null)
+                      setSelectedTool(null)
+                    }}
+                    variant="outline"
+                  >
+                    Close
+                  </Button>
+                </div>
               </div>
             </Card>
           </div>

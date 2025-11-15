@@ -15,6 +15,9 @@ import { NextResponse } from "next/server";
  * Agents: StrategicAnalysisAgent, CompetitiveIntelligenceAgent, MarketingContentAgent
  */
 
+// Increase timeout for deep scraping and multi-agent analysis
+export const maxDuration = 60; // 60 seconds
+
 export async function POST(request: Request) {
   try {
     const input: BusinessAuditInput = await request.json();
@@ -29,32 +32,51 @@ export async function POST(request: Request) {
 
     console.log("[Business Audit] Starting analysis for:", input.website_url);
 
-    // Step 1: Deep scrape and analyze website (multiple pages for comprehensive data)
+    const depthLevel = input.depth_level || "quick"; // Default to quick for demo/free users
     const scraperAgent = new WebScraperAgent();
 
-    console.log("[Business Audit] Starting deep multi-page scrape...");
-    const intelligence = await scraperAgent.scrapeAndAnalyze({
-      url: input.website_url,
-      paths: [
-        "/", // Homepage
-        "/about",
-        "/about-us",
-        "/services",
-        "/pricing",
-        "/contact",
-        "/locations",
-        "/reviews",
-        "/testimonials",
-        "/why-choose-us",
-      ],
-      extractors: {
+    // Define scraping strategy based on depth level
+    let scrapePaths: string[];
+    let extractors: any;
+
+    if (depthLevel === "comprehensive") {
+      // Full scrape for paid users - comprehensive analysis
+      console.log("[Business Audit] Starting COMPREHENSIVE multi-page scrape...");
+      scrapePaths = [
+        "/", "/about", "/about-us", "/services", "/pricing",
+        "/contact", "/locations", "/reviews", "/testimonials", "/why-choose-us",
+      ];
+      extractors = {
         business: true,
         competitors: true,
         seo: true,
         social: true,
         reviews: true,
         metaAds: true,
-      },
+      };
+    } else if (depthLevel === "standard") {
+      // Standard scrape - moderate analysis
+      console.log("[Business Audit] Starting STANDARD scrape...");
+      scrapePaths = ["/", "/about", "/services", "/contact"];
+      extractors = {
+        business: true,
+        competitors: true,
+        seo: true,
+      };
+    } else {
+      // Quick scrape for demo/free users - homepage only
+      console.log("[Business Audit] Starting QUICK scrape (demo mode - homepage only)...");
+      scrapePaths = ["/"]; // Only homepage for speed
+      extractors = {
+        business: true,
+        seo: true,
+      };
+    }
+
+    const intelligence = await scraperAgent.scrapeAndAnalyze({
+      url: input.website_url,
+      paths: scrapePaths,
+      extractors,
     });
 
     console.log(

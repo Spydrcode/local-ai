@@ -34,21 +34,21 @@ const marketingChallenges = [
 const aiCapabilities = [
   {
     icon: "🤖",
-    title: "19 AI Marketing Workflows",
-    description: "Specialized workflows for SEO, content, social media, brand voice, competitors, and more",
-    features: ["Marketing Intelligence", "SEO Strategy", "Content Calendar", "Brand Voice Analysis"],
+    title: "19 AI Marketing Tools",
+    description: "Automated tools for SEO, content creation, social media, and competitive analysis",
+    features: ["Get More Customers Online", "Rank Higher on Google", "30-Day Content Calendar", "Stand Out From Competitors"],
   },
   {
     icon: "🎓",
-    title: "Harvard & Strategic Frameworks",
-    description: "World-class strategies from HBS professors and proven business frameworks",
-    features: ["Jobs-to-be-Done", "Blue Ocean Strategy", "BCG Matrix", "Ansoff Growth Matrix", "OKR Framework"],
+    title: "Expert Business Strategies",
+    description: "Proven growth strategies used by successful businesses worldwide",
+    features: ["Find What Customers Really Want", "Discover Untapped Markets", "Smart Growth Planning", "Set Clear Business Goals"],
   },
   {
     icon: "📊",
-    title: "Modern ML Practices",
-    description: "Cutting-edge machine learning for personalization and optimization",
-    features: ["AI Personalization", "Attribution Modeling", "Marketing Mix Optimization", "Predictive Analytics"],
+    title: "Smart Recommendations",
+    description: "AI analyzes your business and creates personalized marketing plans",
+    features: ["Custom Strategy for Your Business", "Track What's Working", "Optimize Your Marketing Budget", "Predict Future Trends"],
   },
 ]
 
@@ -113,8 +113,25 @@ export default function Home() {
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!websiteUrl) {
+
+    // Validate URL
+    if (!websiteUrl.trim()) {
       setError("Please enter your website URL")
+      return
+    }
+
+    // Add https:// if missing
+    let url = websiteUrl.trim()
+    if (!url.match(/^https?:\/\//)) {
+      url = 'https://' + url
+      setWebsiteUrl(url)
+    }
+
+    // Basic URL validation
+    try {
+      new URL(url)
+    } catch {
+      setError("Please enter a valid website URL (e.g., yourbusiness.com)")
       return
     }
 
@@ -129,7 +146,7 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          url: websiteUrl,
+          url: url, // Use validated URL
           mode: 'comprehensive', // Full intelligence extraction
           paths: ["/", "/about", "/services", "/pricing", "/contact"]
         })
@@ -219,7 +236,7 @@ export default function Home() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
               </span>
-              Powered by 19 AI Workflows + Harvard & Strategic Frameworks
+              Powered by 19 AI Tools + Expert Business Strategies
             </div>
 
             <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
@@ -228,7 +245,7 @@ export default function Home() {
             </h1>
 
             <p className="mb-10 text-xl leading-relaxed text-slate-300 sm:text-2xl">
-              Get world-class marketing intelligence in minutes. Powered by Harvard Business School frameworks and modern AI.
+              Get world-class marketing intelligence in minutes.
             </p>
 
             <form onSubmit={handleAnalyze} className="mx-auto mb-8 max-w-2xl">

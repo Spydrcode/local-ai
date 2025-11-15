@@ -136,6 +136,7 @@ export interface ObjectionHandlerInput {
 }
 
 export interface PricingToolInput {
+  website_url?: string;
   current_pricing?: Record<string, number>;
   competitor_pricing?: Record<string, number>;
   target_margin?: number;
@@ -146,6 +147,9 @@ export interface PricingToolInput {
 }
 
 export interface PackageDesignerInput {
+  website_url?: string;
+  current_services?: string[];
+  target_market?: string;
   service_tiers?: number;
   price_points?: number[];
   target_segments?: string[];
