@@ -258,10 +258,14 @@ export default function AgencyDashboardPage() {
     if (!analyzedWebsite) return
 
     try {
+      setAnalysisError('')
+
       // Create demo/client entry
       const url = analyzedWebsite.metadata?.url || analyzedWebsite.website || ''
       const businessName = analyzedWebsite.business?.name || 'Unnamed Business'
       const industry = analyzedWebsite.business?.industry || null
+
+      console.log('[Agency Dashboard] Adding client:', { url, businessName, industry })
 
       const response = await fetch('/api/demos', {
         method: 'POST',
@@ -274,7 +278,20 @@ export default function AgencyDashboardPage() {
         })
       })
 
-      if (!response.ok) throw new Error('Failed to add client')
+      const responseData = await response.json()
+      console.log('[Agency Dashboard] API Response:', responseData)
+
+      if (!response.ok) {
+        if (response.status === 503) {
+          throw new Error('Database not configured. Please set up Supabase to save clients.')
+        }
+        throw new Error(responseData.error || responseData.details || 'Failed to add client')
+      }
+
+      // Check if client already existed
+      if (responseData.existing) {
+        console.log('[Agency Dashboard] Client already exists')
+      }
 
       // Reload clients list
       await loadClients()
@@ -285,6 +302,7 @@ export default function AgencyDashboardPage() {
       sessionStorage.removeItem('marketingAnalysis')
       setShowNewClientModal(false)
     } catch (err: any) {
+      console.error('[Agency Dashboard] Failed to add client:', err)
       setAnalysisError(err.message || 'Failed to add client')
     }
   }
