@@ -393,6 +393,14 @@ export default function AgencyDashboardPage() {
                   👥 Team
                 </Button>
               </Link>
+              {clients.filter(c => c.business_name === 'Unnamed Business').length > 0 && (
+                <Button
+                  onClick={() => setShowCleanupConfirm(true)}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  🗑️ Clean Up ({clients.filter(c => c.business_name === 'Unnamed Business').length})
+                </Button>
+              )}
               <Button
                 onClick={() => setShowNewClientModal(true)}
                 className="bg-emerald-500 hover:bg-emerald-600"
