@@ -437,12 +437,14 @@ export default function AgencyDashboardPage() {
             </div>
           </Card>
           <Card className="p-6 bg-slate-900/50 border-slate-700">
-            <div className="text-sm text-slate-400">Active Reports</div>
-            <div className="text-3xl font-bold text-blue-400 mt-1">{clients.length}</div>
+            <div className="text-sm text-slate-400">Active Clients</div>
+            <div className="text-3xl font-bold text-blue-400 mt-1">
+              {clients.filter(c => c.business_name !== 'Unnamed Business').length}
+            </div>
           </Card>
           <Card className="p-6 bg-slate-900/50 border-slate-700">
-            <div className="text-sm text-slate-400">Team Members</div>
-            <div className="text-3xl font-bold text-purple-400 mt-1">-</div>
+            <div className="text-sm text-slate-400">Tools Available</div>
+            <div className="text-3xl font-bold text-purple-400 mt-1">42</div>
           </Card>
         </div>
 
@@ -550,14 +552,11 @@ export default function AgencyDashboardPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/analysis/${client.id}`}>
-                      <Button className="bg-slate-700 hover:bg-slate-600">
-                        📊 View Reports
+                    <Link href={`/agency/client/${client.id}`}>
+                      <Button className="bg-emerald-500 hover:bg-emerald-600">
+                        Open Client Dashboard →
                       </Button>
                     </Link>
-                    <Button className="bg-emerald-500 hover:bg-emerald-600">
-                      📄 Export
-                    </Button>
                     <Button
                       onClick={() => handleDeleteClient(client.id)}
                       className="bg-red-600 hover:bg-red-700"
