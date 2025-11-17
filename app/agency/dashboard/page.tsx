@@ -153,6 +153,13 @@ export default function AgencyDashboardPage() {
     checkForAnalyzedWebsite()
   }, [])
 
+  // Auto-open modal if website was analyzed
+  useEffect(() => {
+    if (analyzedWebsite && !isLoading) {
+      setShowNewClientModal(true)
+    }
+  }, [analyzedWebsite, isLoading])
+
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setFilteredClients(clients)
