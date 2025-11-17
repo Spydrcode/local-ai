@@ -220,7 +220,7 @@ export default function Home() {
             <div className="flex items-center gap-6">
               <Link href="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Dashboard</Link>
               <Link href="/pricing" className="text-sm font-medium text-slate-300 hover:text-white">Pricing</Link>
-              <Link href="/agency/dashboard" className="text-sm font-medium text-emerald-400 hover:text-emerald-300">Agency Portal</Link>
+              <Link href="/agency" className="text-sm font-medium text-emerald-400 hover:text-emerald-300">Agency Portal</Link>
             </div>
           </div>
         </div>

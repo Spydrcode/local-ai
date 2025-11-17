@@ -22,7 +22,9 @@
       "Bash(\"pages/api/strategic-frameworks/$file/[demoId].ts\")",
       "Bash(done)",
       "Bash(powershell -Command:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []

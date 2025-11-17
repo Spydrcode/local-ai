@@ -353,7 +353,7 @@ export default function DashboardPage() {
               <Link href="/" className="text-sm font-medium text-slate-300 hover:text-white">Home</Link>
               <Link href="/dashboard" className="text-sm font-medium text-emerald-400">Dashboard</Link>
               <Link href="/pricing" className="text-sm font-medium text-slate-300 hover:text-white">Pricing</Link>
-              <Link href="/agency/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Agency Portal</Link>
+              <Link href="/agency" className="text-sm font-medium text-slate-300 hover:text-white">Agency Portal</Link>
             </div>
           </div>
         </div>

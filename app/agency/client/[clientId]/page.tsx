@@ -65,7 +65,7 @@ export default function ClientDashboardPage() {
           <div className="text-6xl mb-4">❌</div>
           <h2 className="text-2xl font-bold text-white mb-4">Client Not Found</h2>
           <p className="text-slate-400 mb-6">This client may have been deleted</p>
-          <Link href="/agency/dashboard">
+          <Link href="/agency/clients">
             <Button className="bg-emerald-500 hover:bg-emerald-600">
               ← Back to Clients
             </Button>
@@ -83,7 +83,7 @@ export default function ClientDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <Link
-                href="/agency/dashboard"
+                href="/agency/clients"
                 className="text-sm text-slate-400 hover:text-emerald-400 mb-2 inline-flex items-center gap-2"
               >
                 ← Back to Clients

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
 interface TeamMember {
   id: string
@@ -155,9 +155,9 @@ export default function TeamManagementPage() {
             <p className="text-slate-400">Manage who has access to your agency account</p>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/agency/dashboard">
+            <Link href="/agency">
               <Button className="bg-slate-700 hover:bg-slate-600">
-                ← Back to Dashboard
+                ← Back to Portal
               </Button>
             </Link>
             <Button

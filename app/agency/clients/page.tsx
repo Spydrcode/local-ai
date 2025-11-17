@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 interface Client {
   id: string
@@ -144,6 +144,9 @@ export default function AgencyDashboardPage() {
   // Cleanup state
   const [showCleanupConfirm, setShowCleanupConfirm] = useState(false)
   const [isCleaningUp, setIsCleaningUp] = useState(false)
+  
+  // Success message state
+  const [successMessage, setSuccessMessage] = useState('')
 
   // For demo purposes, we'll load all demos instead of filtering by agency
   // TODO: Implement proper auth and agency-specific filtering
@@ -302,6 +305,9 @@ export default function AgencyDashboardPage() {
       // Check if client already existed
       if (responseData.existing) {
         console.log('[Agency Dashboard] Client already exists')
+        setSuccessMessage(`Client "${businessName}" was already in your list`)
+      } else {
+        setSuccessMessage(`✓ Client "${businessName}" has been successfully added!`)
       }
 
       // Reload clients list
@@ -312,14 +318,17 @@ export default function AgencyDashboardPage() {
       sessionStorage.removeItem('websiteIntelligence')
       sessionStorage.removeItem('marketingAnalysis')
       setShowNewClientModal(false)
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(''), 5000)
     } catch (err: any) {
       console.error('[Agency Dashboard] Failed to add client:', err)
       setAnalysisError(err.message || 'Failed to add client')
     }
   }
 
-  const handleDeleteClient = async (clientId: string) => {
-    if (!confirm('Are you sure you want to delete this client?')) return
+  const handleDeleteClient = async (clientId: string, clientName?: string) => {
+    if (!confirm(`Are you sure you want to remove ${clientName || 'this client'}?`)) return
 
     try {
       const response = await fetch(`/api/demos?id=${clientId}`, {
@@ -331,8 +340,13 @@ export default function AgencyDashboardPage() {
         throw new Error(error.error || 'Failed to delete client')
       }
 
+      setSuccessMessage(`✓ Client "${clientName || 'Client'}" has been removed`)
+      
       // Reload clients list
       await loadClients()
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(''), 5000)
     } catch (err: any) {
       console.error('Failed to delete client:', err)
       alert(err.message || 'Failed to delete client')
@@ -386,10 +400,15 @@ export default function AgencyDashboardPage() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white">Client Dashboard</h1>
+              <h1 className="text-3xl font-bold text-white">Client Management</h1>
               <p className="text-slate-400 mt-1">Manage your client reports and analyses</p>
             </div>
             <div className="flex items-center gap-3">
+              <Link href="/agency">
+                <Button variant="outline" className="text-slate-400">
+                  ← Agency Portal
+                </Button>
+              </Link>
               <Link href="/agency/settings">
                 <Button className="bg-slate-700 hover:bg-slate-600">
                   ⚙️ Settings
@@ -420,6 +439,16 @@ export default function AgencyDashboardPage() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 flex items-center gap-3">
+            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span>{successMessage}</span>
+          </div>
+        )}
+        
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="p-6 bg-slate-900/50 border-slate-700">
@@ -558,11 +587,11 @@ export default function AgencyDashboardPage() {
                       </Button>
                     </Link>
                     <Button
-                      onClick={() => handleDeleteClient(client.id)}
-                      className="bg-red-600 hover:bg-red-700"
-                      title="Delete client"
+                      onClick={() => handleDeleteClient(client.id, client.business_name || client.site_summary)}
+                      className="bg-red-600 hover:bg-red-700 px-4"
+                      title="Remove this client"
                     >
-                      🗑️
+                      🗑️ Remove
                     </Button>
                   </div>
                 </div>
@@ -623,12 +652,21 @@ export default function AgencyDashboardPage() {
               {/* Show analyzed website if available */}
               {analyzedWebsite ? (
                 <div className="space-y-6">
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-4">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">ℹ️</span>
+                      <div>
+                        <p className="text-sm text-amber-200 font-medium mb-1">Ready to Add Client</p>
+                        <p className="text-xs text-amber-300/80">Review the details below and click "Add as Client" to save this business to your client list. This will NOT be saved automatically.</p>
+                      </div>
+                    </div>
+                  </div>
                   <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <h3 className="text-lg font-semibold text-white">Website Analyzed Successfully!</h3>
+                      <h3 className="text-lg font-semibold text-white">Website Analysis Complete</h3>
                     </div>
                     <div className="space-y-2 text-sm">
                       <div className="flex items-start gap-2">
@@ -662,13 +700,13 @@ export default function AgencyDashboardPage() {
                       variant="outline"
                       className="text-slate-400"
                     >
-                      Analyze Different Website
+                      ← Analyze Different Website
                     </Button>
                     <Button
                       onClick={handleAddAsClient}
-                      className="bg-emerald-500 hover:bg-emerald-600"
+                      className="bg-emerald-500 hover:bg-emerald-600 px-6"
                     >
-                      Add as Client
+                      ✓ Confirm & Add as Client
                     </Button>
                   </div>
                 </div>
