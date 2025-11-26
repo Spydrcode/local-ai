@@ -4,13 +4,17 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function initializeAlertConfigs(demo_id: string) {
   console.log('[ContractorAlertsInit] Initializing alert configs for demo:', demo_id);
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceKey) {
+    throw new Error('Supabase credentials not configured');
+  }
+
+  const supabase = createClient(supabaseUrl, serviceKey);
 
   // Fetch alert templates
   const { data: templates, error: templatesError } = await supabase
