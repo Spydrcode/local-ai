@@ -1,17 +1,23 @@
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 
-// Check if Supabase is configured
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+// Helper to get Supabase client
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-const supabase = supabaseUrl && supabaseKey
-  ? createClient(supabaseUrl, supabaseKey)
-  : null
+  if (!supabaseUrl || !supabaseKey) {
+    return null
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
+}
 
 // GET /api/demos - Get all demos/clients
 export async function GET() {
   try {
+    const supabase = getSupabaseClient()
+
     if (!supabase) {
       // Return empty array if Supabase not configured (demo mode)
       console.warn("Supabase not configured - returning empty client list")
@@ -40,6 +46,8 @@ export async function GET() {
 // POST /api/demos - Create a new demo/client
 export async function POST(req: NextRequest) {
   try {
+    const supabase = getSupabaseClient()
+
     if (!supabase) {
       return NextResponse.json(
         { error: "Database not configured. Please set up Supabase credentials in .env.local" },
@@ -128,6 +136,8 @@ export async function POST(req: NextRequest) {
 // DELETE /api/demos?cleanup=unnamed - Delete all "Unnamed Business" clients
 export async function DELETE(req: NextRequest) {
   try {
+    const supabase = getSupabaseClient()
+
     if (!supabase) {
       return NextResponse.json(
         { error: "Database not configured" },
