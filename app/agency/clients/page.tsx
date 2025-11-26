@@ -294,7 +294,8 @@ export default function AgencyDashboardPage() {
           website_url: url,
           business_name: businessName,
           industry: industry,
-          intelligence_data: analyzedWebsite
+          intelligence_data: analyzedWebsite,
+          created_by_email: 'agency-user@local.ai' // TODO: Replace with actual user email from auth
         })
       })
 

@@ -113,26 +113,9 @@ export default function Home() {
 
   const handleContractorSetup = async () => {
     try {
-      // Create a new demo for contractor mode
-      const response = await fetch('/api/demos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          website_url: 'contractor-setup',
-          business_name: 'Contractor Business',
-          contractor_mode: true
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create contractor demo');
-      }
-
-      const data = await response.json();
-
-      // Redirect to contractor onboarding with demo_id
-      router.push(`/contractor/onboard?demo_id=${data.id}`);
+      // Redirect directly to contractor onboarding
+      // No need to create a demo entry - that pollutes the agency client list
+      router.push('/contractor/onboard');
     } catch (err: any) {
       console.error('Error setting up contractor:', err);
       setError(err.message || 'Failed to start contractor setup. Please try again.');
