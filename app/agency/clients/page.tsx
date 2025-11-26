@@ -140,11 +140,12 @@ export default function AgencyDashboardPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analyzedWebsite, setAnalyzedWebsite] = useState<any>(null)
   const [analysisError, setAnalysisError] = useState('')
+  const [isAddingClient, setIsAddingClient] = useState(false)
 
   // Cleanup state
   const [showCleanupConfirm, setShowCleanupConfirm] = useState(false)
   const [isCleaningUp, setIsCleaningUp] = useState(false)
-  
+
   // Success message state
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -269,10 +270,14 @@ export default function AgencyDashboardPage() {
   }
 
   const handleAddAsClient = async () => {
-    if (!analyzedWebsite) return
+    if (!analyzedWebsite) {
+      console.error('[Agency Dashboard] No analyzed website data')
+      return
+    }
 
     try {
       setAnalysisError('')
+      setIsAddingClient(true)
 
       // Create demo/client entry
       const url = analyzedWebsite.metadata?.url || analyzedWebsite.website || ''
@@ -280,6 +285,7 @@ export default function AgencyDashboardPage() {
       const industry = analyzedWebsite.business?.industry || null
 
       console.log('[Agency Dashboard] Adding client:', { url, businessName, industry })
+      console.log('[Agency Dashboard] Full analyzed website data:', analyzedWebsite)
 
       const response = await fetch('/api/demos', {
         method: 'POST',
@@ -291,6 +297,8 @@ export default function AgencyDashboardPage() {
           intelligence_data: analyzedWebsite
         })
       })
+
+      console.log('[Agency Dashboard] Response status:', response.status)
 
       const responseData = await response.json()
       console.log('[Agency Dashboard] API Response:', responseData)
@@ -324,6 +332,8 @@ export default function AgencyDashboardPage() {
     } catch (err: any) {
       console.error('[Agency Dashboard] Failed to add client:', err)
       setAnalysisError(err.message || 'Failed to add client')
+    } finally {
+      setIsAddingClient(false)
     }
   }
 
@@ -690,6 +700,12 @@ export default function AgencyDashboardPage() {
                     </div>
                   </div>
 
+                  {analysisError && (
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-sm text-red-400">
+                      {analysisError}
+                    </div>
+                  )}
+
                   <div className="flex justify-between gap-3">
                     <Button
                       onClick={() => {
@@ -699,14 +715,16 @@ export default function AgencyDashboardPage() {
                       }}
                       variant="outline"
                       className="text-slate-400"
+                      disabled={isAddingClient}
                     >
                       ← Analyze Different Website
                     </Button>
                     <Button
                       onClick={handleAddAsClient}
                       className="bg-emerald-500 hover:bg-emerald-600 px-6"
+                      disabled={isAddingClient}
                     >
-                      ✓ Confirm & Add as Client
+                      {isAddingClient ? '⏳ Adding Client...' : '✓ Confirm & Add as Client'}
                     </Button>
                   </div>
                 </div>
