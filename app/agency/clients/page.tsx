@@ -299,9 +299,17 @@ export default function AgencyDashboardPage() {
       })
 
       console.log('[Agency Dashboard] Response status:', response.status)
+      console.log('[Agency Dashboard] Response ok:', response.ok)
+      console.log('[Agency Dashboard] Response statusText:', response.statusText)
 
-      const responseData = await response.json()
-      console.log('[Agency Dashboard] API Response:', responseData)
+      let responseData
+      try {
+        responseData = await response.json()
+        console.log('[Agency Dashboard] API Response:', responseData)
+      } catch (parseError) {
+        console.error('[Agency Dashboard] Failed to parse response:', parseError)
+        throw new Error('Server returned invalid response')
+      }
 
       if (!response.ok) {
         if (response.status === 503) {
