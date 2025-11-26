@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 
 // Check if Supabase is configured
-const supabaseUrl = process.env.SUPABASE_URL
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 const supabase = supabaseUrl && supabaseKey
@@ -90,6 +90,11 @@ export async function POST(req: NextRequest) {
     // Add optional columns if they exist in your schema
     if (industry) insertData.industry = industry
     if (intelligence_data) insertData.intelligence_data = intelligence_data
+
+    // Add contractor_mode if provided (column should exist from migrations)
+    if (body.contractor_mode !== undefined) {
+      insertData.contractor_mode = body.contractor_mode
+    }
 
     console.log("Inserting new client:", insertData)
 

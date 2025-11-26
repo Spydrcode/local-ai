@@ -66,7 +66,7 @@ export class EnhancedVectorRepository {
   private namespaces: NamespaceConfig;
 
   constructor(indexName?: string) {
-    this.indexName = indexName || process.env.PINECONE_INDEX_NAME || "local-ai-demos";
+    this.indexName = indexName || process.env.PINECONE_INDEX_NAME || "forecasta-ai-demos";
 
     // Define namespace structure for data isolation
     this.namespaces = {

@@ -1,5 +1,5 @@
 /**
- * Comprehensive TypeScript types for LocalAI 2.0 AI improvements
+ * Comprehensive TypeScript types for ForecastaAI 2.0 AI improvements
  */
 
 // ============================================================================

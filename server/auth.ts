@@ -1,4 +1,5 @@
 import type { NextApiRequest } from "next";
+import { headers } from "next/headers";
 import { supabaseAdmin } from "./supabaseAdmin";
 
 export interface AuthContext {
@@ -6,8 +7,23 @@ export interface AuthContext {
   email?: string;
 }
 
-export async function requireUser(req: NextApiRequest): Promise<AuthContext> {
-  const authHeader = req.headers.authorization;
+/**
+ * Require user authentication for API routes
+ * Supports both Pages API (NextApiRequest) and App Router (no param - uses headers())
+ */
+export async function requireUser(req?: NextApiRequest): Promise<AuthContext> {
+  let authHeader: string | undefined;
+
+  // App Router (Next.js 13+) - use headers() from next/headers
+  if (!req) {
+    const headersList = await headers();
+    authHeader = headersList.get("authorization") || undefined;
+  }
+  // Pages API - use req.headers
+  else {
+    authHeader = req.headers.authorization;
+  }
+
   const token = authHeader?.replace("Bearer ", "").trim();
 
   if (!token) {

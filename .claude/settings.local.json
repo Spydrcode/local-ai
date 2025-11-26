@@ -24,7 +24,10 @@
       "Bash(powershell -Command:*)",
       "Bash(npm install:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(start https://supabase.com/dashboard/project/dtegqjoqywlxzsfkurzh/sql/new)",
+      "Bash(npx tsx:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

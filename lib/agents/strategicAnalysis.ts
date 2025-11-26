@@ -8,7 +8,7 @@ const openai = new OpenAI({
 async function scrapeWebsite(url: string) {
   try {
     const response = await fetch(url, {
-      headers: { "User-Agent": "LocalAI-Bot/1.0" },
+      headers: { "User-Agent": "ForecastaAI-Bot/1.0" },
       signal: AbortSignal.timeout(10000),
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);

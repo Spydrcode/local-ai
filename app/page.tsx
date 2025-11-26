@@ -111,6 +111,34 @@ export default function Home() {
   const [error, setError] = useState("")
   const router = useRouter()
 
+  const handleContractorSetup = async () => {
+    try {
+      // Create a new demo for contractor mode
+      const response = await fetch('/api/demos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          website_url: 'contractor-setup',
+          business_name: 'Contractor Business',
+          contractor_mode: true
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create contractor demo');
+      }
+
+      const data = await response.json();
+
+      // Redirect to contractor onboarding with demo_id
+      router.push(`/contractor/onboard?demo_id=${data.id}`);
+    } catch (err: any) {
+      console.error('Error setting up contractor:', err);
+      setError(err.message || 'Failed to start contractor setup. Please try again.');
+    }
+  }
+
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -158,7 +186,7 @@ export default function Home() {
       }
 
       const { data, duration } = await response.json()
-      
+
       console.log(`[Homepage] Intelligence scan completed in ${duration}ms`)
       console.log("[Homepage] Data collected:", {
         business: !!data.business,
@@ -170,31 +198,51 @@ export default function Home() {
         contentAnalysis: !!data.contentAnalysis
       })
 
-      // Store comprehensive intelligence data for all tools to use
-      const intelligenceData = {
-        ...data,
-        // Add optional user-provided context
+      // Create compact version for sessionStorage (avoid quota exceeded)
+      const compactData = {
+        business: data.business,
+        brandAnalysis: data.brandAnalysis,
+        seo: data.seo ? {
+          title: data.seo.title,
+          metaDescription: data.seo.metaDescription,
+          keywords: data.seo.keywords?.slice(0, 10) // Limit keywords
+        } : undefined,
+        social: data.social,
+        reviews: data.reviews ? {
+          totalReviews: data.reviews.totalReviews,
+          averageRating: data.reviews.averageRating,
+          highlights: data.reviews.highlights?.slice(0, 3) // Limit highlights
+        } : undefined,
+        competitors: data.competitors?.slice(0, 5).map((c: any) => ({ // Limit to top 5 competitors
+          name: c.name,
+          url: c.url,
+          differentiators: c.differentiators?.slice(0, 3)
+        })),
         userProvidedName: businessName || undefined,
         userProvidedIndustry: industry || undefined,
         scrapedAt: new Date().toISOString(),
         source: 'web-scraper-agent',
-        // Ensure URL is stored in metadata
         metadata: {
-          ...data.metadata,
           url: websiteUrl
         }
       }
 
-      sessionStorage.setItem('websiteIntelligence', JSON.stringify(intelligenceData))
-      
-      // Also store in marketingAnalysis for backward compatibility
-      sessionStorage.setItem('marketingAnalysis', JSON.stringify(intelligenceData))
-      
-      // Store URL separately for easy access
-      sessionStorage.setItem('lastAnalyzedUrl', websiteUrl)
+      try {
+        // Store compact data in sessionStorage
+        sessionStorage.setItem('websiteIntelligence', JSON.stringify(compactData))
+        sessionStorage.setItem('marketingAnalysis', JSON.stringify(compactData))
+        sessionStorage.setItem('lastAnalyzedUrl', websiteUrl)
 
-      console.log("[Homepage] Intelligence data stored, redirecting to dashboard")
-      
+        console.log("[Homepage] Compact intelligence data stored in sessionStorage")
+      } catch (storageError) {
+        console.warn("[Homepage] SessionStorage quota exceeded, storing minimal data only")
+        // Store absolute minimum if still failing
+        sessionStorage.setItem('lastAnalyzedUrl', websiteUrl)
+        sessionStorage.setItem('businessName', data.business?.name || '')
+      }
+
+      console.log("[Homepage] Redirecting to dashboard")
+
       // Redirect to dashboard with all tools
       router.push("/dashboard")
     } catch (err: any) {
@@ -215,12 +263,13 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold text-white">Local AI</span>
+              <span className="text-xl font-semibold text-white">Forecasta AI</span>
             </Link>
             <div className="flex items-center gap-6">
               <Link href="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Dashboard</Link>
               <Link href="/pricing" className="text-sm font-medium text-slate-300 hover:text-white">Pricing</Link>
               <Link href="/agency" className="text-sm font-medium text-emerald-400 hover:text-emerald-300">Agency Portal</Link>
+              <Link href="#contractor" className="text-sm font-medium text-orange-400 hover:text-orange-300 border border-orange-500/30 rounded-lg px-3 py-1.5 bg-orange-500/10">👷 Contractors</Link>
             </div>
           </div>
         </div>
@@ -492,6 +541,109 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Contractor Copilot Section */}
+      <section id="contractor" className="border-t border-white/10 bg-linear-to-b from-orange-900/20 via-slate-900 to-slate-950 py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-5xl">
+            <div className="text-center mb-12">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-sm text-orange-400">
+                <span className="text-lg">👷</span>
+                Built for Contractors
+              </div>
+              <h2 className="mb-4 text-4xl font-bold text-white">
+                Contractor Copilot
+              </h2>
+              <p className="text-xl text-slate-300">
+                Operational AI for HVAC, Plumbing, Roofing, Remodeling & Field Services
+              </p>
+            </div>
+
+            {/* Contractor Features Grid */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
+              <Card className="p-6 bg-slate-900/50 border-orange-500/30 hover:border-orange-500/50 transition-all">
+                <div className="text-4xl mb-3">📊</div>
+                <h3 className="text-xl font-bold text-white mb-2">Weekly Lead Pulse</h3>
+                <p className="text-sm text-slate-400 mb-3">
+                  Predict next week's leads with seasonal signals. Get 3 actions + ready-to-run ads.
+                </p>
+                <div className="text-xs text-orange-400 font-medium">HVAC, Plumbing, Roofing</div>
+              </Card>
+
+              <Card className="p-6 bg-slate-900/50 border-orange-500/30 hover:border-orange-500/50 transition-all">
+                <div className="text-4xl mb-3">👷</div>
+                <h3 className="text-xl font-bold text-white mb-2">Hire & Onboard Kit</h3>
+                <p className="text-sm text-slate-400 mb-3">
+                  Auto-generate job ads and role-specific onboarding checklists.
+                </p>
+                <div className="text-xs text-orange-400 font-medium">All Industries</div>
+              </Card>
+
+              <Card className="p-6 bg-slate-900/50 border-orange-500/30 hover:border-orange-500/50 transition-all">
+                <div className="text-4xl mb-3">📸</div>
+                <h3 className="text-xl font-bold text-white mb-2">QC Photo Checker</h3>
+                <p className="text-sm text-slate-400 mb-3">
+                  AI-powered quality control with automated punch lists.
+                </p>
+                <div className="text-xs text-orange-400 font-medium">HVAC, Roofing, Remodeling</div>
+              </Card>
+
+              <Card className="p-6 bg-slate-900/50 border-orange-500/30 hover:border-orange-500/50 transition-all">
+                <div className="text-4xl mb-3">📄</div>
+                <h3 className="text-xl font-bold text-white mb-2">Monthly One-Pager</h3>
+                <p className="text-sm text-slate-400 mb-3">
+                  Executive summary for you + investor-grade for lenders.
+                </p>
+                <div className="text-xs text-orange-400 font-medium">All Industries</div>
+              </Card>
+
+              <Card className="p-6 bg-slate-900/50 border-orange-500/30 hover:border-orange-500/50 transition-all">
+                <div className="text-4xl mb-3">🚨</div>
+                <h3 className="text-xl font-bold text-white mb-2">Monitoring & Alerts</h3>
+                <p className="text-sm text-slate-400 mb-3">
+                  Slack/email alerts for ranking drops, bad reviews, competitor moves.
+                </p>
+                <div className="text-xs text-orange-400 font-medium">All Industries</div>
+              </Card>
+
+              <Card className="p-6 bg-slate-900/50 border-orange-500/30 hover:border-orange-500/50 transition-all">
+                <div className="text-4xl mb-3">🔌</div>
+                <h3 className="text-xl font-bold text-white mb-2">Integration Layer</h3>
+                <p className="text-sm text-slate-400 mb-3">
+                  Connect ServiceTitan, Jobber, QuickBooks - sync jobs & customers.
+                </p>
+                <div className="text-xs text-orange-400 font-medium">8 Integrations</div>
+              </Card>
+            </div>
+
+            {/* Contractor CTA */}
+            <div className="text-center">
+              <Button
+                size="lg"
+                className="h-14 px-12 text-lg bg-orange-500 hover:bg-orange-600"
+                onClick={handleContractorSetup}
+              >
+                Set Up Contractor Profile
+              </Button>
+              <p className="mt-4 text-sm text-slate-400">
+                6-step setup • Free to try • Built specifically for field service contractors
+              </p>
+            </div>
+
+            {/* Supported Industries */}
+            <div className="mt-12 text-center">
+              <p className="text-sm text-slate-500 mb-3">Optimized for:</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {['HVAC', 'Plumbing', 'Roofing', 'Remodeling', 'Landscaping', 'Electrical', 'Painting', 'Concrete', 'Propane', 'Fencing'].map((industry) => (
+                  <span key={industry} className="px-3 py-1 text-xs rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400">
+                    {industry}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="border-t border-white/10 bg-linear-to-b from-emerald-900/20 via-slate-900 to-slate-950 py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -517,9 +669,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="font-semibold text-white">Local AI</span>
+              <span className="font-semibold text-white">Forecasta AI</span>
             </div>
-            <p className="text-sm text-slate-500">© 2025 Local AI. AI-Powered Marketing Strategy Platform.</p>
+            <p className="text-sm text-slate-500">© 2025 Forecasta AI. AI-Powered Marketing Strategy Platform.</p>
           </div>
         </div>
       </footer>

@@ -68,7 +68,7 @@ export class PineconeClient {
    * Get or create index connection (with connection pooling)
    */
   static getIndex(indexName?: string): Index {
-    const name = indexName || process.env.PINECONE_INDEX_NAME || "local-ai-demos";
+    const name = indexName || process.env.PINECONE_INDEX_NAME || "forecasta-ai-demos";
 
     if (!this.indexConnections.has(name)) {
       // Check connection pool limit

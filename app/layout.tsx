@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Local AI | Business Intelligence Platform",
+  title: "Forecasta AI | Business Intelligence Platform",
   description: "Instant AI-powered business intelligence for any website. Get strategic insights, competitor analysis, content calendars, and performance optimization in seconds.",
   keywords: ["business intelligence", "AI analysis", "competitor research", "content marketing", "website optimization"],
-  authors: [{ name: "Local AI Team" }],
-  creator: "Local AI",
-  publisher: "Local AI",
+  authors: [{ name: "Forecasta AI Team" }],
+  creator: "Forecasta AI",
+  publisher: "Forecasta AI",
   robots: {
     index: true,
     follow: true,
@@ -35,16 +35,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://local-ai.vercel.app',
-    title: 'Local AI | Business Intelligence Platform',
+    url: 'https://forecasta-ai.vercel.app',
+    title: 'Forecasta AI | Business Intelligence Platform',
     description: 'Instant AI-powered business intelligence for any website. Get strategic insights, competitor analysis, and performance optimization.',
-    siteName: 'Local AI',
+    siteName: 'Forecasta AI',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Local AI | Business Intelligence Platform',
+    title: 'Forecasta AI | Business Intelligence Platform',
     description: 'Instant AI-powered business intelligence for any website.',
-    creator: '@localai',
+    creator: '@forecastaai',
   },
 };
 

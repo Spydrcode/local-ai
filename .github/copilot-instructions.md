@@ -1,4 +1,4 @@
-# Local AI - MCP Server ✅ COMPLETE
+# Forecasta AI - MCP Server ✅ COMPLETE
 
 ## Implementation Status: READY TO USE
 

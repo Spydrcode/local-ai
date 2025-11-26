@@ -53,7 +53,7 @@ export class LangChainVectorStore {
     namespace?: string;
   }): Promise<PineconeStore> {
     const indexName =
-      params.indexName || process.env.PINECONE_INDEX_NAME || "local-ai-demos";
+      params.indexName || process.env.PINECONE_INDEX_NAME || "forecasta-ai-demos";
     const index = this.pinecone.index(indexName);
 
     return await PineconeStore.fromExistingIndex(this.embeddings, {

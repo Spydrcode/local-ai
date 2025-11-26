@@ -15,7 +15,7 @@ interface ScrapedContent {
 async function scrapeWebsite(url: string): Promise<ScrapedContent> {
   try {
     const response = await fetch(url, {
-      headers: { "User-Agent": "LocalAI-Bot/1.0" },
+      headers: { "User-Agent": "ForecastaAI-Bot/1.0" },
       signal: AbortSignal.timeout(10000),
     });
 
