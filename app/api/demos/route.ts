@@ -199,7 +199,7 @@ export async function DELETE(req: NextRequest) {
         .from("demos")
         .delete()
         .or(
-          'business_name.eq.Unnamed Business,business_name.eq.Contractor Business,website_url.eq.contractor-setup,contractor_mode.eq.true'
+          "business_name.eq.Unnamed Business,business_name.eq.Contractor Business,website_url.eq.contractor-setup,contractor_mode.eq.true"
         )
         .select();
 
