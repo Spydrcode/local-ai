@@ -192,12 +192,15 @@ export async function DELETE(req: NextRequest) {
     const clientId = searchParams.get("id");
     const cleanup = searchParams.get("cleanup");
 
-    // Cleanup operation - delete all "Unnamed Business" entries
+    // Cleanup operation - delete all "Unnamed Business" entries AND contractor entries
     if (cleanup === "unnamed") {
+      // Delete all problematic entries in one query
       const { data, error } = await supabase
         .from("demos")
         .delete()
-        .eq("business_name", "Unnamed Business")
+        .or(
+          'business_name.eq.Unnamed Business,business_name.eq.Contractor Business,website_url.eq.contractor-setup,contractor_mode.eq.true'
+        )
         .select();
 
       if (error) {
@@ -205,9 +208,9 @@ export async function DELETE(req: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
 
-      console.log(`Cleaned up ${data?.length || 0} unnamed clients`);
+      console.log(`Cleaned up ${data?.length || 0} unwanted clients`);
       return NextResponse.json({
-        message: `Deleted ${data?.length || 0} unnamed clients`,
+        message: `Deleted ${data?.length || 0} unwanted clients (Unnamed Business, Contractor Business, and test entries)`,
         count: data?.length || 0,
       });
     }
