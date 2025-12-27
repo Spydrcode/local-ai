@@ -39,12 +39,8 @@ export class AgencyService {
       secondaryColor: data.secondary_color,
       footerText: data.footer_text,
       websiteUrl: data.website_url,
-      stripeCustomerId: data.stripe_customer_id,
-      stripeSubscriptionId: data.stripe_subscription_id,
-      plan: data.plan,
       monthlyReportLimit: data.monthly_report_limit,
       reportsUsedThisMonth: data.reports_used_this_month,
-      billingCycleStart: data.billing_cycle_start,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };
@@ -274,56 +270,5 @@ export class AgencyService {
           : agency.monthlyReportLimit - agency.reportsUsedThisMonth,
       mostUsedAnalyses,
     };
-  }
-
-  /**
-   * Update Stripe subscription
-   */
-  static async updateStripeSubscription(
-    agencyId: string,
-    stripeCustomerId: string,
-    stripeSubscriptionId: string
-  ): Promise<boolean> {
-    const { error } = await this.ensureSupabase()
-      .from("agencies")
-      .update({
-        stripe_customer_id: stripeCustomerId,
-        stripe_subscription_id: stripeSubscriptionId,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", agencyId);
-
-    if (error) {
-      console.error("Error updating Stripe subscription:", error);
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Update agency plan
-   */
-  static async updatePlan(
-    agencyId: string,
-    plan: "solo" | "starter" | "pro" | "enterprise"
-  ): Promise<boolean> {
-    const reportLimit = plan === "solo" ? 10 : plan === "starter" ? 50 : -1;
-
-    const { error } = await this.ensureSupabase()
-      .from("agencies")
-      .update({
-        plan,
-        monthly_report_limit: reportLimit,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", agencyId);
-
-    if (error) {
-      console.error("Error updating plan:", error);
-      return false;
-    }
-
-    return true;
   }
 }
