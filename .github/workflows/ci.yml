@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: Build application
+        run: npm run build
+        env:
+          # Provide minimal env vars needed for build
+          NEXT_PUBLIC_VERCEL_URL: http://localhost:3000
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+          PINECONE_INDEX_NAME: forecasta-ai-demos
+          PINECONE_ENVIRONMENT: us-east-1
+      
+      - name: Check for voice violations
+        run: |
+          echo "Checking for prohibited voice patterns..."
+          # Check for banned phrases in UI files
+          if grep -r -i "free trial\|unlock insights\|limited time\|only.*spots left\|crushing it\|10x your" app/ components/ --include="*.tsx" --include="*.ts"; then
+            echo "❌ Found prohibited voice patterns. See docs/voice-lock.md"
+            exit 1
+          else
+            echo "✅ No voice violations found"
+          fi
+        continue-on-error: true

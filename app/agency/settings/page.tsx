@@ -118,23 +118,6 @@ export default function AgencySettingsPage() {
     }
   }
 
-  const handleManageBilling = async () => {
-    try {
-      const response = await fetch('/api/stripe/create-portal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ agencyId }),
-      })
-
-      if (!response.ok) throw new Error('Failed to create portal session')
-
-      const { url } = await response.json()
-      window.location.href = url
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to open billing portal' })
-    }
-  }
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -169,19 +152,20 @@ export default function AgencySettingsPage() {
           </div>
         )}
 
-        {/* Plan & Usage */}
+        {/* Usage Summary */}
         <Card className="p-6 bg-slate-900/50 border-slate-700 mb-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Subscription Plan</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Usage Summary</h2>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-2xl font-bold text-emerald-400 capitalize">{settings.plan}</div>
-              <div className="text-sm text-slate-400 mt-1">
-                {settings.reports_used_this_month} / {settings.monthly_report_limit === -1 ? '∞' : settings.monthly_report_limit} reports used this month
+              <div className="text-sm text-slate-400">Reports Generated This Month</div>
+              <div className="text-2xl font-bold text-emerald-400">{settings.reports_used_this_month}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-slate-400">Monthly Limit</div>
+              <div className="text-2xl font-bold text-white">
+                {settings.monthly_report_limit === -1 ? '∞' : settings.monthly_report_limit}
               </div>
             </div>
-            <Button onClick={handleManageBilling} className="bg-slate-700 hover:bg-slate-600">
-              Manage Billing
-            </Button>
           </div>
           {settings.monthly_report_limit !== -1 && (
             <div className="w-full bg-slate-700 rounded-full h-2">
