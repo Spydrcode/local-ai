@@ -370,7 +370,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-6">
               <Link href="/" className="text-sm font-medium text-slate-300 hover:text-white">Home</Link>
               <Link href="/dashboard" className="text-sm font-medium text-emerald-400">Dashboard</Link>
-              <Link href="/pricing" className="text-sm font-medium text-slate-300 hover:text-white">Pricing</Link>
+              <Link href="/clarity-snapshot" className="text-sm font-medium text-cyan-400 hover:text-cyan-300">✨ Free Tool</Link>
               <Link href="/agency" className="text-sm font-medium text-slate-300 hover:text-white">Agency Portal</Link>
             </div>
           </div>

@@ -250,9 +250,9 @@ export default function Home() {
             </Link>
             <div className="flex items-center gap-6">
               <Link href="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Dashboard</Link>
-              <Link href="/pricing" className="text-sm font-medium text-slate-300 hover:text-white">Pricing</Link>
+              <Link href="/clarity-snapshot" className="text-sm font-medium text-cyan-400 hover:text-cyan-300">✨ Free Clarity Snapshot</Link>
+              <Link href="#how-it-works" className="text-sm font-medium text-slate-300 hover:text-white">How It Works</Link>
               <Link href="/agency" className="text-sm font-medium text-emerald-400 hover:text-emerald-300">Agency Portal</Link>
-              <Link href="#contractor" className="text-sm font-medium text-orange-400 hover:text-orange-300 border border-orange-500/30 rounded-lg px-3 py-1.5 bg-orange-500/10">👷 Contractors</Link>
             </div>
           </div>
         </div>

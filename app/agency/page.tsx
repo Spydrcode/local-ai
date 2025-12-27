@@ -146,15 +146,15 @@ export default function AgencyPortalPage() {
               </Card>
 
               <Card className="p-8 bg-linear-to-br from-blue-500/10 to-slate-900/50 border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer group">
-                <Link href="/dashboard">
+                <Link href="/agency/tools">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="text-4xl mb-4">🛠️</div>
                       <h2 className="text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
-                        All Tools
+                        Agency Tools
                       </h2>
                       <p className="text-slate-400 mb-4">
-                        Access all 42 marketing and business tools
+                        All 42 marketing tools for client campaigns
                       </p>
                       <div className="text-blue-400 font-medium">
                         View tools →
