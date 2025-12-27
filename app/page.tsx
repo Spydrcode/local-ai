@@ -272,108 +272,129 @@ export default function Home() {
             </div>
 
             <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
-              AI Marketing Strategy
-              <span className="bg-linear-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent"> Platform</span>
+              Get Instant Clarity
+              <span className="bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"> on Your Business</span>
             </h1>
 
             <p className="mb-10 text-xl leading-relaxed text-slate-300 sm:text-2xl">
-              Get world-class marketing intelligence in minutes.
+              Know exactly what's working and what to fix first — in 30 seconds.
             </p>
 
-            <form onSubmit={handleAnalyze} className="mx-auto mb-8 max-w-2xl">
-              <div className="mb-4">
-                <Input
-                  type="url"
-                  value={websiteUrl}
-                  onChange={(e) => { setWebsiteUrl(e.target.value); setError("") }}
-                  placeholder="Enter your website URL (e.g., yourbusiness.com)"
-                  className="h-14 text-base text-center"
-                  required
-                  disabled={isAnalyzing}
-                />
-              </div>
-
-              <div className="mb-4 grid gap-3 sm:grid-cols-2">
-                <Input
-                  type="text"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="Business Name (Optional)"
-                  className="h-12 text-base"
-                  disabled={isAnalyzing}
-                />
-                <Input
-                  type="text"
-                  value={industry}
-                  onChange={(e) => setIndustry(e.target.value)}
-                  placeholder="Industry (e.g., Plumbing, Restaurant)"
-                  className="h-12 text-base"
-                  disabled={isAnalyzing}
-                />
-              </div>
-
-              {error && (
-                <div className="mb-4 rounded-md border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</div>
-              )}
-
-              <Button
-                type="submit"
-                disabled={isAnalyzing}
-                size="lg"
-                className="h-14 w-full text-lg bg-emerald-500 hover:bg-emerald-600 sm:w-auto sm:px-16"
-              >
-                {isAnalyzing ? "Processing..." : "Generate Marketing Strategy"}
-              </Button>
-            </form>
+            <div className="mb-8">
+              <Link href="/clarity-snapshot">
+                <Button
+                  size="lg"
+                  className="h-16 px-12 text-xl bg-cyan-500 hover:bg-cyan-600 shadow-lg shadow-cyan-500/25"
+                >
+                  ✨ Get Your Free Clarity Snapshot
+                </Button>
+              </Link>
+            </div>
 
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Free analysis
+                No email required
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Results in 30s - 2min
+                Results in 30 seconds
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                No signup required
+                Free forever
               </div>
             </div>
+
+            <p className="mt-8 text-slate-500 text-sm">
+              Need comprehensive marketing strategy? 
+              <button
+                onClick={() => document.getElementById('full-platform')?.scrollIntoView({ behavior: 'smooth' })}
+                className="ml-2 text-emerald-400 hover:text-emerald-300 underline"
+              >
+                Explore full platform →
+              </button>
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Clarity Snapshot CTA */}
-      <section className="border-t border-white/10 bg-linear-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 py-12">
+      {/* Clarity Snapshot Secondary CTA - Removed, now primary above */}
+
+      {/* Full Platform Section */}
+      <section id="full-platform" className="border-t border-white/10 bg-slate-900/30 py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="max-w-4xl mx-auto bg-slate-900/70 border-cyan-500/30 p-8">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-3xl">✨</span>
-                  <h2 className="text-2xl font-bold text-white">Don't have a website yet?</h2>
-                </div>
-                <p className="text-slate-300 mb-2">
-                  Get instant business clarity in 2 minutes — no website required, no long forms.
-                </p>
-                <p className="text-sm text-slate-400">
-                  Quick selections → Recognition-first insights → What to fix first
-                </p>
-              </div>
-              <Link href="/clarity-snapshot">
-                <Button size="lg" className="bg-cyan-500 hover:bg-cyan-600 whitespace-nowrap">
-                  Try Clarity Snapshot →
-                </Button>
-              </Link>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+              Full AI Marketing Platform
             </div>
-          </Card>
+            <h2 className="mb-3 text-3xl font-bold text-white">Need More Than Quick Insights?</h2>
+            <p className="text-slate-400">Get comprehensive marketing intelligence with our full platform</p>
+          </div>
+
+          <div className="mx-auto max-w-3xl">
+            <Card className="p-8 bg-slate-900/70 border-emerald-500/30">
+              <form onSubmit={handleAnalyze} className="space-y-4">
+                <div>
+                  <Input
+                    type="url"
+                    value={websiteUrl}
+                    onChange={(e) => { setWebsiteUrl(e.target.value); setError("") }}
+                    placeholder="Enter your website URL (e.g., yourbusiness.com)"
+                    className="h-14 text-base"
+                    required
+                    disabled={isAnalyzing}
+                  />
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Input
+                    type="text"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder="Business Name (Optional)"
+                    className="h-12 text-base"
+                    disabled={isAnalyzing}
+                  />
+                  <Input
+                    type="text"
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
+                    placeholder="Industry (e.g., Plumbing, Restaurant)"
+                    className="h-12 text-base"
+                    disabled={isAnalyzing}
+                  />
+                </div>
+
+                {error && (
+                  <div className="rounded-md border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isAnalyzing}
+                  size="lg"
+                  className="h-14 w-full text-lg bg-emerald-500 hover:bg-emerald-600"
+                >
+                  {isAnalyzing ? "Processing..." : "Generate Full Marketing Strategy"}
+                </Button>
+
+                <p className="text-center text-xs text-slate-500">
+                  Includes: SEO audit, content calendar, competitor analysis, brand voice, and more
+                </p>
+              </form>
+            </Card>
+          </div>
         </div>
       </section>
 
@@ -655,18 +676,19 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="border-t border-white/10 bg-linear-to-b from-emerald-900/20 via-slate-900 to-slate-950 py-20">
+      <section className="border-t border-white/10 bg-linear-to-b from-cyan-900/20 via-slate-900 to-slate-950 py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="mb-4 text-4xl font-bold text-white">Ready to Transform Your Marketing?</h2>
-          <p className="mb-8 text-xl text-slate-300">Get world-class strategy in minutes, not months.</p>
-          <Button
-            size="lg"
-            className="h-16 px-16 text-lg bg-emerald-500 hover:bg-emerald-600"
-            onClick={() => document.querySelector('input')?.focus()}
-          >
-            Start Free Analysis Now
-          </Button>
-          <p className="mt-4 text-sm text-slate-400">No credit card required • Instant results</p>
+          <h2 className="mb-4 text-4xl font-bold text-white">Ready for Instant Business Clarity?</h2>
+          <p className="mb-8 text-xl text-slate-300">No signup, no email, no waiting. Just clear answers.</p>
+          <Link href="/clarity-snapshot">
+            <Button
+              size="lg"
+              className="h-16 px-16 text-lg bg-cyan-500 hover:bg-cyan-600 shadow-lg shadow-cyan-500/25"
+            >
+              ✨ Get Your Free Clarity Snapshot
+            </Button>
+          </Link>
+          <p className="mt-4 text-sm text-slate-400">Takes 30 seconds • Completely free</p>
         </div>
       </section>
 
