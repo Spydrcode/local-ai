@@ -2,7 +2,7 @@
 
 ## Overview
 
-Phase 1 transforms Forecasta AI into an operational AI copilot for contractors by implementing a **business-profile-first** approach. This foundation enables all future contractor-specific features.
+Phase 1 transforms 2ndmynd into an operational AI copilot for contractors by implementing a **business-profile-first** approach. This foundation enables all future contractor-specific features.
 
 ## What's Included
 

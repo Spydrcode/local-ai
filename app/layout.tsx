@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Forecasta AI | Business Intelligence Platform",
+  title: "2ndmynd | Business Intelligence Platform",
   description: "Instant AI-powered business intelligence for any website. Get strategic insights, competitor analysis, content calendars, and performance optimization in seconds.",
   keywords: ["business intelligence", "AI analysis", "competitor research", "content marketing", "website optimization"],
-  authors: [{ name: "Forecasta AI Team" }],
-  creator: "Forecasta AI",
-  publisher: "Forecasta AI",
+  authors: [{ name: "2ndmynd Team" }],
+  creator: "2ndmynd",
+  publisher: "2ndmynd",
   robots: {
     index: true,
     follow: true,
@@ -35,16 +35,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://forecasta-ai.vercel.app',
-    title: 'Forecasta AI | Business Intelligence Platform',
+    url: 'https://2ndmynd.com',
+    title: '2ndmynd | Business Intelligence Platform',
     description: 'Instant AI-powered business intelligence for any website. Get strategic insights, competitor analysis, and performance optimization.',
-    siteName: 'Forecasta AI',
+    siteName: '2ndmynd',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Forecasta AI | Business Intelligence Platform',
+    title: '2ndmynd | Business Intelligence Platform',
     description: 'Instant AI-powered business intelligence for any website.',
-    creator: '@forecastaai',
+    creator: '@2ndmynd',
   },
 };
 

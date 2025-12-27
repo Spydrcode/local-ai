@@ -251,7 +251,7 @@ export default function MarketingHubPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold text-white">Forecasta AI</span>
+              <span className="text-xl font-semibold text-white">2ndmynd</span>
             </Link>
             <div className="flex items-center gap-6">
               <Link href="/grow" className="text-sm font-medium text-emerald-400">Marketing Hub</Link>

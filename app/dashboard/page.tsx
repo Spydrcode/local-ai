@@ -9,6 +9,24 @@ import { useEffect, useState } from "react"
 // Unified Tool System powered by specialized agents
 const toolCategories = [
   {
+    id: "clarity",
+    title: "✨ Quick Business Clarity",
+    description: "Fast insights without website analysis",
+    color: "cyan",
+    tools: [
+      {
+        id: "clarity-snapshot",
+        title: "Clarity Snapshot",
+        description: "2-minute business clarity check with recognition-first insights (no website required)",
+        icon: "✨",
+        isSelectionBased: true,
+        requiresWebsiteData: false,
+        route: "/clarity-snapshot",
+        agents: ['clarity-snapshot']
+      }
+    ]
+  },
+  {
     id: "web-scraper",
     title: "🌐 Website Intelligence",
     description: "Analyze any website to extract comprehensive business data",
@@ -347,7 +365,7 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold text-white">Forecasta AI</span>
+              <span className="text-xl font-semibold text-white">2ndmynd</span>
             </Link>
             <div className="flex items-center gap-6">
               <Link href="/" className="text-sm font-medium text-slate-300 hover:text-white">Home</Link>
@@ -379,7 +397,7 @@ export default function DashboardPage() {
 
         {/* All Tool Categories */}
         <div className="space-y-8">
-          {toolCategories.slice(1).map((category) => (
+          {toolCategories.map((category) => (
             <div key={category.id}>
               <div className="mb-4">
                 <h2 className="text-2xl font-bold text-white mb-1">{category.title}</h2>
@@ -399,17 +417,32 @@ export default function DashboardPage() {
                           Primary
                         </span>
                       )}
+                      {'isSelectionBased' in tool && tool.isSelectionBased && (
+                        <span className="text-xs bg-cyan-500/20 border border-cyan-500/30 rounded-full px-2 py-1 text-cyan-400">
+                          No Website
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">{tool.title}</h3>
                     <p className="text-sm text-slate-300 mb-4">{tool.description}</p>
-                    <Button
-                      size="sm"
-                      className="w-full"
-                      onClick={() => handleRunTool(tool)}
-                      disabled={!hasWebsiteData && !('isPrimary' in tool && tool.isPrimary)}
-                    >
-                      {isGenerating && selectedTool?.id === tool.id ? "Running..." : "Run Tool"}
-                    </Button>
+                    
+                    {/* Route-based tools use Link, API-based use Button */}
+                    {'route' in tool ? (
+                      <Link href={tool.route} className="block">
+                        <Button size="sm" className="w-full">
+                          Try Clarity Snapshot →
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleRunTool(tool)}
+                        disabled={!hasWebsiteData && !('isPrimary' in tool && tool.isPrimary)}
+                      >
+                        {isGenerating && selectedTool?.id === tool.id ? "Running..." : "Run Tool"}
+                      </Button>
+                    )}
                   </Card>
                 ))}
               </div>

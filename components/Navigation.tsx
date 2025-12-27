@@ -49,7 +49,7 @@ export function Navigation({ currentPath, businessName, websiteUrl, demoId }: Na
             <div className="h-8 w-8 rounded-lg bg-emerald-500 flex items-center justify-center">
               <span className="text-white font-bold text-sm">AI</span>
             </div>
-            <span className="text-xl font-bold text-white">Forecasta AI</span>
+            <span className="text-xl font-bold text-white">2ndmynd</span>
           </Link>
 
           {/* Business Info */}

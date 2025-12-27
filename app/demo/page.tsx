@@ -13,7 +13,7 @@ export default function DemoPage() {
       id: "overview",
       title: "Platform Overview",
       icon: "🎯",
-      description: "See how Forecasta AI analyzes your business and generates actionable marketing strategies",
+      description: "See how 2ndmynd analyzes your business and generates actionable marketing strategies",
     },
     {
       id: "marketing-strategy",
@@ -102,7 +102,7 @@ export default function DemoPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold text-white">Forecasta AI</span>
+              <span className="text-xl font-semibold text-white">2ndmynd</span>
             </Link>
             <div className="flex items-center gap-6">
               <Link href="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Dashboard</Link>
@@ -126,7 +126,7 @@ export default function DemoPage() {
             </div>
 
             <h1 className="mb-6 text-5xl font-bold text-white sm:text-6xl">
-              See Forecasta AI in <span className="bg-linear-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">Action</span>
+              See 2ndmynd in <span className="bg-linear-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">Action</span>
             </h1>
 
             <p className="mb-10 text-xl text-slate-300">
@@ -307,9 +307,9 @@ export default function DemoPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="font-semibold text-white">Forecasta AI</span>
+              <span className="font-semibold text-white">2ndmynd</span>
             </div>
-            <p className="text-sm text-slate-500">© 2025 Forecasta AI. AI-Powered Marketing Strategy Platform.</p>
+            <p className="text-sm text-slate-500">(c) 2025 2ndmynd. AI-Powered Marketing Strategy Platform.</p>
           </div>
         </div>
       </footer>

@@ -41,7 +41,7 @@ export default function AgencySettingsPage() {
       logo_url: null,
       primary_color: '#10b981', // Emerald
       secondary_color: '#6366f1', // Indigo
-      footer_text: 'Powered by Forecasta AI Marketing Platform',
+      footer_text: 'Powered by 2ndmynd Marketing Platform',
       website_url: null,
       plan: 'demo',
       reports_used_this_month: 0,

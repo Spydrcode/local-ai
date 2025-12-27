@@ -23,7 +23,7 @@ import {
 import { validateOpenAIConfig } from "./config/openai.js";
 
 /**
- * Forecasta AI MCP Server
+ * 2ndmynd MCP Server
  *
  * Exposes 5 AI agents as MCP tools for use with GitHub Copilot, Claude, and other MCP clients:
  * - SiteAnalysisAgent: Analyze websites
@@ -429,7 +429,7 @@ server.setRequestHandler(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Forecasta AI MCP Server running on stdio");
+  console.error("2ndmynd MCP Server running on stdio");
 }
 
 main().catch((error) => {

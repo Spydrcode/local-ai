@@ -1,6 +1,6 @@
 /**
  * Small-Business Friendly Types
- * Plain English data structures for Forecasta AI
+ * Plain English data structures for 2ndmynd
  */
 
 export interface QuickWin {

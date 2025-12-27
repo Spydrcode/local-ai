@@ -246,7 +246,7 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold text-white">Forecasta AI</span>
+              <span className="text-xl font-semibold text-white">2ndmynd</span>
             </Link>
             <div className="flex items-center gap-6">
               <Link href="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Dashboard</Link>
@@ -347,6 +347,33 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Clarity Snapshot CTA */}
+      <section className="border-t border-white/10 bg-linear-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <Card className="max-w-4xl mx-auto bg-slate-900/70 border-cyan-500/30 p-8">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-3xl">✨</span>
+                  <h2 className="text-2xl font-bold text-white">Don't have a website yet?</h2>
+                </div>
+                <p className="text-slate-300 mb-2">
+                  Get instant business clarity in 2 minutes — no website required, no long forms.
+                </p>
+                <p className="text-sm text-slate-400">
+                  Quick selections → Recognition-first insights → What to fix first
+                </p>
+              </div>
+              <Link href="/clarity-snapshot">
+                <Button size="lg" className="bg-cyan-500 hover:bg-cyan-600 whitespace-nowrap">
+                  Try Clarity Snapshot →
+                </Button>
+              </Link>
+            </div>
+          </Card>
         </div>
       </section>
 
@@ -652,9 +679,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="font-semibold text-white">Forecasta AI</span>
+              <span className="font-semibold text-white">2ndmynd</span>
             </div>
-            <p className="text-sm text-slate-500">© 2025 Forecasta AI. AI-Powered Marketing Strategy Platform.</p>
+            <p className="text-sm text-slate-500">(c) 2025 2ndmynd. AI-Powered Marketing Strategy Platform.</p>
           </div>
         </div>
       </footer>

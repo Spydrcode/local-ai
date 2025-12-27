@@ -42,9 +42,9 @@ export default function PricingPage() {
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">L</span>
+                <span className="text-white font-bold text-lg">2</span>
               </div>
-              <span className="text-white font-semibold text-lg">Forecasta AI</span>
+              <span className="text-white font-semibold text-lg">2ndmynd</span>
             </Link>
             <div className="flex items-center gap-4">
               <Link
@@ -270,7 +270,7 @@ export default function PricingPage() {
             Ready to 10x Your Strategic Deliverable Output?
           </h2>
           <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">
-            Join 50+ agencies using Forecasta AI to scale strategic consulting without hiring more analysts.
+            Join 50+ agencies using 2ndmynd to scale strategic consulting without hiring more analysts.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link

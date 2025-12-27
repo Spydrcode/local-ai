@@ -157,7 +157,7 @@ View full alert and take action:
 https://yourdomain.com/contractor/alerts/${alert.id}
 
 ---
-Forecasta AI | Contractor Copilot
+2ndmynd | Contractor Copilot
     `.trim();
 
     const html = `
@@ -202,7 +202,7 @@ Forecasta AI | Contractor Copilot
     </a>
   </div>
   <div class="footer">
-    Forecasta AI | Contractor Copilot<br>
+    2ndmynd | Contractor Copilot<br>
     <a href="https://yourdomain.com/contractor/alerts/settings">Manage Alert Settings</a>
   </div>
 </body>
@@ -283,7 +283,7 @@ View all alerts:
 https://yourdomain.com/contractor/alerts
 
 ---
-Forecasta AI | Contractor Copilot
+2ndmynd | Contractor Copilot
     `.trim();
 
     console.log('[NotificationService] Sending digest email to:', email);
